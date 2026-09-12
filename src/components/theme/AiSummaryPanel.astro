@@ -12,6 +12,8 @@ interface Props {
   title: string;
   summary?: string; // PrimerAI (author-written in markdown)
   staticSummary?: string; // LLMGPT (pre-baked Groq summary)
+  staticSummariesByLang?: Record<string, string>; // Multi-lingual static summaries
+  articleLang?: string; // Current article's native language
   url: string;
   related?: RelatedItem[];
 }
@@ -19,14 +21,56 @@ interface Props {
 const rawRuntimeApiBase = process.env.PUBLIC_RUNTIME_API_BASE?.trim() || '';
 const runtimeApiBase = rawRuntimeApiBase.replace(/\/api\/?$/, '');
 const apiBase = runtimeApiBase ? `${runtimeApiBase}/api` : '/api';
-const { slug, title, summary = '', staticSummary = '', url, related = [] } = Astro.props;
+const {
+  slug,
+  title,
+  summary = '',
+  staticSummary = '',
+  staticSummariesByLang = {},
+  articleLang = 'zh-CN',
+  url,
+  related = []
+} = Astro.props;
 
-// Rich, detailed author introduction templates
+// Rich, detailed author introduction templates (Chinese)
 const detailedAuthorIntros = [
   `${siteConfig.site.author.name}（时鉴）是一名通才型软件构建者、学生与长期内容写作者。专注于把博客当成可长期演进的软件系统来打造，技术栈涵盖 Astro、React、TypeScript、Tailwind、Cloudflare 与系统级工程设计。他崇尚“内容优先、结构优先、体验洁癖”，致力于在高信息密度中建立清晰秩序，把每一次技术重构与日常思考凝练为真实可读的实践档案。`,
   `这里是 ${siteConfig.site.author.name} 的个人数字工坊与研究日志。作者坚持独立开发与深度记录，拒绝浮躁的形式堆砌，主张以工程化视角打磨每一个阅读细节、交互手感与数据契约。无论是在前端工程、系统设计还是产品观察领域，都保持着敬畏秩序与持续构建的初心，希望每一篇记录都能穿越时间，为读者提供扎实的参考价值。`,
   `${siteConfig.site.author.name} 是一名偏好深度思考与动手实践的 INFJ / Builder。他将博客视为个人外脑与长期产品，持续打磨基于 SSR + Islands 架构的高性能个人站点。作者坚信“意图明确的构建远比一次性的热闹更重要”，在这里记录研究实验、技术架构判断与真实生活取舍，探索极客美学与极致可读性之间的完美平衡。`,
 ];
+
+// Rich, detailed author introduction templates (English)
+const detailedAuthorIntrosEn = [
+  `${siteConfig.site.author.name} (Shijianus) is a generalist software builder, student, and long-term writer. Dedicated to treating the blog as a continuously evolving software system, his tech stack spans Astro, React, TypeScript, Tailwind, Cloudflare, and systems engineering. He advocates for "content-first, structure-first, and craft-driven ergonomics," striving to bring order to high-density knowledge and distilling every technical rebuild into readable, enduring artifacts.`,
+  `This is the personal digital workshop and research log of ${siteConfig.site.author.name}. Resisting superficial ornamentation, the author focuses on refined reading ergonomics, tactile interactions, and data contracts from an engineering perspective. Whether in frontend architecture, systems design, or product analysis, each record is crafted to withstand time and provide solid reference value.`,
+  `${siteConfig.site.author.name} is an INFJ / Builder driven by deep thinking and hands-on craftsmanship. Viewing the blog as an external brain and long-term product, he continuously polishes this SSR + Islands architecture. Believing that "purposeful construction matters far more than fleeting spectacle," he documents research experiments, architectural decisions, and the balance between geek aesthetics and ultimate readability.`,
+];
+
+const isEnglishArticle = articleLang === 'en';
+const initialBrandTitle = isEnglishArticle ? 'Chronral Summary' : 'Chronral 摘要';
+const initialLoadingText = isEnglishArticle
+  ? 'Distilling key insights and architectural takeaways via Chronral...'
+  : '正在通过 Chronral 智能提炼文章核心信息...';
+
+const initialActions = isEnglishArticle
+  ? {
+      point: { label: '💡 Key Points', title: 'Extract core architectural arguments & technical decisions' },
+      audience: { label: '🎯 Audience', title: 'Target readership and engineering challenges addressed' },
+      quick: { label: '⏱️ 30s Read', title: 'Rapid 3-sentence executive overview' },
+      insight: { label: '🧠 Insights', title: 'Engineering reflections and practical pitfalls to avoid' },
+      intro: { label: '👤 About Author', title: "Discover the author's background and craft philosophy" },
+      related: { label: '📚 Related Posts', title: 'AI rationale for curated follow-up readings' },
+      top: { label: '🔝 Back to Top', title: 'Smooth scroll back to post top' },
+    }
+  : {
+      point: { label: '💡 核心论点', title: '提炼核心论点与关键技术方案' },
+      audience: { label: '🎯 适用读者', title: '分析目标受众与解决的问题' },
+      quick: { label: '⏱️ 30秒速读', title: '30秒极速三句话概览' },
+      insight: { label: '🧠 实践启示', title: '实践启示与工程思考' },
+      intro: { label: '👤 关于作者', title: '深入了解博主与站点理念' },
+      related: { label: '📚 推荐相关', title: 'AI 分析推荐理由并展开延伸阅读' },
+      top: { label: '🔝 回到顶部', title: '平滑回到文章顶部' },
+    };
 ---
 
 <section
@@ -37,8 +81,11 @@ const detailedAuthorIntros = [
   data-title={title}
   data-primer-summary={summary}
   data-static-summary={staticSummary}
+  data-static-summaries={JSON.stringify(staticSummariesByLang)}
+  data-article-lang={articleLang}
   data-url={url}
   data-intro-templates={JSON.stringify(detailedAuthorIntros)}
+  data-intro-templates-en={JSON.stringify(detailedAuthorIntrosEn)}
   data-ai-unavailable={siteConfig.post.ai.unavailableMessage}
   data-related-empty={siteConfig.post.ai.relatedEmptyMessage}
   data-related={JSON.stringify(related)}
@@ -48,7 +95,7 @@ const detailedAuthorIntros = [
       <span class="shijianus-ai-summary__icon" aria-hidden="true">
         <Sparkles size={16} strokeWidth={2.2} />
       </span>
-      <span class="shijianus-ai-summary__brand-title">Chronral 摘要</span>
+      <span class="shijianus-ai-summary__brand-title" data-ai-brand-title>{initialBrandTitle}</span>
       <button
         type="button"
         class="shijianus-ai-summary__btn-icon"
@@ -78,30 +125,30 @@ const detailedAuthorIntros = [
   </div>
 
   <div class="shijianus-ai-summary__screen">
-    <p class="shijianus-ai-summary__output" data-ai-output>正在通过 Chronral 智能提炼文章核心信息...</p>
+    <p class="shijianus-ai-summary__output" data-ai-output>{initialLoadingText}</p>
   </div>
 
   <div class="shijianus-ai-summary__actions">
-    <button type="button" class="shijianus-ai-summary__action" data-ai-action="point" title="提炼核心论点与关键技术方案">
-      💡 核心论点
+    <button type="button" class="shijianus-ai-summary__action" data-ai-action="point" title={initialActions.point.title}>
+      {initialActions.point.label}
     </button>
-    <button type="button" class="shijianus-ai-summary__action" data-ai-action="audience" title="分析目标受众与解决的问题">
-      🎯 适用读者
+    <button type="button" class="shijianus-ai-summary__action" data-ai-action="audience" title={initialActions.audience.title}>
+      {initialActions.audience.label}
     </button>
-    <button type="button" class="shijianus-ai-summary__action" data-ai-action="quick" title="30秒极速三句话概览">
-      ⏱️ 30秒速读
+    <button type="button" class="shijianus-ai-summary__action" data-ai-action="quick" title={initialActions.quick.title}>
+      {initialActions.quick.label}
     </button>
-    <button type="button" class="shijianus-ai-summary__action" data-ai-action="insight" title="实践启示与工程思考">
-      🧠 实践启示
+    <button type="button" class="shijianus-ai-summary__action" data-ai-action="insight" title={initialActions.insight.title}>
+      {initialActions.insight.label}
     </button>
-    <button type="button" class="shijianus-ai-summary__action" data-ai-action="intro" title="深入了解博主与站点理念">
-      👤 关于作者
+    <button type="button" class="shijianus-ai-summary__action" data-ai-action="intro" title={initialActions.intro.title}>
+      {initialActions.intro.label}
     </button>
-    <button type="button" class="shijianus-ai-summary__action" data-ai-action="related" title="AI 分析推荐理由并展开延伸阅读">
-      📚 推荐相关
+    <button type="button" class="shijianus-ai-summary__action" data-ai-action="related" title={initialActions.related.title}>
+      {initialActions.related.label}
     </button>
-    <button type="button" class="shijianus-ai-summary__action" data-ai-action="top" title="平滑回到文章顶部">
-      🔝 回到顶部
+    <button type="button" class="shijianus-ai-summary__action" data-ai-action="top" title={initialActions.top.title}>
+      {initialActions.top.label}
     </button>
   </div>
 
@@ -112,6 +159,184 @@ const detailedAuthorIntros = [
   (() => {
     const roots = document.querySelectorAll('[data-ai-summary]');
     if (!roots.length) return;
+
+    const normalizeLocale = (val) => {
+      if (!val) return 'zh-CN';
+      const clean = String(val).toLowerCase().trim();
+      if (clean.startsWith('zh-hant') || clean.startsWith('zh-tw') || clean.startsWith('zh-hk')) return 'zh-Hant';
+      if (clean.startsWith('zh')) return 'zh-CN';
+      if (clean.startsWith('en')) return 'en';
+      if (clean.startsWith('fr')) return 'fr';
+      if (clean.startsWith('es')) return 'es';
+      if (clean.startsWith('de')) return 'de';
+      if (clean.startsWith('ja')) return 'ja';
+      return 'zh-CN';
+    };
+
+    const I18N_DICTIONARY = {
+      'zh-CN': {
+        brandTitle: 'Chronral 摘要',
+        refreshTitle: '重新生成 / 刷新摘要 (Refresh Summary)',
+        switchModeTitle: '切换摘要引擎 (LLMGPT / InstanceAI / PrimerAI)',
+        modePillTitle: '当前摘要模式 (Current AI Mode)',
+        initialLoading: '正在通过 Chronral 智能提炼文章核心信息...',
+        actions: {
+          point: { label: '💡 核心论点', title: '提炼核心论点与关键技术方案' },
+          audience: { label: '🎯 适用读者', title: '分析目标受众与解决的问题' },
+          quick: { label: '⏱️ 30秒速读', title: '30秒极速三句话概览' },
+          insight: { label: '🧠 实践启示', title: '实践启示与工程思考' },
+          intro: { label: '👤 关于作者', title: '深入了解博主与站点理念' },
+          related: { label: '📚 推荐相关', title: 'AI 分析推荐理由并展开延伸阅读' },
+          top: { label: '🔝 回到顶部', title: '平滑回到文章顶部' },
+        },
+        thinkingPrefix: '正在调用',
+        thinkingSuffix: '思考...',
+        thinkingSteps: [
+          '正在解析博文核心脉络与架构设计...',
+          '提炼关键论点与技术方案要点...',
+          '组织高信息密度结构并验证准确性...',
+        ],
+        llmgptThinking: '正在通过 LLMGPT 提炼回答...',
+        error429: '模型回报429!!!摘要生成失败!!!请检查{mode}服务是否正常!!!',
+        relatedIntro: '已结合《{title}》的主题脉络为你精选最贴合的 3 个延伸阅读入口，顺着核心架构继续探索：',
+        authorIntroFallback: '在这里持续写作与构建，专注长期可维护的博客系统与工程实践。',
+      },
+      'zh-Hant': {
+        brandTitle: 'Chronral 摘要',
+        refreshTitle: '重新生成 / 重新整理摘要 (Refresh Summary)',
+        switchModeTitle: '切換摘要引擎 (LLMGPT / InstanceAI / PrimerAI)',
+        modePillTitle: '目前摘要模式 (Current AI Mode)',
+        initialLoading: '正在透過 Chronral 智慧提煉文章核心資訊...',
+        actions: {
+          point: { label: '💡 核心論點', title: '提煉核心論點與關鍵技術方案' },
+          audience: { label: '🎯 適用讀者', title: '分析目標受眾與解決的問題' },
+          quick: { label: '⏱️ 30秒速讀', title: '30秒極速三句話概覽' },
+          insight: { label: '🧠 實踐啟示', title: '實踐啟示與工程思考' },
+          intro: { label: '👤 關於作者', title: '深入了解站長與站點理念' },
+          related: { label: '📚 推薦相關', title: 'AI 分析推薦理由並展開延伸閱讀' },
+          top: { label: '🔝 回到頂部', title: '平滑回到文章頂部' },
+        },
+        thinkingPrefix: '正在調用',
+        thinkingSuffix: '思考...',
+        thinkingSteps: [
+          '正在解析文章核心脈絡與架構設計...',
+          '提煉關鍵論點與技術方案要點...',
+          '組織高資訊密度結構並驗證準確性...',
+        ],
+        llmgptThinking: '正在透過 LLMGPT 提煉回答...',
+        error429: '模型回報429!!!摘要生成失敗!!!請檢查{mode}服務是否正常!!!',
+        relatedIntro: '已結合《{title}》的主題脈絡為你精選最貼合的 3 個延伸閱讀入口，順著核心架構繼續探索：',
+        authorIntroFallback: '在這裡持續寫作與構建，專注長期可維護的部落格系統與工程實踐。',
+      },
+      'en': {
+        brandTitle: 'Chronral Summary',
+        refreshTitle: 'Regenerate / Refresh Summary',
+        switchModeTitle: 'Switch AI Engine (LLMGPT / InstanceAI / PrimerAI)',
+        modePillTitle: 'Current AI Mode',
+        initialLoading: 'Distilling key insights and architectural takeaways via Chronral...',
+        actions: {
+          point: { label: '💡 Key Points', title: 'Extract core architectural arguments & technical decisions' },
+          audience: { label: '🎯 Audience', title: 'Target readership and engineering challenges addressed' },
+          quick: { label: '⏱️ 30s Read', title: 'Rapid 3-sentence executive overview' },
+          insight: { label: '🧠 Insights', title: 'Engineering reflections and practical pitfalls to avoid' },
+          intro: { label: '👤 About Author', title: 'Discover the author\'s background and craft philosophy' },
+          related: { label: '📚 Related Posts', title: 'AI rationale for curated follow-up readings' },
+          top: { label: '🔝 Back to Top', title: 'Smooth scroll back to post top' },
+        },
+        thinkingPrefix: 'Calling',
+        thinkingSuffix: 'to think...',
+        thinkingSteps: [
+          'Analyzing core context and architectural trajectory...',
+          'Extracting key arguments and engineering decisions...',
+          'Synthesizing high-density structure and validating accuracy...',
+        ],
+        llmgptThinking: 'Distilling response via LLMGPT...',
+        error429: 'Model returned 429! Summary generation throttled. Please check {mode} service status!',
+        relatedIntro: 'Curated 3 most relevant follow-up readings for "{title}" to continue your technical exploration:',
+        authorIntroFallback: 'Continuously writing and building here, focusing on long-term maintainable blog architecture and systems engineering.',
+      },
+      'fr': {
+        brandTitle: 'Résumé Chronral',
+        refreshTitle: 'Régénérer / Actualiser le résumé',
+        switchModeTitle: 'Changer de moteur IA (LLMGPT / InstanceAI / PrimerAI)',
+        modePillTitle: 'Mode IA actuel',
+        initialLoading: 'Synthèse des points clés et de l\'architecture via Chronral en cours...',
+        actions: {
+          point: { label: '💡 Points Clés', title: 'Extraire les arguments et décisions d\'architecture' },
+          audience: { label: '🎯 Public Cible', title: 'Profil des lecteurs et problèmes résolus' },
+          quick: { label: '⏱️ Lecture 30s', title: 'Aperçu rapide en 3 phrases' },
+          insight: { label: '🧠 Enseignements', title: 'Retours d\'expérience et pièges à éviter' },
+          intro: { label: '👤 À propos', title: 'Présentation de l\'auteur et démarche d\'ingénierie' },
+          related: { label: '📚 Articles Connexes', title: 'Recommandations pour approfondir' },
+          top: { label: '🔝 Haut de Page', title: 'Retour fluide en haut de page' },
+        },
+        thinkingPrefix: 'Appel de',
+        thinkingSuffix: 'en cours...',
+        thinkingSteps: [
+          'Analyse du contexte et de la structure architecturale...',
+          'Extraction des décisions d\'ingénierie majeures...',
+          'Synthèse à haute densité d\'information...',
+        ],
+        llmgptThinking: 'Distillation de la réponse via LLMGPT...',
+        error429: 'Erreur 429 ! Génération du résumé temporairement limitée. Vérifiez le service {mode} !',
+        relatedIntro: 'Sélection des 3 lectures complémentaires les plus pertinentes pour "{title}" :',
+        authorIntroFallback: 'Création et écriture continue autour de systèmes logiciels durables.',
+      },
+      'es': {
+        brandTitle: 'Resumen Chronral',
+        refreshTitle: 'Regenerar / Actualizar resumen',
+        switchModeTitle: 'Cambiar motor IA (LLMGPT / InstanceAI / PrimerAI)',
+        modePillTitle: 'Modo IA actual',
+        initialLoading: 'Sintetizando puntos clave y arquitectura técnica mediante Chronral...',
+        actions: {
+          point: { label: '💡 Puntos Clave', title: 'Extraer argumentos y decisiones arquitectónicas' },
+          audience: { label: '🎯 Destinatarios', title: 'Lectores objetivo y desafíos resueltos' },
+          quick: { label: '⏱️ Lectura 30s', title: 'Resumen ejecutivo en 3 oraciones' },
+          insight: { label: '🧠 Aprendizajes', title: 'Reflexiones prácticas y errores a evitar' },
+          intro: { label: '👤 Sobre el Autor', title: 'Conoce al autor y su filosofía de desarrollo' },
+          related: { label: '📚 Relacionados', title: 'Lecturas recomendadas para continuar' },
+          top: { label: '🔝 Ir Arriba', title: 'Volver arriba suavemente' },
+        },
+        thinkingPrefix: 'Invocando',
+        thinkingSuffix: 'para razonar...',
+        thinkingSteps: [
+          'Analizando contexto técnico y trayectoria arquitectónica...',
+          'Extrayendo decisiones clave y compensaciones de ingeniería...',
+          'Estructurando síntesis de alta densidad de información...',
+        ],
+        llmgptThinking: 'Destilando respuesta mediante LLMGPT...',
+        error429: '¡Error 429! Límite de solicitudes alcanzado. ¡Compruebe el servicio {mode}!',
+        relatedIntro: 'Selección de 3 lecturas recomendadas para continuar explorando "{title}":',
+        authorIntroFallback: 'Escribiendo y construyendo sistemas de software mantenibles a largo plazo.',
+      },
+      'de': {
+        brandTitle: 'Chronral Zusammenfassung',
+        refreshTitle: 'Zusammenfassung neu generieren',
+        switchModeTitle: 'KI-Modell wechseln (LLMGPT / InstanceAI / PrimerAI)',
+        modePillTitle: 'Aktueller KI-Modus',
+        initialLoading: 'Wichtigste Erkenntnisse und Systemarchitektur werden via Chronral destilliert...',
+        actions: {
+          point: { label: '💡 Kernpunkte', title: 'Wichtigste Architekturargumente extrahieren' },
+          audience: { label: '🎯 Zielgruppe', title: 'Zielgruppe und gelöste technische Probleme' },
+          quick: { label: '⏱️ 30s Überblick', title: 'Schneller 3-Satz-Überblick' },
+          insight: { label: '🧠 Praxistipps', title: 'Architekturentscheidungen und Fallstricke' },
+          intro: { label: '👤 Über den Autor', title: 'Hintergrund des Autors und Bauphilosophie' },
+          related: { label: '📚 Ähnliche Beiträge', title: 'KI-Empfehlungen zur Vertiefung' },
+          top: { label: '🔝 Nach oben', title: 'Sanft nach oben scrollen' },
+        },
+        thinkingPrefix: 'Rufe',
+        thinkingSuffix: 'zum Nachdenken auf...',
+        thinkingSteps: [
+          'Analysiere Kontext und Architekturentwicklung...',
+          'Extrahiere Kernaussagen und Systementscheidungen...',
+          'Formuliere dichte und präzise Zusammenfassung...',
+        ],
+        llmgptThinking: 'Destilliere Antwort via LLMGPT...',
+        error429: 'Modell meldet 429! Zusammenfassung überlastet. Bitte {mode}-Dienst prüfen!',
+        relatedIntro: 'Ausgewählte weiterführende Artikel zu "{title}":',
+        authorIntroFallback: 'Kontinuierliche Entwicklung und Veröffentlichung nachhaltiger Softwaresysteme.',
+      },
+    };
 
     const getDeviceId = () => {
       const key = 'shijianus-device-id';
@@ -184,19 +409,15 @@ const detailedAuthorIntros = [
       { id: 'primer', label: 'PrimerAI', desc: '作者自述摘要' },
     ];
 
-    const get429ErrorMessage = (modeId) => {
-      if (modeId === 'primer') return '模型回报429!!!摘要生成失败!!!请检查PrimerAI服务是否正常!!!';
-      if (modeId === 'llmgpt') return '模型回报429!!!摘要生成失败!!!请检查LLMGPT服务是否正常!!!';
-      return '模型回报429!!!摘要生成失败!!!请检查InstanceAI服务是否正常!!!';
-    };
-
     roots.forEach((root) => {
       if (!(root instanceof HTMLElement)) return;
       const output = root.querySelector('[data-ai-output]');
+      const brandTitleEl = root.querySelector('[data-ai-brand-title]');
       const modeLabel = root.querySelector('[data-ai-mode-label]');
       const switchBtn = root.querySelector('[data-ai-switch-mode]');
       const relatedBox = root.querySelector('[data-ai-related]');
       const refreshButton = root.querySelector('[data-ai-refresh]');
+      const modePill = root.querySelector('.shijianus-ai-summary__mode-pill');
       const apiBase = root.dataset.apiBase || '/api';
       const slug = root.dataset.slug || '';
       const title = root.dataset.title || document.title;
@@ -205,10 +426,19 @@ const detailedAuthorIntros = [
       const url = root.dataset.url || window.location.href;
       const relatedEmptyMessage = root.dataset.relatedEmpty || '当前还没有找到合适的延伸阅读，可以先回到首页看看最近更新。';
 
-      let introTemplates = [];
+      let staticSummaries = {};
       try {
-        const parsed = JSON.parse(root.dataset.introTemplates || '[]');
-        if (Array.isArray(parsed) && parsed.length > 0) introTemplates = parsed;
+        staticSummaries = JSON.parse(root.dataset.staticSummaries || '{}');
+      } catch {}
+
+      let introTemplatesZh = [];
+      try {
+        introTemplatesZh = JSON.parse(root.dataset.introTemplates || '[]');
+      } catch {}
+
+      let introTemplatesEn = [];
+      try {
+        introTemplatesEn = JSON.parse(root.dataset.introTemplatesEn || '[]');
       } catch {}
 
       let authorIntroIndex = 0;
@@ -216,6 +446,75 @@ const detailedAuthorIntros = [
       let isLoading = false;
       let activeAbortController = null;
       let activeThinkingInterval = null;
+      let activeActionName = null;
+      let userExplicitlySwitchedLang = null;
+
+      // Priority Rule: If article language and selected language differ, the selected language has HIGHEST priority!
+      const getTargetLanguage = () => {
+        if (userExplicitlySwitchedLang) {
+          return normalizeLocale(userExplicitlySwitchedLang);
+        }
+        const manualSelected = window.localStorage.getItem('shijianus-manual-locale-selected');
+        if (manualSelected) {
+          return normalizeLocale(manualSelected);
+        }
+
+        // If user hasn't explicitly chosen a manual UI language, align with article's native language
+        const articleLang = root.dataset.articleLang;
+        if (articleLang) {
+          return normalizeLocale(articleLang);
+        }
+
+        const docVariant = document.documentElement.dataset.localeVariant;
+        if (docVariant && docVariant !== 'zh-CN') {
+          return normalizeLocale(docVariant);
+        }
+        const storedVariant = window.localStorage.getItem('shijianus-locale-variant');
+        if (storedVariant && storedVariant !== 'zh-CN') {
+          return normalizeLocale(storedVariant);
+        }
+
+        return 'zh-CN';
+      };
+
+      const getI18n = () => {
+        const lang = getTargetLanguage();
+        return I18N_DICTIONARY[lang] || I18N_DICTIONARY['zh-CN'];
+      };
+
+      const get429ErrorMessage = (modeId) => {
+        const i18n = getI18n();
+        const modeLabelText = modeId === 'primer' ? 'PrimerAI' : modeId === 'llmgpt' ? 'LLMGPT' : 'InstanceAI';
+        return i18n.error429.replace('{mode}', modeLabelText);
+      };
+
+      // Updates UI labels (brand, action buttons, tooltips) dynamically based on current language
+      const updateUiLanguage = () => {
+        const i18n = getI18n();
+        if (brandTitleEl instanceof HTMLElement) {
+          brandTitleEl.textContent = i18n.brandTitle;
+        }
+        if (refreshButton instanceof HTMLButtonElement) {
+          refreshButton.title = i18n.refreshTitle;
+          refreshButton.setAttribute('aria-label', i18n.refreshTitle);
+        }
+        if (switchBtn instanceof HTMLButtonElement) {
+          switchBtn.title = i18n.switchModeTitle;
+          switchBtn.setAttribute('aria-label', i18n.switchModeTitle);
+        }
+        if (modePill instanceof HTMLElement) {
+          modePill.title = i18n.modePillTitle;
+        }
+
+        root.querySelectorAll('[data-ai-action]').forEach((btn) => {
+          if (!(btn instanceof HTMLElement)) return;
+          const actionKey = btn.dataset.aiAction;
+          if (actionKey && i18n.actions[actionKey]) {
+            btn.textContent = i18n.actions[actionKey].label;
+            btn.title = i18n.actions[actionKey].title;
+          }
+        });
+      };
 
       const cancelActiveRequest = () => {
         if (activeThinkingInterval) {
@@ -247,6 +546,7 @@ const detailedAuthorIntros = [
       };
 
       const setActiveAction = (actionName = null) => {
+        activeActionName = actionName;
         root.querySelectorAll('[data-ai-action]').forEach((btn) => {
           if (btn instanceof HTMLElement) {
             btn.classList.toggle('is-active', Boolean(actionName && btn.dataset.aiAction === actionName));
@@ -288,13 +588,14 @@ const detailedAuthorIntros = [
         });
         relatedBox.hidden = false;
 
+        const i18n = getI18n();
         const explanation =
           reasonText ||
-          `已结合《${title}》的主题脉络为你精选最贴合的 3 个延伸阅读入口，顺着核心架构继续探索：`;
+          i18n.relatedIntro.replace('{title}', title);
         typeInto(output, explanation);
       };
 
-      // Real live AI caller
+      // Real live AI caller with explicit language targeting
       const fetchLiveAi = async (params = {}) => {
         cancelActiveRequest();
         relatedBox instanceof HTMLElement && (relatedBox.hidden = true);
@@ -317,18 +618,20 @@ const detailedAuthorIntros = [
 
         const mode = params.mode || MODES[currentModeIndex].id;
         const questionType = params.questionType || '';
+        const targetLang = params.lang || getTargetLanguage();
         const assignedModel = getRandomModel();
         const isInstanceMode = mode === 'instance';
+        const i18n = I18N_DICTIONARY[targetLang] || getI18n();
 
         const startTime = Date.now();
 
-        // Only InstanceAI displays the 3~5s dynamic Thinking CoT preview
+        // InstanceAI displays dynamic Thinking CoT preview in target language
         if (isInstanceMode && !params.skipThinking) {
           const thinkingSteps = [
-            `正在调用 ${assignedModel} 思考...`,
-            `正在调用 ${assignedModel} 思考... 正在解析博文核心脉络与架构设计...`,
-            `正在调用 ${assignedModel} 思考... 提炼关键论点与技术方案要点...`,
-            `正在调用 ${assignedModel} 思考... 组织高信息密度结构并验证准确性...`,
+            `${i18n.thinkingPrefix} ${assignedModel} ${i18n.thinkingSuffix}`,
+            `${i18n.thinkingPrefix} ${assignedModel} ${i18n.thinkingSuffix} ${i18n.thinkingSteps[0]}`,
+            `${i18n.thinkingPrefix} ${assignedModel} ${i18n.thinkingSuffix} ${i18n.thinkingSteps[1]}`,
+            `${i18n.thinkingPrefix} ${assignedModel} ${i18n.thinkingSuffix} ${i18n.thinkingSteps[2]}`,
           ];
 
           let stepIndex = 0;
@@ -344,7 +647,7 @@ const detailedAuthorIntros = [
           }, 900);
         } else if (params.mode === 'llmgpt' && questionType) {
           if (output instanceof HTMLElement) {
-            output.textContent = '正在通过 LLMGPT 提炼回答...';
+            output.textContent = i18n.llmgptThinking;
           }
         }
 
@@ -370,6 +673,7 @@ const detailedAuthorIntros = [
               content,
               mode,
               questionType,
+              lang: targetLang,
               related: relatedList,
             }),
           });
@@ -421,13 +725,23 @@ const detailedAuthorIntros = [
 
       const applyMode = (modeId, options = {}) => {
         cancelActiveRequest();
-        setActiveAction(null); // Reset/cancel all action highlights on mode switch or summary refresh
+        if (!options.preserveAction) {
+          setActiveAction(null);
+        }
         relatedBox instanceof HTMLElement && (relatedBox.hidden = true);
         setModeDisplay(modeId);
+        updateUiLanguage();
+
+        const targetLang = getTargetLanguage();
+        const articleLang = normalizeLocale(root.dataset.articleLang || 'zh-CN');
 
         if (modeId === 'primer') {
           if (primerSummary) {
-            typeInto(output, primerSummary);
+            if (targetLang === 'zh-Hant' && typeof window.__shijianus_convertText === 'function') {
+              typeInto(output, window.__shijianus_convertText(primerSummary));
+            } else {
+              typeInto(output, primerSummary);
+            }
           } else {
             typeInto(output, get429ErrorMessage('primer'));
           }
@@ -435,9 +749,27 @@ const detailedAuthorIntros = [
         }
 
         if (modeId === 'llmgpt') {
-          if (staticSummary && !options.force) {
+          // Check if we have a pre-baked static summary specifically for targetLang
+          const candidateStatic = staticSummaries[targetLang];
+          if (candidateStatic && !options.force) {
+            typeInto(output, candidateStatic);
+            return;
+          }
+
+          // If targetLang matches the article's native language, default staticSummary can be used directly
+          if (targetLang === articleLang && staticSummary && !options.force) {
             typeInto(output, staticSummary);
-          } else if (staticSummary) {
+            return;
+          }
+
+          // When targetLang is different from articleLang (e.g. English UI requested on a Chinese article),
+          // call the API to fetch or generate the cached summary in targetLang!
+          if (targetLang !== articleLang || options.force) {
+            void fetchLiveAi({ mode: 'llmgpt', lang: targetLang, skipThinking: true });
+            return;
+          }
+
+          if (staticSummary) {
             typeInto(output, staticSummary);
           } else if (primerSummary) {
             typeInto(output, primerSummary);
@@ -448,7 +780,7 @@ const detailedAuthorIntros = [
         }
 
         if (modeId === 'instance') {
-          void fetchLiveAi({ mode: 'instance' });
+          void fetchLiveAi({ mode: 'instance', lang: targetLang });
         }
       };
 
@@ -465,7 +797,7 @@ const detailedAuthorIntros = [
         applyMode(mode, { force: true });
       });
 
-      // Action buttons (re-clicking same button re-triggers fresh generation)
+      // Action buttons
       root.querySelectorAll('[data-ai-action]').forEach((button) => {
         button.addEventListener('click', () => {
           if (!(button instanceof HTMLElement)) return;
@@ -479,15 +811,18 @@ const detailedAuthorIntros = [
 
           setActiveAction(action);
           const currentMode = MODES[currentModeIndex].id;
+          const targetLang = getTargetLanguage();
+          const i18n = getI18n();
 
           if (action === 'intro') {
             cancelActiveRequest();
             relatedBox instanceof HTMLElement && (relatedBox.hidden = true);
-            authorIntroIndex = (authorIntroIndex + 1) % Math.max(1, introTemplates.length);
+            const templates = targetLang === 'en' && introTemplatesEn.length > 0 ? introTemplatesEn : introTemplatesZh;
+            authorIntroIndex = (authorIntroIndex + 1) % Math.max(1, templates.length);
             const selected =
-              introTemplates[authorIntroIndex] ||
-              introTemplates[0] ||
-              `${siteConfig.site.author.name} 在这里持续写作与构建，专注长期可维护的博客系统与工程实践。`;
+              templates[authorIntroIndex] ||
+              templates[0] ||
+              i18n.authorIntroFallback;
             typeInto(output, selected);
             return;
           }
@@ -499,6 +834,7 @@ const detailedAuthorIntros = [
               void fetchLiveAi({
                 mode: currentMode,
                 questionType: 'related_reason',
+                lang: targetLang,
                 skipThinking: currentMode !== 'instance',
               });
             }
@@ -508,7 +844,8 @@ const detailedAuthorIntros = [
           if (['point', 'audience', 'quick', 'insight'].includes(action)) {
             if (currentMode === 'primer') {
               if (primerSummary) {
-                typeInto(output, `【作者手记】${primerSummary}`);
+                const prefix = targetLang === 'en' ? '[Author Note] ' : targetLang === 'zh-Hant' ? '【作者手記】' : '【作者手记】';
+                typeInto(output, `${prefix}${primerSummary}`);
               } else {
                 typeInto(output, get429ErrorMessage('primer'));
               }
@@ -516,6 +853,7 @@ const detailedAuthorIntros = [
               void fetchLiveAi({
                 mode: currentMode,
                 questionType: action,
+                lang: targetLang,
                 skipThinking: currentMode !== 'instance',
               });
             }
@@ -523,10 +861,50 @@ const detailedAuthorIntros = [
         });
       });
 
-      // Intersection Observer for initial auto load (direct content loading)
+      // Synchronize language switch in real-time across the entire page lifecycle
+      const handleLocaleSwitch = (newLang) => {
+        const normalized = normalizeLocale(newLang);
+        if (userExplicitlySwitchedLang === normalized) return;
+        userExplicitlySwitchedLang = normalized;
+        updateUiLanguage();
+
+        // If an action was active, re-distill in the new language
+        if (activeActionName) {
+          const actionBtn = root.querySelector(`[data-ai-action="${activeActionName}"]`);
+          if (actionBtn instanceof HTMLElement) {
+            actionBtn.click();
+            return;
+          }
+        }
+
+        // Otherwise, reload the summary in the new language
+        const currentMode = MODES[currentModeIndex].id;
+        applyMode(currentMode, { force: true });
+      };
+
+      window.addEventListener('shijianus:localechange', (e) => {
+        handleLocaleSwitch(e?.detail);
+      });
+
+      // Mutation observer on <html data-locale-variant> to catch any direct DOM locale changes
+      const htmlObserver = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+          if (m.attributeName === 'data-locale-variant') {
+            const next = document.documentElement.dataset.localeVariant;
+            if (next) handleLocaleSwitch(next);
+          }
+        }
+      });
+      htmlObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-locale-variant'] });
+
+      // Immediately synchronize UI language labels
+      updateUiLanguage();
+
+      // Intersection Observer for initial auto load
       const observer = new IntersectionObserver((entries) => {
         if (!entries[0]?.isIntersecting) return;
         observer.disconnect();
+        updateUiLanguage();
         applyMode('llmgpt');
       }, { threshold: 0.15 });
 

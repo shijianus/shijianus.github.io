@@ -10,6 +10,7 @@ import {
   buildSummaryPrompt,
   buildQuestionPrompt,
   normalizeArticleText,
+  normalizeSummaryLocale,
   getSummaryLevel,
   getSystemInstructionByLevel,
   SUMMARY_SYSTEM_INSTRUCTION,
@@ -24,6 +25,8 @@ type SummaryRequest = {
   content?: string;
   mode?: 'auto' | 'instance' | 'llmgpt' | 'question';
   questionType?: string;
+  lang?: string;
+  locale?: string;
   related?: Array<{ title: string; href: string }>;
 };
 
@@ -169,6 +172,7 @@ export async function onRequestPost(context: { request: Request; env: AppEnv }) 
 
   // 获取站长配置的档位（默认低档位 low，可随时切回）
   const level = getSummaryLevel(env.AI_SUMMARY_LEVEL);
+  const lang = normalizeSummaryLocale(body?.lang || body?.locale);
   // 根据档位处理正文内容：low 截取前 3500 字，medium 截取前 15000 字，high 保留全量知识库上下文
   const content = normalizeArticleText(body?.content || '', level);
 
@@ -176,8 +180,8 @@ export async function onRequestPost(context: { request: Request; env: AppEnv }) 
     return jsonResponse(request, env, { ok: false, error: 'Missing title or content.' }, { status: 400 });
   }
 
-  // 缓存 key 加入 level，保证档位切换后不读取旧档位缓存
-  const cacheKey = await sha256Hex([slug, title, summary, mode, questionType, level, content.slice(0, 1000)].join('|'));
+  // 缓存 key 加入 level 与 lang，保证多语言与档位切换后不读取旧缓存
+  const cacheKey = await sha256Hex([slug, title, summary, mode, questionType, level, lang, content.slice(0, 1000)].join('|'));
   
   // Only use server D1 cache for non-instance and non-question requests, or when cached
   if (mode !== 'instance') {
@@ -190,14 +194,15 @@ export async function onRequestPost(context: { request: Request; env: AppEnv }) 
         model: cached.model,
         summary: cached.summary,
         level,
+        lang,
       });
     }
   }
 
-  const systemInstruction = getSystemInstructionByLevel(level, env.AI_SUMMARY_CUSTOM_SYSTEM_PROMPT);
+  const systemInstruction = getSystemInstructionByLevel(level, env.AI_SUMMARY_CUSTOM_SYSTEM_PROMPT, lang);
   const prompt = questionType
-    ? buildQuestionPrompt({ title, url, summary, content, questionType, level, related })
-    : buildSummaryPrompt({ title, url, summary, content, level, customUserPrompt: env.AI_SUMMARY_CUSTOM_USER_PROMPT });
+    ? buildQuestionPrompt({ title, url, summary, content, questionType, level, lang, related })
+    : buildSummaryPrompt({ title, url, summary, content, level, lang, customUserPrompt: env.AI_SUMMARY_CUSTOM_USER_PROMPT });
 
   const maxTokens = level === 'high' ? 2048 : level === 'medium' ? 1200 : 800;
   const providerOptions = {
@@ -261,6 +266,7 @@ export async function onRequestPost(context: { request: Request; env: AppEnv }) 
     model: aiResult.model,
     summary: aiResult.text,
     level,
+    lang,
     thinking: (aiResult as any).thinking || undefined,
   });
 }

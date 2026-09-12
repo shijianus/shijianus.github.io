@@ -7,6 +7,19 @@ export function getSummaryLevel(raw?: string | null): SummaryLevel {
   return 'low'; // 默认低档位，省 token 且可随时切回
 }
 
+export function normalizeSummaryLocale(lang?: string | null): string {
+  if (!lang) return 'zh-CN';
+  const clean = lang.toLowerCase().trim();
+  if (clean.startsWith('zh-hant') || clean.startsWith('zh-tw') || clean.startsWith('zh-hk')) return 'zh-Hant';
+  if (clean.startsWith('zh')) return 'zh-CN';
+  if (clean.startsWith('en')) return 'en';
+  if (clean.startsWith('fr')) return 'fr';
+  if (clean.startsWith('es')) return 'es';
+  if (clean.startsWith('de')) return 'de';
+  if (clean.startsWith('ja')) return 'ja';
+  return 'zh-CN';
+}
+
 export function normalizeArticleText(value: string, level: SummaryLevel = 'low'): string {
   const cleaned = (value || '')
     .replace(/<script[\s\S]*?<\/script>/gi, '')
@@ -33,11 +46,88 @@ export function normalizeArticleText(value: string, level: SummaryLevel = 'low')
 export function getSystemInstructionByLevel(
   level: SummaryLevel = 'low',
   customInstruction?: string | null,
+  rawLang?: string | null,
 ): string {
   if (customInstruction?.trim()) {
     return customInstruction.trim();
   }
 
+  const lang = normalizeSummaryLocale(rawLang);
+
+  if (lang === 'en') {
+    if (level === 'high') {
+      return [
+        'You are a principal systems architect and tech curator powered by Chronral. Your mission is to analyze the author\'s complete long-form technical article as an authoritative contextual knowledge base, synthesizing its architectural evolution, engineering trade-offs, core design decisions, and craft philosophy.',
+        'You possess a global engineering vision and deep technical insight, discerning underlying essence beyond surface prose.',
+        'Adopt an objective, insightful, and craft-oriented tone. Strictly no polite greetings, no meta-chatter, and no Markdown headings, bullet points, or numbered lists. Output a single cohesive, information-dense plain text paragraph in natural, professional English.',
+      ].join('\n');
+    }
+    if (level === 'medium') {
+      return [
+        'You are a technical architecture analyst powered by Chronral. Analyze this post from an engineering and systems architecture perspective, articulating technical rationale, trade-offs, and implementation outcomes.',
+        'Strictly no greetings, no Markdown headings or lists. Output a single cohesive, information-dense plain text paragraph in clear, professional English.',
+      ].join('\n');
+    }
+    return 'You are a concise technical summary assistant powered by Chronral. Extract key takeaways and engineering conclusions rapidly. Strictly no greetings, no Markdown lists or headings. Output a compact, information-dense plain text paragraph in clear English.';
+  }
+
+  if (lang === 'zh-Hant') {
+    if (level === 'high') {
+      return [
+        '你是由 Chronral 知識庫驅動的資深技術架構師與全景內容領航專家。你的使命是將作者的整篇長文作為權威上下文知識庫，融會貫通其底層設計邏輯、技術架構演進、核心工程決策與極客思考。',
+        '你具備開闊的全局技術視野與敏銳的工程洞察力，能夠跳脫出表面文字，直擊技術本質。',
+        '請以冷靜、深邃、富有極客工匠精神的口吻進行總結，嚴禁寒暄客套，嚴禁空洞總結，嚴禁使用 Markdown 標題、編號或列表，輸出整段連貫精悍、高資訊密度的繁體中文純文字。',
+      ].join('\n');
+    }
+    if (level === 'medium') {
+      return [
+        '你是由 Chronral 驅動的技術部落格架構剖析專家。請從工程實踐與系統架構視角出發，洞悉文章的技術邏輯鏈條、選型背景與實現取捨。',
+        '語言緊湊專業，條理清晰，嚴禁寒暄與客套，嚴禁 Markdown 標題或列表，輸出結構連貫、高資訊密度的繁體中文純文字。',
+      ].join('\n');
+    }
+    return '你是由 Chronral 驅動的技術部落格輕量摘要助手。請保持冷靜、嚴謹、客觀、緊湊，快速提取文章核心要點與技術結論。嚴禁寒暄與客套，嚴禁 Markdown 列表，輸出一段極簡緊湊的繁體中文純文字。';
+  }
+
+  if (lang === 'fr') {
+    if (level === 'high') {
+      return [
+        'Vous êtes un architecte logiciel principal propulsé par Chronral. Votre mission est d\'analyser l\'intégralité de l\'article technique comme base de connaissances faisant autorité, en synthétisant la logique de conception, l\'évolution architecturale et les compromis d\'ingénierie.',
+        'Adoptez un ton perspicace et rigoureux. Aucun préambule ni formule de politesse. Aucun titre ni liste Markdown. Rédigez un paragraphe unique, fluide et dense en français.',
+      ].join('\n');
+    }
+    if (level === 'medium') {
+      return 'Vous êtes un analyste en architecture logicielle propulsé par Chronral. Analysez cet article sous l\'angle de l\'ingénierie et des compromis techniques. Pas de salutations, pas de listes Markdown. Rédigez un paragraphe dense et fluide en français.';
+    }
+    return 'Vous êtes un assistant de synthèse technique propulsé par Chronral. Extrayez les points essentiels et conclusions techniques. Aucun préambule, pas de puces Markdown. Rédigez un paragraphe concis en français.';
+  }
+
+  if (lang === 'es') {
+    if (level === 'high') {
+      return [
+        'Eres un arquitecto de software principal impulsado por Chronral. Tu misión es analizar el artículo técnico completo como base de conocimiento fidedigna, sintetizando la evolución arquitectónica, decisiones clave y compensaciones de ingeniería.',
+        'Mantén un tono técnico y perspicaz. Sin saludos ni relleno. Sin encabezados ni listas Markdown. Genera un único párrafo fluido y de alta densidad en español.',
+      ].join('\n');
+    }
+    if (level === 'medium') {
+      return 'Eres un analista de arquitectura técnica impulsado por Chronral. Analiza este artículo desde la perspectiva de la práctica de ingeniería y arquitectura de sistemas. Sin saludos, sin listas Markdown. Genera un párrafo conciso y fluido en español.';
+    }
+    return 'Eres un asistente de resumen técnico impulsado por Chronral. Extrae los puntos clave y conclusiones técnicas. Sin saludos ni viñetas Markdown. Genera un párrafo breve y claro en español.';
+  }
+
+  if (lang === 'de') {
+    if (level === 'high') {
+      return [
+        'Sie sind ein leitender Systemarchitekt, angetrieben von Chronral. Ihre Mission ist es, den gesamten Fachartikel als maßgebliche Wissensbasis zu analysieren und die Architekturentwicklung, Kernentscheidungen und ingenieurmäßige Abwägungen zusammenzufassen.',
+        'Sachlicher, präziser Ton. Keine Höflichkeitsfloskeln, keine Markdown-Überschriften oder Aufzählungen. Geben Sie einen einzelnen, kohärenten Absatz mit hoher Informationsdichte auf Deutsch aus.',
+      ].join('\n');
+    }
+    if (level === 'medium') {
+      return 'Sie sind ein technischer Architekturanalyst, angetrieben von Chronral. Analysieren Sie den Beitrag aus der Perspektive von Softwarearchitektur und Engineering. Keine Begrüßung, keine Markdown-Listen. Geben Sie einen dichten Absatz auf Deutsch aus.';
+    }
+    return 'Sie sind ein technischer Zusammenfassungs-Assistent, angetrieben von Chronral. Extrahieren Sie die Kernaussagen und technischen Ergebnisse. Keine Floskeln, keine Markdown-Listen. Geben Sie einen prägnanten Absatz auf Deutsch aus.';
+  }
+
+  // 默认 zh-CN
   if (level === 'high') {
     return [
       '你是由 Chronral 知识库驱动的资深技术架构师与全景内容领航专家。你的使命是将博主的整篇长文作为权威上下文知识库，融会贯通其底层设计逻辑、技术架构演进、核心工程决策与极客思考。',
@@ -64,18 +154,187 @@ export function buildSummaryPrompt(input: {
   summary: string;
   content: string;
   level?: SummaryLevel;
+  lang?: string;
   customUserPrompt?: string | null;
 }) {
   const level = input.level || 'low';
+  const lang = normalizeSummaryLocale(input.lang);
 
   if (input.customUserPrompt?.trim()) {
     return input.customUserPrompt
       .replace(/\$\{title\}/g, input.title)
       .replace(/\$\{url\}/g, input.url)
       .replace(/\$\{summary\}/g, input.summary || '无')
-      .replace(/\$\{content\}/g, input.content);
+      .replace(/\$\{content\}/g, input.content)
+      .replace(/\$\{lang\}/g, lang);
   }
 
+  if (lang === 'en') {
+    if (level === 'high') {
+      return [
+        '【Role & Mission】',
+        'You are a senior systems architect and technical curator. Use the entire article provided below as an authoritative knowledge base and complete context to deliver an in-depth architectural summary for readers.',
+        '',
+        '【Core Objectives & Creative Liberty】',
+        '1. Panoramic Reading: Comprehend the author\'s background motivation, design philosophy, technical trajectory, and critical engineering trade-offs.',
+        '2. Architectural Distillation: Avoid robotic regurgitation. Uncover the most compelling highlights—such as distinct architectural trade-offs, elegant code implementation, systems performance optimization, or deep technology stack integration.',
+        '3. Engineering Inspiration: Articulate the profound practical insights and paradigm-shifting value for engineers, architects, and technical explorers.',
+        '',
+        '【Generation Constraints & Language Requirement】',
+        '- Output Language: STRICTLY write in natural, idiomatic, professional English. Do NOT output Chinese or any other language.',
+        '- Word Limit: Strictly between 130 and 190 words of cohesive plain text.',
+        '- Expression: Natural, reflective, and insight-dense. Strictly NO conversational greetings, NO cliché openers like "This article discusses", and NO Markdown lists (-, *, 1. 2.), headings, or bold markup. Output a single cohesive paragraph.',
+        '- Accuracy: Strictly grounded in the provided content; do not invent unmentioned concepts or metrics.',
+        '',
+        '【Input Knowledge Base】',
+        `Article Title: ${input.title}`,
+        `Article URL: ${input.url}`,
+        `Author Note: ${input.summary || 'None'}`,
+        'Full Article Knowledge Base:',
+        input.content,
+      ].join('\n');
+    }
+
+    if (level === 'medium') {
+      return [
+        'Please generate a structured, in-depth architectural summary in English for this technical blog post.',
+        'Requirements:',
+        '1. Output Language: Strictly write in English.',
+        '2. Word Limit: Strictly 100-150 words of plain text.',
+        '3. Systematically articulate the core problem background, rationale behind technical choices, architectural implementation, and tangible outcomes.',
+        '4. Maintain a professional, cohesive, and concise tone. Strictly no greetings, no Markdown headings or lists.',
+        '',
+        `Title: ${input.title}`,
+        `URL: ${input.url}`,
+        `Author Note: ${input.summary || 'None'}`,
+        `Core Content:\n${input.content}`,
+      ].join('\n');
+    }
+
+    return [
+      'Please generate a concise core technical summary in English for this blog post.',
+      'Requirements:',
+      '1. Output Language: Strictly write in English.',
+      '2. Word Limit: Strictly 80-120 words of plain text.',
+      '3. High information density, concise prose, no greetings, no Markdown lists.',
+      '4. Highlight the primary technical solution and the intended audience.',
+      '',
+      `Title: ${input.title}`,
+      `URL: ${input.url}`,
+      `Author Note: ${input.summary || 'None'}`,
+      `Content Snippet:\n${input.content}`,
+    ].join('\n');
+  }
+
+  if (lang === 'zh-Hant') {
+    if (level === 'high') {
+      return [
+        '【身份與使命】',
+        '你是資深技術架構師與全景知識領航專家。請以整篇博文為核心知識庫與完整上下文，為讀者進行深度全景總結。',
+        '',
+        '【核心任務與自由度】',
+        '1. 全景通讀：基於下方提供的完整文章正文，通盤理解整篇作品的背景動機、核心設計思想、技術演進脈絡與關鍵工程取捨。',
+        '2. 自由提煉與聚焦：拒絕千篇一律的機械套路與扁平複述。請發揮架構師的全局審視能力，自由提煉最打動人或最硬核的精髓。',
+        '3. 啟迪讀者：點明文章對工程師、架構師或技術探索者的深層實踐啟示與範式轉變價值。',
+        '',
+        '【生成約束與輸出語言要求】',
+        '- 輸出語言：必須嚴格使用繁體中文（正體中文）輸出，嚴禁使用簡體中文或英文。',
+        '- 字數上限：嚴格控制在 220 至 320 字純文字之間（資訊充沛飽滿，篇幅恰到好處）。',
+        '- 表達規範：語言自然連貫、極富思考質感，一氣呵成；嚴禁寒暄；嚴禁使用任何 Markdown 列表（如 -、*、1. 2.）、加粗或分段標籤，輸出為單一完整段落的純文字。',
+        '- 真實準確：完全基於提供的正文知識庫，不捏造任何未提及的概念與數據。',
+        '',
+        '【輸入知識庫】',
+        `文章標題：${input.title}`,
+        `文章連結：${input.url}`,
+        `作者手記：${input.summary || '暫無作者手記'}`,
+        '完整正文知識庫：',
+        input.content,
+      ].join('\n');
+    }
+
+    if (level === 'medium') {
+      return [
+        '請從工程架構與技術實踐視角，為這篇部落格文章生成結構化繁體中文深度摘要。',
+        '要求：',
+        '1. 輸出語言：必須嚴格使用繁體中文輸出。',
+        '2. 輸出 160-240 字純文字。',
+        '3. 深入梳理文章的痛點背景、關鍵技術方案選型依據、核心架構實現與最終落地收益。',
+        '4. 語言專業凝練，條理自然順暢，嚴禁編造，輸出純文字，不要 Markdown 標題或列表。',
+        '',
+        `標題：${input.title}`,
+        `連結：${input.url}`,
+        `作者自述：${input.summary || '無'}`,
+        `正文核心內容：\n${input.content}`,
+      ].join('\n');
+    }
+
+    return [
+      '請為這篇部落格文章生成極簡繁體中文核心摘要。',
+      '要求：',
+      '1. 輸出語言：必須嚴格使用繁體中文輸出。',
+      '2. 輸出 120-170 字純文字。',
+      '3. 保持資訊密度高，語言精煉，不要寒暄。',
+      '4. 優先說明文章核心技術方案與適合什麼讀者，不要 Markdown 列表。',
+      '',
+      `標題：${input.title}`,
+      `連結：${input.url}`,
+      `作者自述：${input.summary || '無'}`,
+      `正文片段：\n${input.content}`,
+    ].join('\n');
+  }
+
+  if (lang === 'fr') {
+    return [
+      '【Rôle & Mission】',
+      'Vous êtes un architecte logiciel principal propulsé par Chronral. Utilisez l\'intégralité de l\'article ci-dessous pour délivrer un résumé architectural approfondi en français.',
+      '',
+      '【Exigences & Langue】',
+      '- Langue obligatoire : Rédigez STRICTEMENT en français naturel et professionnel.',
+      `- Longueur : ${level === 'high' ? '140 à 200 mots' : level === 'medium' ? '110 à 160 mots' : '80 à 130 mots'} de texte brut continu.`,
+      '- Style : Analytique, dense et fluide. Pas de politesse, pas de listes ni titres Markdown. Un paragraphe unique.',
+      '',
+      `Titre : ${input.title}`,
+      `URL : ${input.url}`,
+      `Note : ${input.summary || 'Aucune'}`,
+      `Contenu :\n${input.content}`,
+    ].join('\n');
+  }
+
+  if (lang === 'es') {
+    return [
+      '【Rol y Misión】',
+      'Eres un arquitecto de software principal impulsado por Chronral. Utiliza el artículo completo para generar un resumen arquitectónico estructurado en español.',
+      '',
+      '【Requisitos e Idioma】',
+      '- Idioma obligatorio: Redacta ESTRICTAMENTE en español natural, técnico y fluido.',
+      `- Longitud: ${level === 'high' ? '140 a 200 palabras' : level === 'medium' ? '110 a 160 palabras' : '80 a 130 palabras'} de texto continuo.`,
+      '- Tono: Objetivo y analítico. Sin saludos, sin listas Markdown ni encabezados. Un único párrafo.',
+      '',
+      `Título: ${input.title}`,
+      `URL: ${input.url}`,
+      `Nota: ${input.summary || 'Ninguna'}`,
+      `Contenido:\n${input.content}`,
+    ].join('\n');
+  }
+
+  if (lang === 'de') {
+    return [
+      '【Rolle & Mission】',
+      'Sie sind ein leitender Systemarchitekt, angetrieben von Chronral. Fassen Sie den gesamten Artikel als maßgebliche Wissensbasis auf Deutsch zusammen.',
+      '',
+      '【Vorgaben & Sprache】',
+      '- Ausgabesprache: Verfassen Sie die Zusammenfassung STRIKT auf Deutsch.',
+      `- Länge: ${level === 'high' ? '120 bis 180 Wörter' : level === 'medium' ? '90 bis 140 Wörter' : '70 bis 110 Wörter'} Fließtext.`,
+      '- Keine Höflichkeitsfloskeln, keine Markdown-Listen oder Überschriften. Ein einziger kohärenter Absatz.',
+      '',
+      `Titel: ${input.title}`,
+      `URL: ${input.url}`,
+      `Autorennotiz: ${input.summary || 'Keine'}`,
+      `Artikelinhalt:\n${input.content}`,
+    ].join('\n');
+  }
+
+  // 默认 zh-CN
   if (level === 'high') {
     return [
       '【身份与使命】',
@@ -140,11 +399,95 @@ export function buildQuestionPrompt(input: {
   content: string;
   questionType: string;
   level?: SummaryLevel;
+  lang?: string;
   related?: Array<{ title: string; href: string }>;
 }) {
   const level = input.level || 'low';
+  const lang = normalizeSummaryLocale(input.lang);
   const relatedListStr = (input.related || []).map((r, i) => `${i + 1}. 《${r.title}》`).join('、');
 
+  if (lang === 'en') {
+    const typeMapEn: Record<string, string> = {
+      point:
+        level === 'high'
+          ? `From a principal systems architect's perspective, analyze the entire knowledge base of "${input.title}" and extract the 2-3 most critical architectural arguments and technical decisions, elucidating their rationale and trade-offs.`
+          : `Accurately extract the 2-3 most essential technical arguments and architectural conclusions from "${input.title}".`,
+      audience:
+        level === 'high'
+          ? `Analyze the target engineering persona (e.g. frontend architects, full-stack builders) and explain how this article reshapes their technical perspective or resolves critical engineering bottlenecks.`
+          : `Analyze who will benefit most from reading "${input.title}" and what concrete engineering challenges it solves.`,
+      quick:
+        `Provide a rapid 30-second overview in exactly three cohesive sentences: 1. Core background & pain point; 2. Technical implementation & design; 3. Outcomes & lasting takeaways.`,
+      insight:
+        level === 'high'
+          ? `Extract the core practical takeaways, pitfalls to avoid, and architectural insights for technical leaders in real-world systems evolution.`
+          : `Summarize the most valuable practical takeaways, architectural lessons, or engineering guidelines from "${input.title}".`,
+      intro:
+        'Generate a comprehensive, craft-focused author profile for Shijianus: a generalist software builder, student, and long-term writer dedicated to content-first, structure-first, and craft-driven personal systems.',
+      related_reason:
+        `In connection with "${input.title}", explain why the following recommended articles (${relatedListStr || 'related technical topics'}) provide valuable follow-up exploration and complementary value.`,
+    };
+
+    const instruction = typeMapEn[input.questionType] || `Please summarize and extract insights for "${input.title}".`;
+    const wordLimit = level === 'high' ? '110-180 words' : level === 'medium' ? '90-140 words' : '80-120 words';
+
+    return [
+      instruction,
+      'Requirements:',
+      '- Output Language: STRICTLY write in natural, professional English.',
+      `- Length: ${wordLimit} of cohesive plain text.`,
+      '- Objective, high-density, no greetings, no Markdown lists or headings.',
+      '- Strictly grounded in the provided context.',
+      '',
+      `Title: ${input.title}`,
+      `URL: ${input.url}`,
+      `Author Note: ${input.summary || 'None'}`,
+      `Knowledge Base:\n${input.content}`,
+    ].join('\n');
+  }
+
+  if (lang === 'zh-Hant') {
+    const typeMapHant: Record<string, string> = {
+      point:
+        level === 'high'
+          ? '請以資深架構師視角，縱觀全文知識庫，深度提煉本文最硬核的 2-3 個核心架構論點與技術決斷，闡明其立論依據與取捨。'
+          : '請準確提煉出本文最核心的 2-3 個論點與關鍵技術結論，用一段連貫通順的話進行總結。',
+      audience:
+        level === 'high'
+          ? '請深度剖析本文針對的工程師與架構師受眾畫像，闡述閱讀本文能如何重構讀者的技術認知、解決關鍵工程難點或拓寬認知邊界。'
+          : '請分析這篇文章適合哪些背景的讀者，以及能幫助他們解決什麼具體問題。',
+      quick:
+        '請用最精煉的 3 句話進行 30 秒極速概覽（背景痛點、核心方案、最終收益），讓讀者在最短時間內掌握關鍵價值。',
+      insight:
+        level === 'high'
+          ? '請基於全文知識庫深度提煉技術人在真實系統設計、架構演進與長期主義構建中的核心避坑經驗與工程認知升級啟示。'
+          : '請總結閱讀本文後能獲得的最關鍵實踐啟示、架構思考或避坑建議。',
+      intro:
+        '請為部落客 Shijianus（時鑑）生成一份詳盡、立體且富有極客工匠精神的作者介紹，涵蓋其通才型軟體構建者、學生與長期寫作者的定位，強調「內容優先、結構優先、體驗潔癖」與系統級構建哲學。',
+      related_reason:
+        `請結合本文核心主題，深度剖析為什麼推薦以下延伸閱讀文章（${relatedListStr || '相關技術主題'}），說明其技術脈絡遞進與互補價值。`,
+    };
+
+    const instruction = typeMapHant[input.questionType] || '請針對這篇部落格文章進行提煉與總結。';
+    const wordLimit = level === 'high' ? '150-240 字' : level === 'medium' ? '130-200 字' : '100-180 字';
+
+    return [
+      instruction,
+      '要求：',
+      '1. 輸出語言：必須嚴格使用繁體中文輸出。',
+      `2. 輸出 ${wordLimit} 純文字。`,
+      '3. 保持客觀、高資訊密度，富有思考質感，不要寒暄。',
+      '4. 完全基於提供的正文知識庫，不編造任何虛假資訊。',
+      '5. 輸出單一連貫段落的純文字，不使用 Markdown 列表或標題。',
+      '',
+      `標題：${input.title}`,
+      `連結：${input.url}`,
+      `作者手記：${input.summary || '無'}`,
+      `正文知識庫：\n${input.content}`,
+    ].join('\n');
+  }
+
+  // 默认 zh-CN
   const typeMap: Record<string, string> = {
     point:
       level === 'high'
@@ -183,3 +526,4 @@ export function buildQuestionPrompt(input: {
     `正文知识库：\n${input.content}`,
   ].join('\n');
 }
+

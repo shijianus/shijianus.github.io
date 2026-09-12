@@ -160,6 +160,20 @@ for (const p of siblingTranslations) {
 }
 const hasTranslations = Object.keys(translationsByLang).length > 1;
 
+const typedAiSummaries = aiSummaries as Record<string, { summary: string; model?: string }>;
+const staticSummariesByLang: Record<string, string> = {};
+if (typedAiSummaries[entry.id]?.summary) {
+  staticSummariesByLang[currentLang] = typedAiSummaries[entry.id].summary;
+}
+for (const p of siblingTranslations) {
+  const pSuffix = p.id.match(/\.([a-zA-Z]{2,3}(?:-[a-zA-Z]{2,4})?)$/);
+  const pLang = p.data.lang || (pSuffix ? pSuffix[1] : 'zh-CN');
+  const pSum = typedAiSummaries[p.id]?.summary;
+  if (pSum && !staticSummariesByLang[pLang]) {
+    staticSummariesByLang[pLang] = pSum;
+  }
+}
+
 // Prepare the inline-encrypted article content (rendered server-side, initially hidden)
 // For encrypted routes: always render content (hidden behind gate)
 const access = isEncryptedRoute ? undefined : entry.data.access;
@@ -352,7 +366,9 @@ const heroSummary = isUnlocked
         slug={entry.id}
         title={publicFacingTitle}
         summary={(entry.data as any).aiSummary || (entry.data as any).ai_summary || (entry.data as any).summary || entry.data.description || ''}
-        staticSummary={(aiSummaries as Record<string, { summary: string; model?: string }>)[entry.id]?.summary || ''}
+        staticSummary={typedAiSummaries[entry.id]?.summary || ''}
+        staticSummariesByLang={staticSummariesByLang}
+        articleLang={currentLang}
         url={Astro.url.href}
         related={relatedPosts.map((post) => ({
           title: post.data.title,
@@ -516,37 +532,48 @@ const heroSummary = isUnlocked
             const data = JSON.parse(dataEl.textContent || '{}');
             const translations = data.translations || {};
             const currentLang = data.currentLang;
+            const i18nKey = data.currentI18nKey;
 
             function navigateToLang(targetLang) {
               const target = translations[targetLang];
               if (target && target.url) {
                 const currentPath = window.location.pathname;
                 const targetPath = target.url;
-                if (currentPath !== targetPath && currentPath !== targetPath.replace(/\/$/, '')) {
+                // Normalize: both with and without trailing slash
+                const norm = (p) => p.replace(/\/$/, '');
+                if (norm(currentPath) !== norm(targetPath)) {
+                  try {
+                    window.localStorage.setItem('shijianus-locale-variant', targetLang);
+                  } catch {}
                   window.location.href = targetPath;
                 }
               }
             }
 
-            // 1. Listen for global locale changes from dock translate button or drawer
+            // 1. Listen for global locale changes from the account card language selector
             window.addEventListener('shijianus:localechange', function (e) {
-              const nextLang = (e && e.detail) ? e.detail : 'zh-CN';
-              if (nextLang !== currentLang) {
+              const nextLang = (e && e.detail) ? e.detail : currentLang;
+              if (nextLang !== currentLang && translations[nextLang]) {
                 navigateToLang(nextLang);
               }
             });
 
-            // 2. If user enters canonical article with preferred non-default locale in localStorage
-            const stored = window.localStorage.getItem('shijianus-locale-variant');
-            if (currentLang === 'zh-CN' && stored && stored !== 'zh-CN' && translations[stored]) {
-              const sessionKey = 'i18n-auto-nav:' + data.currentI18nKey;
+            // 2. On page load: only if user has explicitly chosen a manual locale preference
+            //    that differs from article's locale, auto-redirect to the matching translation.
+            const manualSelected = window.localStorage.getItem('shijianus-manual-locale-selected');
+            if (manualSelected && manualSelected !== currentLang && translations[manualSelected]) {
+              const sessionKey = 'i18n-auto-nav:' + i18nKey + ':' + manualSelected;
               if (!window.sessionStorage.getItem(sessionKey)) {
                 window.sessionStorage.setItem(sessionKey, '1');
-                navigateToLang(stored);
+                navigateToLang(manualSelected);
               }
-            } else if (currentLang !== 'zh-CN' && (!stored || stored === 'zh-CN')) {
-              // If user explicitly visits a localized article URL, sync their locale
-              window.localStorage.setItem('shijianus-locale-variant', currentLang);
+            } else if (!manualSelected) {
+              // User has not manually locked a locale: align stored variant with current post's language
+              try {
+                window.localStorage.setItem('shijianus-locale-variant', currentLang);
+                document.documentElement.dataset.localeVariant = currentLang;
+                document.documentElement.lang = currentLang;
+              } catch {}
             }
           } catch {}
         })();

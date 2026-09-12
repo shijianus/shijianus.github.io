@@ -155,10 +155,11 @@
   },
   "api-ready-theme-contracts-en": {
     "title": "Turning Theme Configuration into an API-Ready Contract",
-    "summary": "文章抛出“先定义契约再写 UI”的逆向思路，指出若模板直接读取 Markdown 内容，后期迁移至 API 几乎等同重构全部页面。作者将分页、归档、分类、标签、关联推荐等业务抽象为统一的数据获取层，形成一套独立的 contract。核心在于把页面所依赖的结构化数据模型固化为入口函数，所有展示组件只消费该模型而不感知来源。这样当数据来源从本地文件切换为远程服务时，只需实现同签名的适配器，业务层保持不变，极大降低耦合度并提升可插拔性。进一步，作者预见未来可能接入自定义仪表盘、外部搜索或文章摘要服务，只要遵循相同 contract，即可无缝挂载而无需拆解现有组件，实现主题的真正可扩展与演进。",
-    "model": "openai/gpt-oss-120b",
-    "provider": "Chronral LLMGPT (High Tier)",
-    "generatedAt": "2026-09-12T17:55:19.907Z"
+    "summary": "The article argues that a theme’s data contract should be defined before any UI logic, because binding templates directly to raw sources couples presentation to a specific storage format and makes later migration to an API costly. By extracting all data‑retrieval concerns—post sorting, archive, category, tag aggregation, and related‑post recommendation—into a single helper layer, the author creates a stable interface that isolates the UI from the underlying source. The primary trade‑off is the upfront investment in designing and maintaining this abstraction, which adds indirection and may slightly increase latency, but it yields substantial long‑term gains: swapping a local Markdown store for a remote API, or plugging in custom dashboards, external search services, or remote summarization engines, can be achieved by swapping the helper’s implementation without touching component code. Readers gain a concrete pattern for improving theme extensibility, reducing refactor risk, and future‑proofing front‑end code against evolving data architectures.",
+    "model": "llama-3.3-70b-versatile",
+    "provider": "Chronral LLMGPT",
+    "lang": "en",
+    "generatedAt": "2026-09-12T20:18:49.422Z"
   },
   "badges-guide": {
     "title": "全网盘点！EpoCanvas 博客读者等级、称号与徽章获取完全指南（2026 持续更新）",
@@ -168,10 +169,19 @@
     "generatedAt": "2026-09-12T17:55:39.381Z"
   },
   "hello-world-en": {
-    "title": "Theme Refactoring Kickoff Log",
-    "summary": "此次主题重构的深层驱动并非功能缺失，而是对既有架构混乱、品牌风格与组件混杂的根本性不满，导致主题既无原始设计的清晰，也未能形成自身秩序。工程决策的核心在于汲取原主题稳健的首页、侧边栏模块与卡片系统等成熟优势，同时彻底转向基于Astro、React与Tailwind的内容优先（content-first）架构范式。这不仅是技术栈的迁移，更是对信息架构的重塑，强调首页作为信息地图，需清晰呈现品牌身份、核心分类、近期要闻与导航路径，避免沦为营销页面。整个重构的终极目标是打造一个兼具技术深度与用户友好性的主题，实现技术表达与普适阅读体验的和谐统一，这体现了对工程美学与信息架构严谨思考的实践。",
-    "model": "gemini-2.5-flash",
+    "title": "Theme Refactor Kickoff Log",
+    "summary": "The refactor addresses the fundamental architectural flaw of the previous theme: an ambiguous file hierarchy that interleaved branding, styling, and isolated components, preventing a clear, maintainable structure and yielding a UI that diverged from both the original aesthetic and a logical layout. The new design preserves the proven strengths of the original—robust homepage, sidebar modules, and card system—while migrating the entire stack to a content‑first paradigm built on Astro, React, and Tailwind, thereby separating content rendering from presentation logic and enabling static site generation, fine‑grained component reuse, and streamlined styling conventions. The homepage is reconceptualized as an information map rather than a marketing splash, prioritizing immediate visibility of brand identity, primary categories, recent articles, and navigational cues via the sidebar, which improves discoverability and reduces cognitive load. Future iterations will iterate on this foundation, balancing technical depth with accessibility to ensure the theme remains sophisticated without alienating non‑technical readers, delivering a maintainable, scalable, and user‑centric experience.",
+    "model": "llama-3.3-70b-versatile",
+    "provider": "Chronral LLMGPT",
+    "lang": "en",
+    "generatedAt": "2026-09-12T20:20:30.808Z"
+  },
+  "content-formats-and-markup-mastery-en": {
+    "title": "Static Site Generators (SSG) and Blog Theme Content Formats",
+    "summary": "Static site generators fundamentally shape authoring freedom and reader experience by the breadth of content formats they can ingest and render, a premise this guide makes explicit across the dominant ecosystem of Hugo, Jekyll, Eleventy, Astro, Hexo, Pelican, WordPress‑based headless themes, and VitePress. Hugo’s Go‑based Goldmark engine offers high‑concurrency native support for Markdown, Org‑mode, and HTML, trading extensibility for raw speed, while Astro’s Vite‑powered unified pipeline couples MDX with mountable AST loaders, sacrificing some build‑time efficiency to enable island‑style interactivity such as dropdowns, accordions, and encrypted sections directly in content. Eleventy and Hexo provide JavaScript‑centric template pipelines that balance plug‑in flexibility with modest performance overhead, whereas Jekyll and Pelican rely on Ruby and Python ecosystems, respectively, delivering mature but less dynamic extensions. Front‑matter serialization across YAML, TOML, and JSON further influences tooling integration and deployment pipelines. By mapping lightweight markup variants—AsciiDoc, Org‑mode, reStructuredText—to equivalent MDX constructs, the article equips developers with a decision matrix for selecting an SSG that aligns with required markup diversity, performance constraints, and interactive UI ambitions, streamlining migration and future‑proofing content workflows.",
+    "model": "openai/gpt-oss-120b",
     "provider": "Chronral LLMGPT (High Tier)",
-    "generatedAt": "2026-09-12T17:57:08.507Z"
+    "lang": "en",
+    "generatedAt": "2026-09-12T20:22:25.315Z"
   }
 }
