@@ -5,17 +5,19 @@
  * Logic:
  * 1. Checks if AI translation build assistant is enabled (ENABLE_ARTICLE_AI_I18N === 'true').
  *    - Default is DISABLED (false). Exits with zero delay.
- * 2. Scans `src/content/posts/` for all articles and extracts their `i18nKey`, `lang`, and `isAiGenerated` status.
+ * 2. Scans `src/content/posts/` for all articles and extracts their `i18nKey`, `lang`, and `aiTranslatedFrom` status.
  * 3. User-written articles take 100% precedence and are NEVER overwritten.
  * 4. For missing target locales (e.g. 'en'), calls the AI translation interface (ChronralAI / Custom API)
  *    to generate full, idiomatic localized Markdown articles.
+ *    - Articles with body > 8000 chars use the chunked pipeline (translateArticleChunked).
+ *    - Articles with body <= 8000 chars use single-request translation (translateArticle).
  * 5. Saves generated files and updates `src/.generated/article-i18n-map.json`.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import yaml from 'js-yaml';
-import { translateArticle, resolveArticleI18nConfig } from '../src/lib/server-article-i18n.ts';
+import { translateArticle, translateArticleChunked, resolveArticleI18nConfig } from '../src/lib/server-article-i18n.ts';
 
 const POSTS_DIR = path.resolve(process.cwd(), 'src/content/posts');
 const GENERATED_DIR = path.resolve(process.cwd(), 'src/.generated');
@@ -50,7 +52,7 @@ function parseFrontmatter(rawContent, filename) {
  */
 function inspectArticle(filename, fullPath) {
   const raw = fs.readFileSync(fullPath, 'utf8');
-  const { meta } = parseFrontmatter(raw, filename);
+  const { meta, body } = parseFrontmatter(raw, filename);
 
   const baseStem = filename.replace(/\.(md|mdx)$/, '');
   
@@ -67,7 +69,8 @@ function inspectArticle(filename, fullPath) {
 
   const i18nKey = meta.i18nKey || inferredKey;
   const lang = meta.lang || inferredLang;
-  const isAiGenerated = Boolean(meta.isAiGenerated);
+  // An article is AI-generated if it has aiTranslatedFrom or isAiGenerated (legacy)
+  const isAiGenerated = Boolean(meta.isAiGenerated || meta.aiTranslatedFrom);
   const title = meta.title || baseStem;
 
   return {
@@ -78,15 +81,16 @@ function inspectArticle(filename, fullPath) {
     isAiGenerated,
     title,
     raw,
+    body,
     mtime: fs.statSync(fullPath).mtimeMs,
   };
 }
 
 async function main() {
-  console.log('[Article-i18n] 🌐 Inspecting article i18n build matrix...');
+  console.log('[Article-i18n] Inspecting article i18n build matrix...');
 
   if (!fs.existsSync(POSTS_DIR)) {
-    console.log('[Article-i18n] ⚠️ Posts directory not found. Skipping.');
+    console.log('[Article-i18n] Warning: Posts directory not found. Skipping.');
     return;
   }
 
@@ -125,13 +129,13 @@ async function main() {
   const config = resolveArticleI18nConfig();
 
   if (!config.enabled) {
-    console.log('[Article-i18n] ℹ️ AI article translation build assistant is disabled (ENABLE_ARTICLE_AI_I18N=false).');
+    console.log('[Article-i18n] AI article translation build assistant is disabled (ENABLE_ARTICLE_AI_I18N=false).');
     console.log('[Article-i18n]    To enable, set ENABLE_ARTICLE_AI_I18N=true in .env / build environment.');
     console.log(`[Article-i18n]    Indexed ${articleGroups.size} article groups across ${articles.length} posts.`);
     return;
   }
 
-  console.log(`[Article-i18n] 🚀 AI article translation build assistant is ACTIVE!`);
+  console.log(`[Article-i18n] AI article translation build assistant is ACTIVE!`);
   console.log(`[Article-i18n]    Target Locales: ${config.targetLocales.join(', ')}`);
   if (config.targetPosts && config.targetPosts.length > 0) {
     console.log(`[Article-i18n]    Target Post Scope: ${config.targetPosts.join(', ')}`);
@@ -172,31 +176,25 @@ async function main() {
             skippedCount++;
             continue;
           }
-          console.log(`[Article-i18n] 🔄 Source article "${key}" updated. Refreshing AI translation for ${targetLang}...`);
+          console.log(`[Article-i18n] Source article "${key}" updated. Refreshing AI translation for ${targetLang}...`);
         }
       }
 
-      // Smart truncation: for very large articles (>10KB), only translate
-      // the first ~10KB to stay within API context window limits.
-      // A localized notice is appended to the generated file.
-      const MAX_TRANSLATE_BYTES = 10000;
-      const isTruncated = Buffer.byteLength(sourceArticle.raw, 'utf8') > MAX_TRANSLATE_BYTES;
-      let sourceToTranslate = sourceArticle.raw;
-      if (isTruncated) {
-        // Encode and slice carefully to avoid cutting mid-character
-        sourceToTranslate = Buffer.from(sourceArticle.raw, 'utf8').slice(0, MAX_TRANSLATE_BYTES).toString('utf8');
-        // Find last complete line to avoid split Markdown structures
-        const lastNewline = sourceToTranslate.lastIndexOf('\n');
-        if (lastNewline > 5000) {
-          sourceToTranslate = sourceToTranslate.slice(0, lastNewline);
-        }
-        console.log(`[Article-i18n] ⚠️  Article "${key}" is large (${Math.round(Buffer.byteLength(sourceArticle.raw, 'utf8') / 1024)}KB). Translating first ${Math.round(Buffer.byteLength(sourceToTranslate, 'utf8') / 1024)}KB only.`);
+      // Determine body size to pick translation strategy
+      const bodyLength = sourceArticle.body ? sourceArticle.body.length : sourceArticle.raw.length;
+      const useChunked = bodyLength > 8000;
+
+      console.log(`[Article-i18n] Generating ${targetLang} translation for "${key}" (Title: ${sourceArticle.title})...`);
+      if (useChunked) {
+        console.log(`[Article-i18n]    Body is ${bodyLength} chars - using chunked pipeline`);
+      } else {
+        console.log(`[Article-i18n]    Body is ${bodyLength} chars - using single-request translation`);
       }
 
-      console.log(`[Article-i18n] 🤖 Generating ${targetLang} translation for "${key}" (Title: ${sourceArticle.title})...`);
+      const translateFn = useChunked ? translateArticleChunked : translateArticle;
 
-      const result = await translateArticle({
-        sourceMarkdown: sourceToTranslate,
+      const result = await translateFn({
+        sourceMarkdown: sourceArticle.raw,
         sourceLocale: sourceArticle.lang,
         targetLocale: targetLang,
         i18nKey: key,
@@ -212,18 +210,8 @@ async function main() {
         const targetFilename = `${key}-${targetLang}.md`;
         const targetFilePath = path.join(POSTS_DIR, targetFilename);
 
-        // Localized truncation notice for oversized articles
-        const truncationNotices = {
-          en: '\n\n---\n\n> **Note:** This is an AI-assisted partial translation. The full article (78KB+) exceeds the AI context window. The complete English version is in preparation. [Read the original Chinese version](/posts/content-formats-and-markup-mastery/).',
-          fr: '\n\n---\n\n> **Remarque :** Il s\'agit d\'une traduction partielle assistée par IA. L\'article complet (78 Ko+) dépasse la fenêtre de contexte de l\'IA. La version française complète est en cours de préparation.',
-          es: '\n\n---\n\n> **Nota:** Esta es una traducción parcial asistida por IA. El artículo completo (78KB+) supera la ventana de contexto de la IA. La versión española completa está en preparación.',
-          de: '\n\n---\n\n> **Hinweis:** Dies ist eine KI-unterstützte Teilübersetzung. Der vollständige Artikel (78KB+) überschreitet das KI-Kontextfenster. Die vollständige deutsche Version ist in Vorbereitung.',
-          'zh-Hant': '\n\n---\n\n> **提示：** 此為 AI 輔助局部翻譯。完整文章（78KB+）超出 AI 上下文窗口。完整繁體中文版本正在準備中。',
-        };
-        const notice = isTruncated ? (truncationNotices[targetLang] || '') : '';
-
-        fs.writeFileSync(targetFilePath, result.translatedMarkdown + notice, 'utf8');
-        console.log(`[Article-i18n] ✅ Successfully generated ${targetFilename} via [${result.provider} / ${result.model}]${isTruncated ? ' (partial — first 30KB)' : ''}`);
+        fs.writeFileSync(targetFilePath, result.translatedMarkdown, 'utf8');
+        console.log(`[Article-i18n] Successfully generated ${targetFilename} via [${result.provider} / ${result.model}]`);
         generatedCount++;
 
         // Update in-memory mapping
@@ -234,17 +222,17 @@ async function main() {
           isAiGenerated: true,
         };
       } else {
-        console.error(`[Article-i18n] ❌ Failed to generate ${targetLang} translation for "${key}": ${result.error || 'Unknown error'}`);
+        console.error(`[Article-i18n] Failed to generate ${targetLang} translation for "${key}": ${result.error || 'Unknown error'}`);
       }
     }
   }
 
   // Update mapping file with new translations
   fs.writeFileSync(I18N_MAP_PATH, JSON.stringify(i18nMap, null, 2), 'utf8');
-  console.log(`[Article-i18n] ✨ Completed: ${generatedCount} generated, ${skippedCount} preserved.`);
+  console.log(`[Article-i18n] Completed: ${generatedCount} generated, ${skippedCount} preserved.`);
 }
 
 main().catch((err) => {
-  console.error('[Article-i18n] 💥 Fatal error during i18n sync:', err);
+  console.error('[Article-i18n] Fatal error during i18n sync:', err);
   process.exit(1);
 });
