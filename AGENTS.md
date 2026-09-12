@@ -1635,3 +1635,34 @@
   - Test 4：`api-ready-theme-contracts-en` 英文 TOC 验证通过 ✅
   - Test 5：首页去重检查，hello-world 仅显示 1 张卡片无重复 ✅
 - [x] `ENABLE_ARTICLE_AI_I18N` 恢复默认 `false`，功能默认关闭，用户在 `.env` 手动开启。
+
+### Task 76: Chronral AI 摘要多语言 (i18n) 补丁、提示词语种硬性约束、语种对齐优先级与响应式动态切换 (`6cceb17`)
+- [x] **提示词语种硬性规范与长度自适应 (`functions/_lib/summary.ts` & `src/lib/server-ai-summary.ts`)**：
+  1. 引入 `normalizeSummaryLocale(lang)` 标准化函数，全面覆盖 `zh-CN`、`zh-Hant`、`en`、`fr`、`es`、`de`；
+  2. 实现语言隔离的 `getSystemInstructionByLevel(level, customInstruction, lang)`，针对每种语种制定专属系统架构师角色设定；
+  3. 重构 `buildSummaryPrompt` 与 `buildQuestionPrompt`，硬性注入各语种专有输出规范（如英文明确标注 `STRICTLY write in natural, idiomatic, professional English. Do NOT output Chinese`，字数弹性自适应 130-190 words；繁体中文严格限定正體中文及 220-320 字）；杜绝任何情况下 AI 摘要默认回退或硬编码为中文。
+- [x] **后端 API 多语言多租户隔离 (`functions/api/ai-summary.ts`)**：
+  1. 请求体扩充 `lang` 与 `locale` 字段，解析并标准化客户端请求语种；
+  2. D1 数据库缓存键深度绑定语种维度（`sha256Hex([slug, title, summary, mode, questionType, level, lang, ...])`），彻底消除不同语言间的内容碰撞污染；
+  3. 响应 JSON 明确返回当前生成的 `lang` 字段。
+- [x] **前端多语言响应式引擎与最高优先级对齐 (`src/components/theme/AiSummaryPanel.astro`)**：
+  1. 建立覆盖 6 种主流语言的 `I18N_DICTIONARY`，全量本地化品牌标（`Chronral Summary`）、刷新与切换提示、全部动作按钮（`💡 Key Points`、`🎯 Audience`、`⏱️ 30s Read`、`🧠 Insights`、`👤 About Author`、`📚 Related Posts`、`🔝 Back to Top`）、思考链动效及 429 错误说明；
+  2. 严格实现用户规定的语种对齐优先级准则（“如果文章语言和所选文字不同，以所选语言为最高优先对齐”）：
+     - 优先级 1：页面运行时主动切换语种（`shijianus:localechange` 事件）；
+     - 优先级 2：用户全局手动设置的界面语种（`localStorage['shijianus-manual-locale-selected']`）；
+     - 优先级 3：文章原生语种（`data-article-lang`）；
+     - 优先级 4：已保存的变体或 HTML `dataset.localeVariant`；
+     - 优先级 5：兜底 `zh-CN`；
+  3. 模板 SSR / 构建时自适应渲染：当 `articleLang === 'en'` 时直接直出英文品牌标题与英文按钮，消除初次加载时的中文闪烁；
+  4. 注入 `detailedAuthorIntrosEn` 英文作者背景与理念档案，点击“👤 About Author”无缝呈现地道英文自述；
+  5. 监听 `shijianus:localechange` 与 `htmlObserver`，语种切换时毫秒级更新 UI 文字，并就地重载摘要或重触发当前动作。
+- [x] **跨文章导航与路由语种对齐加固 (`src/pages/posts/[slug].astro`)**：
+  1. 修正直接访问英文文章（如 `/posts/hello-world-en/`）时的自动跳转逻辑，仅当用户手动明确指定偏好语种时才触发自动重定向；
+  2. 在 `navigateToLang` 跳转前先写入对应目标语种的 `localStorage` 并同步 `<html>` 标签属性，确保多语言页面间切换平滑稳定。
+- [x] **离线预构建 LLMGPT 英文摘要生成与静态构建 (`scripts/generate-ai-summaries.mjs` & `src/data/ai-summaries.json`)**：
+  1. 离线生成脚本支持根据文章 frontmatter / 路径后缀自动识别目标语种，为英文博文生成高水准架构师英文离线摘要；
+  2. 构建全站 102 个静态页面，离线摘要无损编译注入 HTML。
+- [x] **端到端自动化验证套件 (`scripts/verify-ai-summary-i18n.mjs` & `scripts/verify-live-ai-summary-i18n.mjs`)**：
+  1. 本地 Playwright 6 项全景测试全部 100% 通过（包含原生英文文章、手动切回中文、无翻译中文文章就地切英文、英文作者自述、带翻译文章双向跳转、静态 HTML 完整性）；
+  2. 部署至生产端（Cloudflare Pages：`https://blog.epocanvas.com`），真实生产环境端到端浏览器与 API 验证 100% PASS。
+
