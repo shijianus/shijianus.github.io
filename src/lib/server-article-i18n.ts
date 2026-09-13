@@ -81,14 +81,16 @@ export function compileSystemPrompt(sourceLocale = 'zh-CN', targetLocale = 'en')
  */
 function compileChunkSystemPrompt(targetLocale: string): string {
   const targetMeta = LOCALE_NAMES[targetLocale] || { native: targetLocale, english: targetLocale };
-  const localeName = `${targetMeta.english} / ${targetMeta.native}`;
+  const localeName = `${targetMeta.english} (${targetMeta.native})`;
   return [
-    `Translate ONLY the following Markdown body text into ${localeName}.`,
-    `Do NOT add frontmatter. Do NOT add any preamble or postscript.`,
-    `Output ONLY the translated Markdown text.`,
-    `Maintain all code blocks, URLs, image references, and special syntax unchanged.`,
-    `Preserve all blank lines and heading levels exactly as in the source.`,
-  ].join(' ');
+    `You are a professional technical translator and documentation specialist.`,
+    `Translate ONLY the provided Markdown body text into natural, idiomatic, professional ${localeName}.`,
+    `CRITICAL RULES:`,
+    `- Output ONLY the translated Markdown text. Do NOT add preamble, conversational remarks, or postscript.`,
+    `- Do NOT add frontmatter (no title, no YAML, no --- headers).`,
+    `- Maintain all Markdown headings, formatting, lists, tables, callout blocks (> [!NOTE]), and HTML tags (<div class="...">, etc.) exactly as in the source.`,
+    `- Do NOT translate code inside code blocks (\`\`\`...\`\`\`) or inline backticks (\`...\`). Preserve URLs and image links intact.`,
+  ].join('\n');
 }
 
 /**
@@ -411,7 +413,7 @@ async function callModel(opts: CallModelOptions): Promise<CallModelResult> {
  * Tracks code fence state to never split inside a fenced block.
  * Each chunk gets ~overlap chars of the previous chunk's end as context header.
  */
-export function splitIntoChunks(body: string, maxChars = 3500, overlap = 150): string[] {
+export function splitIntoChunks(body: string, maxChars = 3500): string[] {
   if (body.length <= maxChars) return [body];
 
   const chunks: string[] = [];
@@ -421,7 +423,7 @@ export function splitIntoChunks(body: string, maxChars = 3500, overlap = 150): s
   let insideCodeFence = false;
 
   const flushChunk = () => {
-    const trimmed = currentChunk.trimEnd();
+    const trimmed = currentChunk.trim();
     if (trimmed) chunks.push(trimmed);
     currentChunk = '';
   };
@@ -445,10 +447,10 @@ export function splitIntoChunks(body: string, maxChars = 3500, overlap = 150): s
 
       if (splitPoint > maxChars / 4) {
         // Good split point found
-        const flushed = currentChunk.slice(0, splitPoint).trimEnd();
-        const remainder = currentChunk.slice(splitPoint).trimStart();
+        const flushed = currentChunk.slice(0, splitPoint).trim();
+        const remainder = currentChunk.slice(splitPoint).trim();
         if (flushed) chunks.push(flushed);
-        currentChunk = remainder + '\n' + line;
+        currentChunk = remainder ? remainder + '\n' + line : line;
       } else {
         // No good boundary: force flush and start fresh
         flushChunk();
@@ -460,23 +462,7 @@ export function splitIntoChunks(body: string, maxChars = 3500, overlap = 150): s
   }
 
   flushChunk();
-
-  // Add overlap context: prepend last `overlap` chars of previous chunk to each subsequent chunk
-  const chunksWithContext: string[] = [];
-  for (let i = 0; i < chunks.length; i++) {
-    if (i === 0) {
-      chunksWithContext.push(chunks[i]);
-    } else {
-      const prevEnd = chunks[i - 1].slice(-overlap);
-      if (!chunks[i].startsWith(prevEnd.trimStart())) {
-        chunksWithContext.push(`<!-- context from previous chunk -->\n${prevEnd}\n<!-- end context -->\n\n${chunks[i]}`);
-      } else {
-        chunksWithContext.push(chunks[i]);
-      }
-    }
-  }
-
-  return chunksWithContext;
+  return chunks;
 }
 
 // ---------------------------------------------------------------------------
@@ -530,22 +516,30 @@ export async function translateFrontmatterOnly(
 
 /**
  * Translates a single body chunk (not a full article; no frontmatter expected in output).
- * Includes retry logic (up to 3 attempts). Falls back to original source chunk on failure.
+ * Includes retry logic (up to 5 attempts). Falls back to original source chunk on failure.
  */
 export async function translateBodyChunk(
   chunk: string,
   chunkIndex: number,
   totalChunks: number,
   options: TranslateArticleOptions,
+  prevContext?: string,
 ): Promise<{ text: string; provider: string; model: string }> {
   const { i18nKey, targetLocale } = options;
   const systemPrompt = compileChunkSystemPrompt(targetLocale);
 
-  const userMessage = [
-    `This is chunk ${chunkIndex + 1} of ${totalChunks} of the article body. Translate ONLY the provided text, maintaining continuity with the previous context shown.`,
-    '',
-    chunk,
-  ].join('\n');
+  const parts: string[] = [];
+  parts.push(`Translate Chunk ${chunkIndex + 1} of ${totalChunks} of the article body.`);
+  if (prevContext && prevContext.trim()) {
+    parts.push(
+      '',
+      `[Preceding context for reference only - DO NOT translate and DO NOT include in output]:`,
+      prevContext.trim(),
+      `---`,
+    );
+  }
+  parts.push('', `[Text to translate]:`, chunk);
+  const userMessage = parts.join('\n');
 
   const MAX_RETRIES = 5;
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
@@ -562,13 +556,27 @@ export async function translateBodyChunk(
 
     if (result.ok && result.text.trim()) {
       let translated = result.text.trim();
-      // Strip any accidental ``` fences
-      if (translated.startsWith('```')) translated = translated.replace(/^```[a-z]*\r?\n/, '');
+      // Strip outer ```markdown ... ``` or ``` ... ```
+      if (translated.startsWith('```markdown')) translated = translated.replace(/^```markdown\r?\n/, '');
+      else if (translated.startsWith('```')) translated = translated.replace(/^```[a-z]*\r?\n/, '');
       if (translated.endsWith('```')) translated = translated.replace(/\r?\n```$/, '');
-      // Strip any accidental frontmatter that slipped in
-      translated = translated.replace(/^---[\s\S]*?---\s*\n?/, '').trim();
-      // Strip context comment markers if model echoed them back
-      translated = translated.replace(/<!-- context from previous chunk -->[\s\S]*?<!-- end context -->\s*\n?/, '').trim();
+      translated = translated.trim();
+
+      // Strip echoed prompt headers
+      if (translated.startsWith('[Text to translate]:')) {
+        translated = translated.replace(/^\[Text to translate\]:\s*\r?\n?/, '').trim();
+      }
+
+      // Strip accidental frontmatter block ONLY if it contains YAML metadata keys
+      if (translated.startsWith('---')) {
+        const secondDashes = translated.indexOf('---', 3);
+        if (secondDashes !== -1 && secondDashes < 500) {
+          const possibleFm = translated.slice(0, secondDashes + 3);
+          if (possibleFm.includes('title:') || possibleFm.includes('lang:') || possibleFm.includes('pubDate:')) {
+            translated = translated.slice(secondDashes + 3).trim();
+          }
+        }
+      }
 
       console.log(`[Article-i18n] 📦 Chunk ${chunkIndex + 1}/${totalChunks} for "${i18nKey}" -> translated via [${result.provider} / ${result.model}]`);
       return { text: translated, provider: result.provider, model: result.model };
@@ -594,7 +602,7 @@ export async function translateBodyChunk(
  * Full chunked translation pipeline for large articles (body > 8000 chars).
  * 1. Extracts frontmatter and body
  * 2. Translates frontmatter (first request)
- * 3. Splits body into ~6000-char semantic chunks
+ * 3. Splits body into ~3500-char semantic chunks
  * 4. Translates each chunk sequentially (3s delay between calls to avoid rate limiting)
  * 5. Reassembles: translated frontmatter + translated body chunks
  * 6. Runs cleanAiArticleOutput() and returns TranslateArticleResult
@@ -621,8 +629,8 @@ export async function translateArticleChunked(options: TranslateArticleOptions):
   // Brief pause before body chunks
   await new Promise((r) => setTimeout(r, 1500));
 
-  // Step 2: Split body into chunks (~3500 chars each, 150 chars overlap)
-  const chunks = splitIntoChunks(rawBody, 3500, 150);
+  // Step 2: Split body into clean semantic chunks (~3500 chars each)
+  const chunks = splitIntoChunks(rawBody, 3500);
   console.log(`[Article-i18n]    Split into ${chunks.length} chunks`);
 
   // Step 3: Translate each chunk sequentially
@@ -635,7 +643,8 @@ export async function translateArticleChunked(options: TranslateArticleOptions):
       // 3s delay between chunk API calls to avoid rate limiting
       await new Promise((r) => setTimeout(r, 3000));
     }
-    const { text, provider, model } = await translateBodyChunk(chunks[i], i, chunks.length, options);
+    const prevContext = i > 0 ? chunks[i - 1].slice(-200) : '';
+    const { text, provider, model } = await translateBodyChunk(chunks[i], i, chunks.length, options, prevContext);
     translatedChunks.push(text);
     lastProvider = provider;
     lastModel = model;
