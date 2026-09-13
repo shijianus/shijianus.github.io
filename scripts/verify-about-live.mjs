@@ -37,6 +37,10 @@ async function runLiveAudit() {
         allPassed = false;
       }
 
+      // 等待核心 DOM 元素完全呈现
+      await page.waitForSelector('.author-box', { timeout: 15000 });
+      await page.waitForSelector('.author-content-item.maxim', { timeout: 15000 });
+
       // 1. 验证打赏模块在线上彻底不存在
       const rewardCheck = await page.evaluate(() => {
         const rewardElement = document.querySelector('#about-reward');
@@ -71,10 +75,9 @@ async function runLiveAudit() {
           gearSoftware: queryAll('.gear-card.software .gear-item').length,
           manifestoTitle: query('.manifesto-title')?.textContent || '',
           manifestoPillars: queryAll('.manifesto-pillars .pillar-card').length,
-          topologyLayers: queryAll('.topology-card .topology-tier').length,
+          topologyLayers: queryAll('.topology-card .topology-tier-box').length,
           milestoneNodes: queryAll('.milestones-card .milestone-node').length,
-          maximTop: query('.author-content-item.maxim .maxim-top')?.textContent || '',
-          maximBottom: query('.author-content-item.maxim .maxim-bottom')?.textContent || '',
+          maximTitle: query('.author-content-item.maxim .maxim-title')?.textContent?.trim().replace(/\s+/g, ' ') || '',
           vinylSongTitle: query('.vinyl-song-title')?.textContent || '',
           equalizerBars: queryAll('.equalizer-bars .bar').length,
           connectButtons: queryAll('.connect-buttons-grid .connect-btn').length,
@@ -84,7 +87,7 @@ async function runLiveAudit() {
       console.log(`[LIVE AUDIT RESULT]:`);
       console.log(` - Online Indicator: ${contentAudit.onlineIndicator}`);
       console.log(` - Hello Chips: ${contentAudit.helloChips} tags`);
-      console.log(` - Maxim Motto: '${contentAudit.maximTop} ${contentAudit.maximBottom}'`);
+      console.log(` - Maxim Motto: '${contentAudit.maximTitle}'`);
       console.log(` - Live PST Clock: '${contentAudit.clockText}'`);
       console.log(` - Personality: ${contentAudit.personalityBadge} with ${contentAudit.personalityTraits} trait bars`);
       console.log(` - Gear Workstation: ${contentAudit.gearHardware} hardware + ${contentAudit.gearSoftware} software`);
@@ -94,9 +97,9 @@ async function runLiveAudit() {
       console.log(` - Vinyl Turntable: '${contentAudit.vinylSongTitle}', Equalizer: ${contentAudit.equalizerBars} bars`);
       console.log(` - Connect Buttons: ${contentAudit.connectButtons} social/subscribe links`);
 
-      const mottoOk = contentAudit.maximTop.includes('厚土潜藏细脉') && contentAudit.maximBottom.includes('大荒广构通衢');
+      const mottoOk = contentAudit.maximTitle.includes('厚土潜藏细脉') && contentAudit.maximTitle.includes('大荒广构通衢');
       if (!mottoOk) {
-        console.error(`❌ Motto text mismatch on live: ${contentAudit.maximTop} / ${contentAudit.maximBottom}`);
+        console.error(`❌ Motto text mismatch on live: ${contentAudit.maximTitle}`);
         allPassed = false;
       }
 
