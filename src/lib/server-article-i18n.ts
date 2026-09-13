@@ -84,12 +84,22 @@ function compileChunkSystemPrompt(targetLocale: string): string {
   const localeName = `${targetMeta.english} (${targetMeta.native})`;
   return [
     `You are a professional technical translator and documentation specialist.`,
-    `Translate ONLY the provided Markdown body text into natural, idiomatic, professional ${localeName}.`,
-    `CRITICAL RULES:`,
-    `- Output ONLY the translated Markdown text. Do NOT add preamble, conversational remarks, or postscript.`,
-    `- Do NOT add frontmatter (no title, no YAML, no --- headers).`,
-    `- Maintain all Markdown headings, formatting, lists, tables, callout blocks (> [!NOTE]), and HTML tags (<div class="...">, etc.) exactly as in the source.`,
-    `- Do NOT translate code inside code blocks (\`\`\`...\`\`\`) or inline backticks (\`...\`). Preserve URLs and image links intact.`,
+    `Translate the provided Markdown body text into natural, idiomatic, professional ${localeName}.`,
+    `CRITICAL STRUCTURAL RULES:`,
+    `1. Output ONLY the translated Markdown text. Do NOT add preamble, conversational remarks, or postscript.`,
+    `2. Do NOT add YAML frontmatter or --- header delimiters.`,
+    `3. Maintain all Markdown syntax structure (headings #/##/###, blockquotes > [!NOTE], lists, tables, dividers ---) exactly.`,
+    `4. CODE & MATH INTEGRITY:`,
+    `   - Do NOT translate code inside code blocks (\`\`\`...\`\`\`) or inline backticks (\`...\`).`,
+    `   - Do NOT translate LaTeX / KaTeX math blocks ($$...$$ or $...$). Keep all formulas completely intact.`,
+    `   - Do NOT translate URLs, file paths, image paths, or technical IDs.`,
+    `5. HTML & ATTRIBUTES INTEGRITY:`,
+    `   - Maintain all HTML opening and closing tags (<div ...>, </div>, <details>, </details>, <summary>, etc.) exactly as in the source. Never drop or prematurely close HTML container tags.`,
+    `   - Strictly keep technical attributes and their values unchanged: class, id, data-level, data-single, data-animate, data-sound, data-hash, data-default, data-video-type, viewBox, etc.`,
+    `   - TRANSLATE human-readable text inside user-facing HTML attributes: data-title="...", placeholder="...", aria-label="...", alt="...", title="...", and data-hint="...". Translate ONLY their natural language values into ${localeName}.`,
+    `6. CONTEXT & CONTINUITY:`,
+    `   - If any [REFERENCE CONTEXT] is provided, use it strictly for terminology continuity. Do NOT translate or echo the reference context in your output.`,
+    `   - Translate ALL text under [TEXT TO TRANSLATE]. Do not truncate or summarize.`,
   ].join('\n');
 }
 
@@ -113,6 +123,16 @@ export function cleanAiArticleOutput(raw: string, i18nKey: string, targetLocale:
   if (cleaned.endsWith('```')) {
     cleaned = cleaned.replace(/\r?\n```$/, '');
   }
+  cleaned = cleaned.trim();
+
+  // Strip legacy or echoed context comments and prompt headers
+  cleaned = cleaned.replace(/<!--\s*context from previous chunk\s*-->[\s\S]*?<!--\s*end context\s*-->/gi, '');
+  cleaned = cleaned.replace(/<!--\s*context from previous chunk\s*-->/gi, '');
+  cleaned = cleaned.replace(/<!--\s*end context\s*-->/gi, '');
+  cleaned = cleaned.replace(/\[REFERENCE (?:ONLY|CONTEXT)[\s\S]*?\[END REFERENCE CONTEXT\]/gi, '');
+  cleaned = cleaned.replace(/\[Preceding context[\s\S]*?---\r?\n/gi, '');
+  cleaned = cleaned.replace(/\[TEXT TO TRANSLATE[^\]]*\]:?\r?\n?/gi, '');
+  cleaned = cleaned.replace(/\[END TEXT TO TRANSLATE\]/gi, '');
   cleaned = cleaned.trim();
 
   // Validate frontmatter presence
@@ -344,16 +364,9 @@ async function callModel(opts: CallModelOptions): Promise<CallModelResult> {
           'qwen/qwen3.6-27b',
           opts.groqModel,
           process.env.GROQ_MODEL,
-        ].filter(
-          (m): m is string =>
-            Boolean(m) &&
-            m !== 'llama-3.3-70b-versatile' &&
-            m !== 'llama-3.1-8b-instant' &&
-            m !== 'llama3-70b-8192' &&
-            m !== 'meta-llama/llama-4-scout-17b-16e-instruct' &&
-            m !== 'gemma2-9b-it' &&
-            m !== 'llama-3.1-70b-versatile',
-        ),
+          'llama-3.3-70b-versatile',
+          'llama-3.1-8b-instant',
+        ].filter(Boolean) as string[],
       ),
     );
 
@@ -409,59 +422,180 @@ async function callModel(opts: CallModelOptions): Promise<CallModelResult> {
 // ---------------------------------------------------------------------------
 
 /**
- * Splits an article body into semantic chunks at paragraph/heading boundaries.
- * Tracks code fence state to never split inside a fenced block.
- * Each chunk gets ~overlap chars of the previous chunk's end as context header.
+ * Splits an article body into semantic chunks at paragraph or heading boundaries.
+ * Strictly guarantees that:
+ * 1. Fenced code blocks (``` or ~~~) are NEVER cut across chunks.
+ * 2. KaTeX math blocks ($$ ... $$) are NEVER cut across chunks.
+ * 3. HTML container tags (<div ...> ... </div>, <details> ... </details>, etc.) are NEVER cut across chunks.
+ * 4. Human-readable components (tabs, accordions, chat dialogs) remain intact as atomic units.
  */
-export function splitIntoChunks(body: string, maxChars = 3500): string[] {
+export function splitIntoChunks(body: string, maxChars = 4500): string[] {
   if (body.length <= maxChars) return [body];
 
-  const chunks: string[] = [];
   const lines = body.split('\n');
+  const chunks: string[] = [];
 
-  let currentChunk = '';
-  let insideCodeFence = false;
+  let currentChunkLines: string[] = [];
+  let currentChunkChars = 0;
 
-  const flushChunk = () => {
-    const trimmed = currentChunk.trim();
-    if (trimmed) chunks.push(trimmed);
-    currentChunk = '';
-  };
+  let inCodeFence = false;
+  let codeFenceChar = '';
+  let codeFenceLen = 0;
+
+  let inMathFence = false;
+  let htmlDepth = 0;
+
+  const VOID_TAGS = new Set([
+    'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
+    'link', 'meta', 'param', 'source', 'track', 'wbr'
+  ]);
+
+  function scanHtmlDepthChange(line: string): number {
+    let delta = 0;
+    // Strip inline code spans e.g. `<div>`
+    const lineWithoutInlineCode = line.replace(/`[^`]*`/g, '');
+    const tagRegex = /<\/?([a-zA-Z0-9_-]+)(?:\s+[^>]*?)?(\/?)>/g;
+    let match: RegExpExecArray | null;
+    while ((match = tagRegex.exec(lineWithoutInlineCode)) !== null) {
+      const isClosing = match[0].startsWith('</');
+      const tagName = match[1].toLowerCase();
+      const isSelfClosing = match[2] === '/' || VOID_TAGS.has(tagName);
+
+      if (isSelfClosing) continue;
+      if (isClosing) {
+        delta -= 1;
+      } else {
+        delta += 1;
+      }
+    }
+    return delta;
+  }
+
+  interface SplitCandidate {
+    lineIndex: number;
+    quality: number; // 3: ##/---, 2: ###, 1: \n\n
+    charsSoFar: number;
+  }
+
+  let safeSplitPoints: SplitCandidate[] = [];
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+    const trimmed = line.trim();
 
-    // Track code fence state (``` toggles)
-    if (line.trimStart().startsWith('```')) {
-      insideCodeFence = !insideCodeFence;
+    // 1. Track code fence: ``` or ~~~
+    const fenceMatch = trimmed.match(/^(`{3,}|~{3,})/);
+    if (fenceMatch) {
+      const matchFenceStr = fenceMatch[1];
+      if (!inCodeFence) {
+        inCodeFence = true;
+        codeFenceChar = matchFenceStr[0];
+        codeFenceLen = matchFenceStr.length;
+      } else if (codeFenceChar === matchFenceStr[0] && matchFenceStr.length >= codeFenceLen) {
+        inCodeFence = false;
+        codeFenceChar = '';
+        codeFenceLen = 0;
+      }
     }
 
-    const candidate = currentChunk ? currentChunk + '\n' + line : line;
-
-    // Check if adding this line would exceed maxChars
-    if (candidate.length > maxChars && !insideCodeFence && currentChunk) {
-      // Find a good split boundary in currentChunk
-      const lastParaBreak = currentChunk.lastIndexOf('\n\n');
-      const lastHeadingBreak = currentChunk.lastIndexOf('\n#');
-      const splitPoint = Math.max(lastParaBreak, lastHeadingBreak);
-
-      if (splitPoint > maxChars / 4) {
-        // Good split point found
-        const flushed = currentChunk.slice(0, splitPoint).trim();
-        const remainder = currentChunk.slice(splitPoint).trim();
-        if (flushed) chunks.push(flushed);
-        currentChunk = remainder ? remainder + '\n' + line : line;
-      } else {
-        // No good boundary: force flush and start fresh
-        flushChunk();
-        currentChunk = line;
+    // 2. Track math fence: $$
+    if (!inCodeFence) {
+      if (trimmed === '$$') {
+        inMathFence = !inMathFence;
+      } else if (trimmed.startsWith('$$') && trimmed.endsWith('$$') && trimmed.length > 2) {
+        // Single-line block math $$ ... $$ does not alter multiline fence state
+      } else if (trimmed.startsWith('$$')) {
+        inMathFence = true;
+      } else if (trimmed.endsWith('$$') && inMathFence) {
+        inMathFence = false;
       }
-    } else {
-      currentChunk = candidate;
+    }
+
+    // 3. Track HTML depth (only outside code fences)
+    if (!inCodeFence) {
+      const delta = scanHtmlDepthChange(line);
+      htmlDepth = Math.max(0, htmlDepth + delta);
+    }
+
+    currentChunkLines.push(line);
+    currentChunkChars += line.length + 1;
+
+    // A split is safe ONLY when outside code fences, outside math fences, and outside any HTML container
+    const isSafeState = !inCodeFence && !inMathFence && htmlDepth === 0;
+
+    if (isSafeState) {
+      let quality = 0;
+      if (i < lines.length - 1) {
+        const nextLine = lines[i + 1].trim();
+        if (nextLine.startsWith('## ') || nextLine === '---') {
+          quality = 3;
+        } else if (nextLine.startsWith('### ')) {
+          quality = 2;
+        } else if (trimmed === '' && nextLine !== '') {
+          quality = 1;
+        }
+      }
+      if (quality > 0) {
+        safeSplitPoints.push({
+          lineIndex: currentChunkLines.length,
+          quality,
+          charsSoFar: currentChunkChars,
+        });
+      }
+    }
+
+    // If accumulated characters exceed maxChars and we are in a safe state, attempt split
+    if (currentChunkChars >= maxChars && isSafeState) {
+      const minAcceptableChars = maxChars * 0.55;
+      let chosenPoint: SplitCandidate | null = null;
+
+      // Prefer quality 3 or 2 (headings / section rules)
+      for (let p = safeSplitPoints.length - 1; p >= 0; p--) {
+        const pt = safeSplitPoints[p];
+        if (pt.charsSoFar >= minAcceptableChars && pt.quality >= 2) {
+          chosenPoint = pt;
+          break;
+        }
+      }
+
+      // Fallback: paragraph boundary
+      if (!chosenPoint) {
+        for (let p = safeSplitPoints.length - 1; p >= 0; p--) {
+          const pt = safeSplitPoints[p];
+          if (pt.charsSoFar >= minAcceptableChars) {
+            chosenPoint = pt;
+            break;
+          }
+        }
+      }
+
+      if (chosenPoint) {
+        const chunkLines = currentChunkLines.slice(0, chosenPoint.lineIndex);
+        const remainderLines = currentChunkLines.slice(chosenPoint.lineIndex);
+
+        const chunkText = chunkLines.join('\n').trim();
+        if (chunkText) chunks.push(chunkText);
+
+        currentChunkLines = remainderLines;
+        currentChunkChars = remainderLines.reduce((acc, l) => acc + l.length + 1, 0);
+        safeSplitPoints = [];
+      } else if (currentChunkChars > maxChars * 1.6) {
+        // Overflow safety guard: if block is huge, split at current safe point
+        const chunkText = currentChunkLines.join('\n').trim();
+        if (chunkText) chunks.push(chunkText);
+        currentChunkLines = [];
+        currentChunkChars = 0;
+        safeSplitPoints = [];
+      }
     }
   }
 
-  flushChunk();
+  // Flush any remaining lines
+  if (currentChunkLines.length > 0) {
+    const chunkText = currentChunkLines.join('\n').trim();
+    if (chunkText) chunks.push(chunkText);
+  }
+
   return chunks;
 }
 
@@ -526,19 +660,21 @@ export async function translateBodyChunk(
   prevContext?: string,
 ): Promise<{ text: string; provider: string; model: string }> {
   const { i18nKey, targetLocale } = options;
+  const targetMeta = LOCALE_NAMES[targetLocale] || { native: targetLocale, english: targetLocale };
+  const localeName = `${targetMeta.english} (${targetMeta.native})`;
   const systemPrompt = compileChunkSystemPrompt(targetLocale);
 
   const parts: string[] = [];
-  parts.push(`Translate Chunk ${chunkIndex + 1} of ${totalChunks} of the article body.`);
+  parts.push(`Translate Chunk ${chunkIndex + 1} of ${totalChunks} of the article body into ${localeName}.`);
   if (prevContext && prevContext.trim()) {
     parts.push(
       '',
-      `[Preceding context for reference only - DO NOT translate and DO NOT include in output]:`,
-      prevContext.trim(),
-      `---`,
+      `[REFERENCE CONTEXT - FOR CONTINUITY ONLY - DO NOT TRANSLATE - DO NOT OUTPUT]:`,
+      prevContext.trim().slice(-300),
+      `[END REFERENCE CONTEXT]`,
     );
   }
-  parts.push('', `[Text to translate]:`, chunk);
+  parts.push('', `[TEXT TO TRANSLATE]:`, chunk, `[END TEXT TO TRANSLATE]`);
   const userMessage = parts.join('\n');
 
   const MAX_RETRIES = 5;
@@ -562,10 +698,13 @@ export async function translateBodyChunk(
       if (translated.endsWith('```')) translated = translated.replace(/\r?\n```$/, '');
       translated = translated.trim();
 
-      // Strip echoed prompt headers
-      if (translated.startsWith('[Text to translate]:')) {
-        translated = translated.replace(/^\[Text to translate\]:\s*\r?\n?/, '').trim();
-      }
+      // Strip echoed prompt markers and reference context
+      translated = translated.replace(/\[REFERENCE CONTEXT[\s\S]*?\[END REFERENCE CONTEXT\]/gi, '').trim();
+      translated = translated.replace(/<!--\s*context from previous chunk\s*-->[\s\S]*?<!--\s*end context\s*-->/gi, '').trim();
+      translated = translated.replace(/<!--\s*context from previous chunk\s*-->/gi, '').trim();
+      translated = translated.replace(/<!--\s*end context\s*-->/gi, '').trim();
+      translated = translated.replace(/^\[TEXT TO TRANSLATE\]:\s*\r?\n?/i, '').trim();
+      translated = translated.replace(/\[END TEXT TO TRANSLATE\]\s*$/i, '').trim();
 
       // Strip accidental frontmatter block ONLY if it contains YAML metadata keys
       if (translated.startsWith('---')) {
@@ -899,11 +1038,44 @@ export function validateTranslatedFormat(sourceMarkdown: string, translatedMarkd
     return { valid: false, reason: `Code blocks dropped: expected ~${srcCodeBlocks}, got ${transCodeBlocks}` };
   }
 
+  // Check code block parity (even count of ``` fences)
+  const totalTripleBackticks = (translatedMarkdown.match(/```/g) || []).length;
+  if (totalTripleBackticks % 2 !== 0) {
+    return { valid: false, reason: `Unbalanced code fences (odd number of triple backticks: ${totalTripleBackticks})` };
+  }
+
+  // Check KaTeX math block parity (even count of $$)
+  const srcMathBlocks = (sourceMarkdown.match(/\$\$/g) || []).length;
+  const transMathBlocks = (translatedMarkdown.match(/\$\$/g) || []).length;
+  if (srcMathBlocks > 0 && transMathBlocks % 2 !== 0) {
+    return { valid: false, reason: `Unbalanced KaTeX math fences (odd number of $$: ${transMathBlocks})` };
+  }
+
   // Check HTML tags preservation
   const srcHtmlTags = (sourceMarkdown.match(/<(?:div|span|details|summary|table|tr|td|th|mark|kbd|figure|figcaption)/gi) || []).length;
   const transHtmlTags = (translatedMarkdown.match(/<(?:div|span|details|summary|table|tr|td|th|mark|kbd|figure|figcaption)/gi) || []).length;
   if (srcHtmlTags >= 4 && transHtmlTags < Math.floor(srcHtmlTags * 0.6)) {
     return { valid: false, reason: `HTML tags dropped: expected ~${srcHtmlTags}, got ${transHtmlTags}` };
+  }
+
+  // Check HTML container balance (<div> vs </div>, <details> vs </details>)
+  const openDivs = (translatedMarkdown.match(/<div(\s+[^>]*)?>/gi) || []).length;
+  const closeDivs = (translatedMarkdown.match(/<\/div>/gi) || []).length;
+  if (Math.abs(openDivs - closeDivs) > 2) {
+    return { valid: false, reason: `Unbalanced <div> tags in translation: open=${openDivs}, close=${closeDivs}` };
+  }
+
+  const openDetails = (translatedMarkdown.match(/<details(\s+[^>]*)?>/gi) || []).length;
+  const closeDetails = (translatedMarkdown.match(/<\/details>/gi) || []).length;
+  if (openDetails !== closeDetails) {
+    return { valid: false, reason: `Unbalanced <details> tags in translation: open=${openDetails}, close=${closeDetails}` };
+  }
+
+  // Check for leaked markers
+  if (/<!--\s*context from previous chunk\s*-->/i.test(translatedMarkdown) ||
+      /\[REFERENCE (?:ONLY|CONTEXT)\]/i.test(translatedMarkdown) ||
+      /\[TEXT TO TRANSLATE\]/i.test(translatedMarkdown)) {
+    return { valid: false, reason: `Leaked prompt markers detected in output` };
   }
 
   // Check headings preservation
@@ -967,9 +1139,6 @@ export async function translateArticleByExtraction(options: TranslateArticleOpti
   // Mask HTML comments
   template = template.replace(/<!--[\s\S]*?-->/g, (m) => mask(m));
 
-  // Mask HTML tags (<div ...>, </span>, etc.)
-  template = template.replace(/<[^>]+>/g, (m) => mask(m));
-
   // 2. Extract translatable segments line by line
   const textSegments: string[] = [];
   const addSegment = (text: string): string => {
@@ -983,6 +1152,22 @@ export async function translateArticleByExtraction(options: TranslateArticleOpti
     const trailing = text.match(/\s*$/)?.[0] || '';
     return `${leading}__TX_NODE_${idx}__${trailing}`;
   };
+
+  // Mask HTML tags (<div ...>, </span>, etc.), while extracting translatable attributes
+  template = template.replace(/<[^>]+>/g, (tagStr) => {
+    const translatableAttrs = ['data-title', 'placeholder', 'aria-label', 'alt', 'title', 'data-hint'];
+    let modifiedTag = tagStr;
+    for (const attr of translatableAttrs) {
+      const attrRegex = new RegExp(`(${attr}=)(["'])(.*?)\\2`, 'gi');
+      modifiedTag = modifiedTag.replace(attrRegex, (_match, prefix, quote, val) => {
+        if (val && !/^[\d\s.,:;!?_—–\-=+*\/\\|()\[\]{}'"]+$/.test(val)) {
+          return `${prefix}${quote}${addSegment(val)}${quote}`;
+        }
+        return _match;
+      });
+    }
+    return mask(modifiedTag);
+  });
 
   const lines = template.split('\n');
   const templatedLines: string[] = [];

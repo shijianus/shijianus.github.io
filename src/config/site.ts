@@ -210,9 +210,9 @@ export const siteConfig = {
     description: '用 Astro、React 和 Tailwind 搭建一套高信息密度、重阅读体验、能长期维护的个人博客。',
     author: {
       name: 'shijianus',
-      role: '00后大学在读 · Web 全栈初探者 · 数字花园建造者',
+      role: '00后在读大学生 · Web 全栈初探者 · 数字花园建造者',
       motto: '厚土潜藏细脉 大荒广构通衢',
-      bio: '生于 2006 年，计算机在读大学生。深潜底层打磨隐秘细脉，拓越远方构筑长效通衢。把博客做成真正能持续生长的数字花园。',
+      bio: '生于 2006 年，计算机专业在读大学生。深潜底层打磨隐秘细脉，拓越远方构筑长效通衢。把博客做成真正能持续生长的数字花园。',
       email: 'shijianus@epocanvas.com',
       location: 'UTC-8',
       avatar: '/media/shijianus/avatar.jpg',
@@ -825,7 +825,7 @@ export const siteConfig = {
       floatingTagsRight: ['开源求索', '长效构建', '数字花园'],
       helloTips: '你好，很高兴认识你',
       helloLead: '你好，我在这里写作与构建',
-      helloDescription: '00后大学在读 · Web 全栈初探者 · 数字花园建造者',
+      helloDescription: '00后在读大学生 · Web 全栈初探者 · 数字花园建造者',
       siteTips: {
         tips: '基调',
         titleTop: '深耕',
@@ -848,12 +848,12 @@ export const siteConfig = {
         ] satisfies AboutSkill[],
       },
       careers: {
-        tips: '生涯',
+        tips: '求索',
         title: '阶段与长期方向',
         items: [
-          { label: '工程化地整理自己的内容系统', accent: '#5b8cff' },
-          { label: '把主题做成可维护的产品，而不是一次性页面', accent: '#ff7d55' },
-          { label: '建立兼顾速度、阅读感和扩展性的个人博客架构', accent: '#30c48d' },
+          { label: '在大学本科阶段踏实打好计算机与工程基础', accent: '#5b8cff' },
+          { label: '把个人主页打磨成长效可演进的数字花园，而非一次性产物', accent: '#ff7d55' },
+          { label: '探索 Web 全栈、现代设计系统与人机协同的融合实践', accent: '#30c48d' },
         ] satisfies AboutCareer[],
       },
       statistics: {
@@ -887,8 +887,8 @@ export const siteConfig = {
       },
       photoTitle: '工作台',
       gear: {
-        tips: '生产力工具',
-        title: '我的装备与工作流',
+        tips: '实用装备',
+        title: '日常学习与开发伙伴',
         hardware: [
           { name: '联想小新 Pro / 拯救者便携本', desc: '自习室与寝室主力 · 陪我熬夜跑实验写代码的高性价比伙伴', icon: 'laptop', badge: 'Daily' },
           { name: '红米 / AOC 24寸 护眼显示屏', desc: '桌面副屏扩展 · 平价实用，双屏分屏查文档编码更专注', icon: 'monitor' },
@@ -896,10 +896,10 @@ export const siteConfig = {
           { name: '实用入耳式降噪耳机', desc: '自习防线 · 图书馆与宿舍里隔绝杂音、开启心流沉浸', icon: 'headphones' },
         ] satisfies AboutGearItem[],
         software: [
-          { name: 'Cursor & VS Code', desc: 'Tokyo Night 主题 · 现代智能结对与流畅编码', icon: 'code', badge: 'Editor' },
-          { name: 'Raycast', desc: '工作流神经中枢 · 毫秒级快捷操作与管道调度', icon: 'zap' },
-          { name: 'Figma', desc: '界面原型绘制 · 像素级打磨与交互草图设计', icon: 'figma' },
-          { name: 'Cloudflare Pages & D1', desc: '全球边缘网络 · 零冷启动现代化分布式架构', icon: 'cloud', badge: 'Cloud' },
+          { name: 'VS Code & 终端', desc: '代码编写与调试 · 课业实验与个人博客维护主力', icon: 'code', badge: 'Editor' },
+          { name: 'Obsidian / Markdown', desc: '知识沉淀与课程笔记 · 构建双向链接的个人知识库', icon: 'zap' },
+          { name: 'Chrome / Edge DevTools', desc: '前端调试与查阅文档 · 边看文档边排查样式布局', icon: 'figma' },
+          { name: 'Cloudflare Pages & GitHub', desc: '自动化部署与版本控制 · 零成本托管个人数字花园', icon: 'cloud', badge: 'Cloud' },
         ] satisfies AboutGearItem[],
       },
       manifesto: {

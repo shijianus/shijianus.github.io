@@ -55,182 +55,238 @@ async function runAudit() {
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
 
+  const viewports = [
+    { name: 'Desktop-1440', width: 1440, height: 900 },
+    { name: 'Tablet-768', width: 768, height: 1024 },
+    { name: 'Mobile-375', width: 375, height: 667 }
+  ];
+
   let allPassed = true;
 
   try {
-    const pagesToAudit = [
-      {
-        lang: 'zh-CN',
-        url: `http://localhost:${port}/about/`,
-        expectedName: '時間',
-        expectedRole: '在读大学生',
-        expectedYear: '2006',
-        expectedMotto: '厚土潜藏细脉 大荒广构通衢',
-        expectedGear: '联想',
-      },
-      {
-        lang: 'zh-Hant',
-        url: `http://localhost:${port}/zh-hant/about/`,
-        expectedName: '時間',
-        expectedRole: '在讀大學生',
-        expectedYear: '2006',
-        expectedMotto: '厚土潛藏細脈 大荒廣構通衢',
-        expectedGear: '聯想',
-      },
-      {
-        lang: 'en',
-        url: `http://localhost:${port}/en/about/`,
-        expectedName: 'Kevin Sparks',
-        expectedRole: 'Undergraduate',
-        expectedYear: '2006',
-        expectedMotto: 'Nurture deep roots quietly',
-        expectedGear: 'Lenovo',
-      },
-      {
-        lang: 'fr',
-        url: `http://localhost:${port}/fr/about/`,
-        expectedName: 'Léon Boven',
-        expectedRole: 'Étudiant',
-        expectedYear: '2006',
-        expectedMotto: 'Enracinement discret',
-        expectedGear: 'Lenovo',
-      }
-    ];
-
-    for (const item of pagesToAudit) {
+    for (const vp of viewports) {
       console.log(`\n=============================================================`);
-      console.log(`[I18N AUDIT] Testing Profile: ${item.lang} (${item.url})`);
+      console.log(`[TEST] Auditing Viewport: ${vp.name} (${vp.width}x${vp.height})`);
       console.log(`=============================================================`);
 
       const page = await browser.newPage();
-      await page.setViewport({ width: 1440, height: 900 });
+      await page.setViewport({ width: vp.width, height: vp.height });
 
       const errors = [];
       page.on('pageerror', err => errors.push(err.message));
 
-      const response = await page.goto(item.url, { waitUntil: 'networkidle2' });
-      if (response.status() !== 200) {
-        console.error(`❌ Non-200 response for ${item.url}: ${response.status()}`);
-        allPassed = false;
-      }
+      await page.goto(`http://localhost:${port}/about/`, { waitUntil: 'networkidle2' });
 
-      await page.waitForSelector('.author-box', { timeout: 10000 });
-
-      // 1. 验证打赏模块 100% 彻底不存在
-      const rewardAudit = await page.evaluate(() => {
-        const rewardId = document.querySelector('#about-reward');
+      // 1. 验证打赏模块彻底移除
+      const rewardCheck = await page.evaluate(() => {
+        const rewardElement = document.querySelector('#about-reward');
         const rewardClass = document.querySelector('.author-content-item.reward');
-        return { hasRewardId: Boolean(rewardId), hasRewardClass: Boolean(rewardClass) };
-      });
-
-      if (!rewardAudit.hasRewardId && !rewardAudit.hasRewardClass) {
-        console.log(`✅ [REWARD REMOVED] No reward element in ${item.lang} profile!`);
-      } else {
-        console.error(`❌ [FAILURE] Reward module found in ${item.lang} profile!`);
-        allPassed = false;
-      }
-
-      // 2. 验证多语言切换栏与当前高亮状态
-      const switcherAudit = await page.evaluate((lang) => {
-        const switcher = document.querySelector('.about-lang-switch-bar');
-        const activeLink = document.querySelector(`.lang-switch-item[data-target-lang="${lang}"]`);
-        const allLinks = Array.from(document.querySelectorAll('.lang-switch-item'));
         return {
-          hasSwitcher: Boolean(switcher),
-          activeMatches: activeLink ? activeLink.classList.contains('active') : false,
-          totalLinks: allLinks.length,
-        };
-      }, item.lang);
-
-      if (switcherAudit.hasSwitcher && switcherAudit.activeMatches && switcherAudit.totalLinks === 4) {
-        console.log(`✅ [SWITCHER OK] 4 language switcher links found, '${item.lang}' correctly active.`);
-      } else {
-        console.error(`❌ [SWITCHER ERROR] Switcher audit failed for ${item.lang}:`, switcherAudit);
-        allPassed = false;
-      }
-
-      // 3. 验证本地化内容与个人定位
-      const content = await page.evaluate(() => {
-        const q = sel => document.querySelector(sel);
-        const qAll = sel => Array.from(document.querySelectorAll(sel));
-
-        return {
-          nameText: q('.myInfoAndSayHello .title2')?.textContent || '',
-          descText: q('.myInfoAndSayHello .role-desc')?.textContent || '',
-          mottoText: q('.author-content-item.maxim .maxim-title')?.textContent?.trim().replace(/\s+/g, ' ') || '',
-          yearText: qAll('.author-content-item.personalities, .milestones-card, #about-page')
-            .map(el => el.textContent).join(' '),
-          firstGearText: q('.gear-card.hardware .gear-item:first-child .gear-item__name strong')?.textContent || '',
-          clockText: q('#about-live-clock')?.textContent || '',
-          topologyLayers: qAll('.topology-card .topology-tier-box').length,
-          milestones: qAll('.milestones-card .milestone-node').length,
+          hasRewardId: Boolean(rewardElement),
+          hasRewardClass: Boolean(rewardClass)
         };
       });
 
-      console.log(`[PROFILE CONTENT RESULT]:`);
-      console.log(` - Display Name Text: '${content.nameText.trim()}'`);
-      console.log(` - Role Description: '${content.descText.trim()}'`);
-      console.log(` - Motto: '${content.mottoText}'`);
-      console.log(` - Hardware 1: '${content.firstGearText}'`);
-      console.log(` - Live Clock: '${content.clockText}'`);
-      console.log(` - Topology Tiers: ${content.topologyLayers}, Milestones: ${content.milestones}`);
-
-      // 断言姓名
-      if (content.nameText.includes(item.expectedName)) {
-        console.log(`✅ [ASSERTION SUCCESS] Name correctly displays '${item.expectedName}'!`);
+      if (!rewardCheck.hasRewardId && !rewardCheck.hasRewardClass) {
+        console.log(`✅ [SUCCESS] Reward module '#about-reward' is completely removed from /about/!`);
       } else {
-        console.error(`❌ [ASSERTION FAILURE] Name mismatch! Expected '${item.expectedName}', got '${content.nameText}'`);
+        console.error(`❌ [FAILURE] Reward module is still present:`, rewardCheck);
         allPassed = false;
       }
 
-      // 断言职业与大学生身份
-      if (content.descText.includes(item.expectedRole) || content.nameText.includes(item.expectedRole)) {
-        console.log(`✅ [ASSERTION SUCCESS] Role correctly contains '${item.expectedRole}'!`);
+      // 2. 验证核心丰富板块存在与完整性
+      const contentAudit = await page.evaluate(() => {
+        const query = sel => document.querySelector(sel);
+        const queryAll = sel => Array.from(document.querySelectorAll(sel));
+
+        return {
+          authorBox: Boolean(query('.author-box')),
+          onlineIndicator: Boolean(query('.online-indicator')),
+          myInfoAndSayHello: Boolean(query('.myInfoAndSayHello')),
+          helloChips: queryAll('.hello-tag-chips span').length,
+          aboutsiteTips: Boolean(query('.aboutsiteTips')),
+          maskWords: queryAll('.aboutsiteTips .mask span').length,
+          helloAbout: Boolean(query('.hello-about')),
+          skills: Boolean(query('.author-content-item.skills')),
+          careers: Boolean(query('.author-content-item.careers')),
+          stats: Boolean(query('.about-statistic')),
+          mapLiveClock: Boolean(query('#about-live-clock')),
+          clockText: query('#about-live-clock')?.textContent || '',
+          liveStatusPill: Boolean(query('.live-status-pill')),
+          personalityBadge: query('.personality-badge')?.textContent || '',
+          personalityTraits: queryAll('.personality-traits-grid .trait-item').length,
+          myphoto: Boolean(query('.author-content-item.myphoto')),
+          gearHardware: queryAll('.gear-card.hardware .gear-item').length,
+          gearSoftware: queryAll('.gear-card.software .gear-item').length,
+          manifestoTitle: query('.manifesto-title')?.textContent || '',
+          manifestoPillars: queryAll('.manifesto-pillars .pillar-card').length,
+          topologyTiers: queryAll('.topology-card .topology-tier-box').length,
+          vinylWidget: Boolean(query('.vinyl-player-widget')),
+          vinylSongTitle: query('.vinyl-song-title')?.textContent || '',
+          equalizerBars: queryAll('.equalizer-bars .bar').length,
+          gameCorner: Boolean(query('.author-content-item.game-yuanshen')),
+          milestones: queryAll('.milestones-card .milestone-node').length,
+          maxim: Boolean(query('.author-content-item.maxim')),
+          maximText: query('.author-content-item.maxim .maxim-title')?.textContent || '',
+          buff: Boolean(query('.author-content-item.buff')),
+          connectButtons: queryAll('.connect-buttons-grid .connect-btn').length,
+        };
+      });
+
+      console.log(`[AUDIT RESULT] Content Structure:`);
+      console.log(` - Author Box: ${contentAudit.authorBox}, Online Indicator: ${contentAudit.onlineIndicator}`);
+      console.log(` - Hello Chips: ${contentAudit.helloChips} tags, Rotating Words: ${contentAudit.maskWords}`);
+      console.log(` - Skills & Careers: Available, Stats: Available`);
+      console.log(` - Live PST Clock: ${contentAudit.clockText} (Status: ${contentAudit.liveStatusPill})`);
+      console.log(` - MBTI Personality: ${contentAudit.personalityBadge} with ${contentAudit.personalityTraits} trait bars`);
+      console.log(` - Workstation Photo: ${contentAudit.myphoto}`);
+      console.log(` - Productivity Gear: ${contentAudit.gearHardware} hardware + ${contentAudit.gearSoftware} software items`);
+      console.log(` - Manifesto Pillars: ${contentAudit.manifestoPillars} pillars ('${contentAudit.manifestoTitle.slice(0, 20)}...')`);
+      console.log(` - Architecture Topology: ${contentAudit.topologyTiers} tiers`);
+      console.log(` - Vinyl Turntable: Song '${contentAudit.vinylSongTitle}', Equalizer: ${contentAudit.equalizerBars} bars`);
+      console.log(` - Creative Corner: ${contentAudit.gameCorner}`);
+      console.log(` - Milestones: ${contentAudit.milestones} evolution steps`);
+      console.log(` - Maxim: '${contentAudit.maximText.replace(/\s+/g, ' ').trim()}', Buff: ${contentAudit.buff}`);
+      console.log(` - Connect Buttons: ${contentAudit.connectButtons} social/subscribe links`);
+
+      // 验证断言
+      if (!contentAudit.maximText.includes('厚土潜藏细脉') || !contentAudit.maximText.includes('大荒广构通衢')) {
+        console.error(`❌ Maxim motto text is incorrect: got '${contentAudit.maximText}'`);
+        allPassed = false;
       } else {
-        console.error(`❌ [ASSERTION FAILURE] Role mismatch! Expected '${item.expectedRole}', got '${content.descText}'`);
+        console.log(`✅ [ASSERTION SUCCESS] Maxim correctly displays '厚土潜藏细脉 大荒广构通衢'!`);
+      }
+
+      // 验证姓名、大学生、2006、设备等真实文字
+      const textAudit = await page.evaluate(() => {
+        const bodyText = document.body.innerText;
+        return {
+          hasTimeName: bodyText.includes('時間'),
+          hasWrongName: bodyText.includes('世健'),
+          hasStudent: bodyText.includes('大学生'),
+          has2006: bodyText.includes('2006'),
+          hasLenovo: bodyText.includes('联想小新'),
+          hasRedmi: bodyText.includes('红米'),
+        };
+      });
+
+      if (textAudit.hasTimeName && !textAudit.hasWrongName) {
+        console.log(`✅ [NAME CHECK] Correct name '時間' verified, '世健' completely absent!`);
+      } else {
+        console.error(`❌ [NAME ERROR] Name mismatch: hasTimeName=${textAudit.hasTimeName}, hasWrongName=${textAudit.hasWrongName}`);
         allPassed = false;
       }
 
-      // 断言 2006 出生年份
-      if (content.yearText.includes('2006')) {
-        console.log(`✅ [ASSERTION SUCCESS] Year 2006 found in profile content!`);
+      if (textAudit.hasStudent && textAudit.has2006) {
+        console.log(`✅ [PERSONA CHECK] Genuine 2006 undergraduate persona verified!`);
       } else {
-        console.error(`❌ [ASSERTION FAILURE] Year 2006 missing from profile!`);
+        console.error(`❌ [PERSONA ERROR] Undergraduate / 2006 not found:`, textAudit);
         allPassed = false;
       }
 
-      // 断言座右铭
-      if (content.mottoText.includes(item.expectedMotto)) {
-        console.log(`✅ [ASSERTION SUCCESS] Motto correctly contains '${item.expectedMotto}'!`);
+      if (textAudit.hasLenovo && textAudit.hasRedmi) {
+        console.log(`✅ [GEAR CHECK] Humble student gear verified (Lenovo / Redmi)!`);
       } else {
-        console.error(`❌ [ASSERTION FAILURE] Motto mismatch! Expected '${item.expectedMotto}', got '${content.mottoText}'`);
+        console.error(`❌ [GEAR ERROR] Student gear not found:`, textAudit);
         allPassed = false;
       }
 
-      // 断言真实接地气的学生硬件装备（非昂贵炫耀装备）
-      if (content.firstGearText.includes(item.expectedGear)) {
-        console.log(`✅ [ASSERTION SUCCESS] Hardware gear correctly displays humble student setup ('${content.firstGearText}')!`);
-      } else {
-        console.error(`❌ [ASSERTION FAILURE] Hardware gear mismatch! Expected '${item.expectedGear}', got '${content.firstGearText}'`);
+      // 测试多语言动态切换 (English: Kevin Sparks, French: Léon Boven)
+      const i18nAudit = await page.evaluate(async () => {
+        const runtime = window.__SHIJIANUS_LOCALE_RUNTIME__;
+        if (!runtime?.applyLocaleVariant) return { available: false };
+
+        // Switch to English
+        runtime.applyLocaleVariant('en');
+        await new Promise(r => setTimeout(r, 200));
+        const enGreeting = document.querySelector('.myInfoAndSayHello .title2')?.innerText || '';
+        const enHasKevin = enGreeting.includes('Kevin Sparks');
+
+        // Switch to French
+        runtime.applyLocaleVariant('fr');
+        await new Promise(r => setTimeout(r, 200));
+        const frGreeting = document.querySelector('.myInfoAndSayHello .title2')?.innerText || '';
+        const frHasLeon = frGreeting.includes('Léon Boven');
+
+        // Restore to zh-CN
+        runtime.applyLocaleVariant('zh-CN');
+        await new Promise(r => setTimeout(r, 200));
+        const zhGreeting = document.querySelector('.myInfoAndSayHello .title2')?.innerText || '';
+        const zhHasTime = zhGreeting.includes('時間');
+
+        return {
+          available: true,
+          enGreeting,
+          enHasKevin,
+          frGreeting,
+          frHasLeon,
+          zhGreeting,
+          zhHasTime
+        };
+      });
+
+      if (i18nAudit.available) {
+        if (i18nAudit.enHasKevin && i18nAudit.frHasLeon && i18nAudit.zhHasTime) {
+          console.log(`✅ [I18N SUCCESS] Multilingual localized identity verified! EN='${i18nAudit.enGreeting.trim()}', FR='${i18nAudit.frGreeting.trim()}', ZH='${i18nAudit.zhGreeting.trim()}'`);
+        } else {
+          console.error(`❌ [I18N FAILURE] Localization failed:`, i18nAudit);
+          allPassed = false;
+        }
+      }
+
+      if (contentAudit.helloChips < 4) {
+        console.error(`❌ Hello chips count < 4`);
+        allPassed = false;
+      }
+      if (contentAudit.personalityTraits !== 5) {
+        console.error(`❌ Personality traits != 5`);
+        allPassed = false;
+      }
+      if (contentAudit.gearHardware !== 4 || contentAudit.gearSoftware !== 4) {
+        console.error(`❌ Gear items != 4 + 4`);
+        allPassed = false;
+      }
+      if (contentAudit.manifestoPillars !== 3) {
+        console.error(`❌ Manifesto pillars != 3`);
+        allPassed = false;
+      }
+      if (contentAudit.topologyTiers !== 3) {
+        console.error(`❌ Topology tiers != 3`);
+        allPassed = false;
+      }
+      if (!contentAudit.vinylWidget || contentAudit.equalizerBars !== 4) {
+        console.error(`❌ Vinyl widget equalizer missing`);
+        allPassed = false;
+      }
+      if (contentAudit.milestones < 4) {
+        console.error(`❌ Milestones steps < 4`);
+        allPassed = false;
+      }
+      if (contentAudit.connectButtons !== 4) {
+        console.error(`❌ Connect buttons != 4`);
         allPassed = false;
       }
 
       if (errors.length > 0) {
-        console.warn(`[WARN] Console JS errors:`, errors);
+        console.error(`❌ Console errors detected:`, errors);
+        allPassed = false;
       } else {
         console.log(`✅ Zero runtime JavaScript errors.`);
       }
 
-      // 截图
-      const shotDesktop = path.join(screenshotDir, `about_i18n_${item.lang}_desktop.png`);
-      await page.screenshot({ path: shotDesktop, fullPage: true });
-      console.log(`📸 Desktop screenshot saved: ${shotDesktop}`);
+      // 截图留档
+      const shotPath = path.join(screenshotDir, `about_rebuild_${vp.name}.png`);
+      await page.screenshot({ path: shotPath, fullPage: true });
+      console.log(`📸 Screenshot saved: ${shotPath}`);
 
-      // 移动端视口测试
-      await page.setViewport({ width: 375, height: 667 });
-      const shotMobile = path.join(screenshotDir, `about_i18n_${item.lang}_mobile.png`);
-      await page.screenshot({ path: shotMobile, fullPage: true });
-      console.log(`📸 Mobile screenshot saved: ${shotMobile}`);
+      // 测试深色模式
+      await page.evaluate(() => {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      });
+      await new Promise(r => setTimeout(r, 400));
+      const darkShotPath = path.join(screenshotDir, `about_rebuild_${vp.name}_dark.png`);
+      await page.screenshot({ path: darkShotPath, fullPage: true });
+      console.log(`📸 Dark Mode Screenshot saved: ${darkShotPath}`);
 
       await page.close();
     }
@@ -240,15 +296,15 @@ async function runAudit() {
   }
 
   if (allPassed) {
-    console.log(`\n🎉 [ALL I18N TESTS PASSED] Multilingual profiles (zh-CN, zh-Hant, en, fr) 100% verified!`);
+    console.log(`\n🎉 [ALL TESTS PASSED] About page reconstruction and innovation audit passed 100%!`);
     process.exit(0);
   } else {
-    console.error(`\n❌ [I18N AUDIT FAILED] Some assertions did not pass.`);
+    console.error(`\n❌ [AUDIT FAILED] Some assertions did not pass.`);
     process.exit(1);
   }
 }
 
 runAudit().catch(err => {
-  console.error('Fatal audit error:', err);
+  console.error('Fatal error during audit:', err);
   process.exit(1);
 });

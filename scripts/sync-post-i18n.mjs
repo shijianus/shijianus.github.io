@@ -171,12 +171,14 @@ async function main() {
 
       const existingTranslation = group.find((g) => g.lang === targetLang);
 
+      const forceRegenerate = process.env.FORCE_REGENERATE_TRANSLATION === 'true';
+
       if (existingTranslation) {
         if (!existingTranslation.isAiGenerated) {
           // User-authored translation exists: strictly preserve it!
           skippedCount++;
           continue;
-        } else {
+        } else if (!forceRegenerate) {
           // AI-generated translation exists: only re-generate if source article is newer or translation is undersized (truncated)
           const isUndersized = sourceArticle.raw.length > 10000 && existingTranslation.raw.length < sourceArticle.raw.length * 0.4;
           if (existingTranslation.mtime >= sourceArticle.mtime && !isUndersized) {
@@ -188,6 +190,8 @@ async function main() {
           } else {
             console.log(`[Article-i18n] Source article "${key}" updated. Refreshing AI translation for ${targetLang}...`);
           }
+        } else {
+          console.log(`[Article-i18n] Force regenerating translation "${existingTranslation.filename}" for ${targetLang}...`);
         }
       }
 
