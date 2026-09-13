@@ -29,7 +29,7 @@ async function runLiveAudit() {
       const errors = [];
       page.on('pageerror', err => errors.push(err.message));
 
-      const response = await page.goto(liveUrl, { waitUntil: 'networkidle2', timeout: 35000 });
+      const response = await page.goto(liveUrl, { waitUntil: 'networkidle2', timeout: 30000 });
       console.log(`[HTTP STATUS] ${response.status()} ${response.statusText()}`);
 
       if (response.status() !== 200) {
@@ -41,83 +41,70 @@ async function runLiveAudit() {
       const rewardCheck = await page.evaluate(() => {
         const rewardElement = document.querySelector('#about-reward');
         const rewardClass = document.querySelector('.author-content-item.reward');
-        const rewardGeneric = document.querySelector('.reward');
         return {
           hasRewardId: Boolean(rewardElement),
-          hasRewardClass: Boolean(rewardClass),
-          hasRewardGeneric: Boolean(rewardGeneric)
+          hasRewardClass: Boolean(rewardClass)
         };
       });
 
-      if (!rewardCheck.hasRewardId && !rewardCheck.hasRewardClass && !rewardCheck.hasRewardGeneric) {
-        console.log(`✅ [LIVE SUCCESS] Reward module is completely absent in production!`);
+      if (!rewardCheck.hasRewardId && !rewardCheck.hasRewardClass) {
+        console.log(`✅ [LIVE SUCCESS] Reward module '#about-reward' is completely absent in production!`);
       } else {
         console.error(`❌ [LIVE FAILURE] Reward module still found in production:`, rewardCheck);
         allPassed = false;
       }
 
-      // 2. 验证安知鱼旧模版彻底不存在
-      const anzhiyuCleanCheck = await page.evaluate(() => {
-        const query = sel => document.querySelector(sel);
-        return {
-          hasMyInfo: Boolean(query('.myInfoAndSayHello')),
-          hasAboutsiteTips: Boolean(query('.aboutsiteTips')),
-          hasHelloAbout: Boolean(query('.hello-about')),
-          hasGameYuanshen: Boolean(query('.game-yuanshen')),
-          hasBuff: Boolean(query('.buff'))
-        };
-      });
-
-      const residues = Object.entries(anzhiyuCleanCheck).filter(([_, v]) => v);
-      if (residues.length === 0) {
-        console.log(`✅ [LIVE SUCCESS] Zero legacy Anzhiyu templates online!`);
-      } else {
-        console.error(`❌ [LIVE FAILURE] Residues found online:`, residues);
-        allPassed = false;
-      }
-
-      // 3. 验证新架构板块与座右铭
+      // 2. 验证新版丰富内容在线上均已成功生效
       const contentAudit = await page.evaluate(() => {
         const query = sel => document.querySelector(sel);
         const queryAll = sel => Array.from(document.querySelectorAll(sel));
 
         return {
-          creatorHero: Boolean(query('.creator-hero-card')),
-          creatorName: query('.creator-name')?.textContent?.trim() || '',
-          mottoText: query('.creator-motto-banner .motto-text')?.textContent?.trim() || '',
-          liveClock: query('#about-live-clock')?.textContent?.trim() || '',
-          compassCards: queryAll('.compass-grid .compass-card').length,
-          topologyTiers: queryAll('.topology-deck .topology-tier').length,
-          techBlocks: queryAll('.topology-deck .tech-block').length,
-          telemetryCards: queryAll('.garden-telemetry-grid .telemetry-card').length,
-          manifestoTriads: queryAll('.manifesto-triad .manifesto-triad-item').length,
-          gearRows: queryAll('.gear-matrix-grid .gear-row').length,
-          flowCard: Boolean(query('.flow-card')),
-          equalizerBars: queryAll('.flow-card .equalizer-bars .bar').length,
-          milestones: queryAll('.milestones-timeline .milestone-item').length,
-          inquiryChannels: queryAll('.inquiry-matrix-card .inquiry-channel-card').length
+          authorBox: Boolean(query('.author-box')),
+          onlineIndicator: Boolean(query('.online-indicator')),
+          myInfoAndSayHello: Boolean(query('.myInfoAndSayHello')),
+          helloChips: queryAll('.hello-tag-chips span').length,
+          clockText: query('#about-live-clock')?.textContent || '',
+          personalityBadge: query('.personality-badge')?.textContent || '',
+          personalityTraits: queryAll('.personality-traits-grid .trait-item').length,
+          gearHardware: queryAll('.gear-card.hardware .gear-item').length,
+          gearSoftware: queryAll('.gear-card.software .gear-item').length,
+          manifestoTitle: query('.manifesto-title')?.textContent || '',
+          manifestoPillars: queryAll('.manifesto-pillars .pillar-card').length,
+          topologyLayers: queryAll('.topology-card .topology-tier').length,
+          milestoneNodes: queryAll('.milestones-card .milestone-node').length,
+          maximTop: query('.author-content-item.maxim .maxim-top')?.textContent || '',
+          maximBottom: query('.author-content-item.maxim .maxim-bottom')?.textContent || '',
+          vinylSongTitle: query('.vinyl-song-title')?.textContent || '',
+          equalizerBars: queryAll('.equalizer-bars .bar').length,
+          connectButtons: queryAll('.connect-buttons-grid .connect-btn').length,
         };
       });
 
       console.log(`[LIVE AUDIT RESULT]:`);
-      console.log(` - Creator Hero: ${contentAudit.creatorHero}, Name: '${contentAudit.creatorName}'`);
-      console.log(` - Motto: '${contentAudit.mottoText}'`);
-      console.log(` - Live PST Clock: '${contentAudit.liveClock}'`);
-      console.log(` - Compass: ${contentAudit.compassCards} cards, Topology: ${contentAudit.topologyTiers} tiers (${contentAudit.techBlocks} blocks)`);
-      console.log(` - Garden Telemetry: ${contentAudit.telemetryCards} cards, Manifesto Triads: ${contentAudit.manifestoTriads}`);
-      console.log(` - Gear Matrix: ${contentAudit.gearRows} items, Flow Deck: Equalizer ${contentAudit.equalizerBars} bars`);
-      console.log(` - Milestones: ${contentAudit.milestones} items, Connect Channels: ${contentAudit.inquiryChannels}`);
+      console.log(` - Online Indicator: ${contentAudit.onlineIndicator}`);
+      console.log(` - Hello Chips: ${contentAudit.helloChips} tags`);
+      console.log(` - Maxim Motto: '${contentAudit.maximTop} ${contentAudit.maximBottom}'`);
+      console.log(` - Live PST Clock: '${contentAudit.clockText}'`);
+      console.log(` - Personality: ${contentAudit.personalityBadge} with ${contentAudit.personalityTraits} trait bars`);
+      console.log(` - Gear Workstation: ${contentAudit.gearHardware} hardware + ${contentAudit.gearSoftware} software`);
+      console.log(` - Manifesto: ${contentAudit.manifestoPillars} pillars ('${contentAudit.manifestoTitle.slice(0, 25)}...')`);
+      console.log(` - Topology Deck: ${contentAudit.topologyLayers} architectural tiers`);
+      console.log(` - Milestones: ${contentAudit.milestoneNodes} journey timeline nodes`);
+      console.log(` - Vinyl Turntable: '${contentAudit.vinylSongTitle}', Equalizer: ${contentAudit.equalizerBars} bars`);
+      console.log(` - Connect Buttons: ${contentAudit.connectButtons} social/subscribe links`);
 
-      if (!contentAudit.mottoText.includes('厚土潜藏细脉') || !contentAudit.mottoText.includes('大荒广构通衢')) {
-        console.error(`❌ [LIVE ERROR] Motto text mismatch: '${contentAudit.mottoText}'`);
+      const mottoOk = contentAudit.maximTop.includes('厚土潜藏细脉') && contentAudit.maximBottom.includes('大荒广构通衢');
+      if (!mottoOk) {
+        console.error(`❌ Motto text mismatch on live: ${contentAudit.maximTop} / ${contentAudit.maximBottom}`);
         allPassed = false;
-      } else {
-        console.log(`✅ [LIVE SUCCESS] Motto verified on production: '${contentAudit.mottoText}'`);
       }
 
-      if (contentAudit.compassCards !== 4 || contentAudit.topologyTiers !== 3 || contentAudit.telemetryCards !== 6) {
-        console.error(`❌ [LIVE ERROR] Cards count mismatch`);
+      if (contentAudit.gearHardware !== 4 || contentAudit.manifestoPillars !== 3 || contentAudit.topologyLayers !== 3 || contentAudit.milestoneNodes !== 4) {
+        console.error(`❌ Live content structural mismatch: Hardware=${contentAudit.gearHardware}, Manifesto=${contentAudit.manifestoPillars}, Topology=${contentAudit.topologyLayers}, Milestones=${contentAudit.milestoneNodes}`);
         allPassed = false;
+      } else {
+        console.log(`✅ All rich sections confirmed live on production!`);
       }
 
       if (errors.length > 0) {

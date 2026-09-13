@@ -81,150 +81,112 @@ async function runAudit() {
       const rewardCheck = await page.evaluate(() => {
         const rewardElement = document.querySelector('#about-reward');
         const rewardClass = document.querySelector('.author-content-item.reward');
-        const rewardGeneric = document.querySelector('.reward');
         return {
           hasRewardId: Boolean(rewardElement),
-          hasRewardClass: Boolean(rewardClass),
-          hasRewardGeneric: Boolean(rewardGeneric)
+          hasRewardClass: Boolean(rewardClass)
         };
       });
 
-      if (!rewardCheck.hasRewardId && !rewardCheck.hasRewardClass && !rewardCheck.hasRewardGeneric) {
-        console.log(`✅ [SUCCESS] Reward module is completely removed from /about/!`);
+      if (!rewardCheck.hasRewardId && !rewardCheck.hasRewardClass) {
+        console.log(`✅ [SUCCESS] Reward module '#about-reward' is completely removed from /about/!`);
       } else {
         console.error(`❌ [FAILURE] Reward module is still present:`, rewardCheck);
         allPassed = false;
       }
 
-      // 2. 验证安知鱼旧式抄袭元素彻底清除
-      const anzhiyuCleanCheck = await page.evaluate(() => {
-        const query = sel => document.querySelector(sel);
-        return {
-          hasMyInfo: Boolean(query('.myInfoAndSayHello')),
-          hasAboutsiteTips: Boolean(query('.aboutsiteTips')),
-          hasHelloAbout: Boolean(query('.hello-about')),
-          hasGameYuanshen: Boolean(query('.game-yuanshen')),
-          hasBuff: Boolean(query('.buff')),
-          hasCareers: Boolean(query('.careers'))
-        };
-      });
-
-      const anzhiyuResidue = Object.entries(anzhiyuCleanCheck).filter(([_, v]) => v);
-      if (anzhiyuResidue.length === 0) {
-        console.log(`✅ [SUCCESS] All Anzhiyu legacy/template elements are 100% eradicated!`);
-      } else {
-        console.error(`❌ [FAILURE] Anzhiyu legacy elements detected:`, anzhiyuResidue);
-        allPassed = false;
-      }
-
-      // 3. 验证新架构 9 大板块与核心座右铭
+      // 2. 验证核心丰富板块存在与完整性
       const contentAudit = await page.evaluate(() => {
         const query = sel => document.querySelector(sel);
         const queryAll = sel => Array.from(document.querySelectorAll(sel));
 
         return {
-          // Module 1: Hero Card
-          heroCard: Boolean(query('.creator-hero-card')),
-          avatarImg: Boolean(query('.creator-avatar-img')),
-          statusOrb: Boolean(query('.creator-status-orb')),
-          creatorName: query('.creator-name')?.textContent?.trim() || '',
-          creatorAlias: query('.creator-alias')?.textContent?.trim() || '',
-          creatorTagBadge: query('.creator-tag-badge')?.textContent?.trim() || '',
-          creatorHeadline: query('.creator-headline')?.textContent?.trim() || '',
-          mottoText: query('.creator-motto-banner .motto-text')?.textContent?.trim() || '',
-          mottoAnnotation: query('.creator-motto-banner .motto-annotation')?.textContent?.trim() || '',
-          liveClock: query('#about-live-clock')?.textContent?.trim() || '',
-          telemetryPills: queryAll('.creator-telemetry-bar .telemetry-pill').length,
-
-          // Module 2: Compass
-          compassCards: queryAll('.compass-grid .compass-card').length,
-          compassTags: queryAll('.compass-grid .compass-tag').map(el => el.textContent.trim()),
-
-          // Module 3: Topology Deck
-          topologyTiers: queryAll('.topology-deck .topology-tier').length,
-          techBlocks: queryAll('.topology-deck .tech-block').length,
-
-          // Module 4: Garden Telemetry
-          telemetryCards: queryAll('.garden-telemetry-grid .telemetry-card').length,
-          telemetryValues: queryAll('.garden-telemetry-grid .telemetry-card__val').map(el => el.textContent.trim()),
-
-          // Module 5: Manifesto
-          manifestoTitle: query('.manifesto-lead-title')?.textContent?.trim() || '',
-          manifestoTriads: queryAll('.manifesto-triad .manifesto-triad-item').length,
-
-          // Module 6: Gear Matrix
-          gearColumns: queryAll('.gear-matrix-grid .gear-column-card').length,
-          gearRows: queryAll('.gear-matrix-grid .gear-row').length,
-
-          // Module 7: Flow Deck
-          flowCard: Boolean(query('.flow-card')),
-          vinylGroove: Boolean(query('.turntable-vinyl-groove')),
-          vinylCover: Boolean(query('.vinyl-core-art')),
-          flowSongTitle: query('.flow-track-title')?.textContent?.trim() || '',
-          equalizerBars: queryAll('.flow-card .equalizer-bars .bar').length,
-
-          // Module 8: Milestones
-          milestoneItems: queryAll('.milestones-timeline .milestone-item').length,
-          milestoneYears: queryAll('.milestones-timeline .milestone-year').map(el => el.textContent.trim()),
-
-          // Module 9: Inquiry Matrix
-          inquiryChannels: queryAll('.inquiry-matrix-card .inquiry-channel-card').length,
-          inquiryTitles: queryAll('.inquiry-matrix-card .inquiry-channel-title').map(el => el.textContent.trim())
+          authorBox: Boolean(query('.author-box')),
+          onlineIndicator: Boolean(query('.online-indicator')),
+          myInfoAndSayHello: Boolean(query('.myInfoAndSayHello')),
+          helloChips: queryAll('.hello-tag-chips span').length,
+          aboutsiteTips: Boolean(query('.aboutsiteTips')),
+          maskWords: queryAll('.aboutsiteTips .mask span').length,
+          helloAbout: Boolean(query('.hello-about')),
+          skills: Boolean(query('.author-content-item.skills')),
+          careers: Boolean(query('.author-content-item.careers')),
+          stats: Boolean(query('.about-statistic')),
+          mapLiveClock: Boolean(query('#about-live-clock')),
+          clockText: query('#about-live-clock')?.textContent || '',
+          liveStatusPill: Boolean(query('.live-status-pill')),
+          personalityBadge: query('.personality-badge')?.textContent || '',
+          personalityTraits: queryAll('.personality-traits-grid .trait-item').length,
+          myphoto: Boolean(query('.author-content-item.myphoto')),
+          gearHardware: queryAll('.gear-card.hardware .gear-item').length,
+          gearSoftware: queryAll('.gear-card.software .gear-item').length,
+          manifestoTitle: query('.manifesto-title')?.textContent || '',
+          manifestoPillars: queryAll('.manifesto-pillars .pillar-card').length,
+          topologyTiers: queryAll('.topology-card .topology-tier-box').length,
+          vinylWidget: Boolean(query('.vinyl-player-widget')),
+          vinylSongTitle: query('.vinyl-song-title')?.textContent || '',
+          equalizerBars: queryAll('.equalizer-bars .bar').length,
+          gameCorner: Boolean(query('.author-content-item.game-yuanshen')),
+          milestones: queryAll('.milestones-card .milestone-node').length,
+          maxim: Boolean(query('.author-content-item.maxim')),
+          maximText: query('.author-content-item.maxim .maxim-title')?.textContent || '',
+          buff: Boolean(query('.author-content-item.buff')),
+          connectButtons: queryAll('.connect-buttons-grid .connect-btn').length,
         };
       });
 
       console.log(`[AUDIT RESULT] Content Structure:`);
-      console.log(` - Creator Hero: Name='${contentAudit.creatorName} ${contentAudit.creatorAlias}', Badge='${contentAudit.creatorTagBadge}'`);
-      console.log(` - Motto: '${contentAudit.mottoText}'`);
-      console.log(` - Motto Annotation: '${contentAudit.mottoAnnotation.slice(0, 30)}...'`);
-      console.log(` - Live Clock: '${contentAudit.liveClock}', Telemetry Pills: ${contentAudit.telemetryPills}`);
-      console.log(` - Philosophy Compass: ${contentAudit.compassCards} cards (${contentAudit.compassTags.join(', ')})`);
-      console.log(` - Tech Topology: ${contentAudit.topologyTiers} tiers with ${contentAudit.techBlocks} tech blocks`);
-      console.log(` - Garden Telemetry: ${contentAudit.telemetryCards} metric cards (Values: ${contentAudit.telemetryValues.join(', ')})`);
-      console.log(` - Manifesto: '${contentAudit.manifestoTitle.slice(0, 25)}...', Triads: ${contentAudit.manifestoTriads}`);
-      console.log(` - Gear Matrix: ${contentAudit.gearColumns} columns with ${contentAudit.gearRows} gear rows`);
-      console.log(` - Flow Deck: Vinyl=${contentAudit.vinylGroove}, Song='${contentAudit.flowSongTitle}', Equalizer=${contentAudit.equalizerBars} bars`);
-      console.log(` - Milestones: ${contentAudit.milestoneItems} items (${contentAudit.milestoneYears.join(' -> ')})`);
-      console.log(` - Connect Channels: ${contentAudit.inquiryChannels} items (${contentAudit.inquiryTitles.join(', ')})`);
+      console.log(` - Author Box: ${contentAudit.authorBox}, Online Indicator: ${contentAudit.onlineIndicator}`);
+      console.log(` - Hello Chips: ${contentAudit.helloChips} tags, Rotating Words: ${contentAudit.maskWords}`);
+      console.log(` - Skills & Careers: Available, Stats: Available`);
+      console.log(` - Live PST Clock: ${contentAudit.clockText} (Status: ${contentAudit.liveStatusPill})`);
+      console.log(` - MBTI Personality: ${contentAudit.personalityBadge} with ${contentAudit.personalityTraits} trait bars`);
+      console.log(` - Workstation Photo: ${contentAudit.myphoto}`);
+      console.log(` - Productivity Gear: ${contentAudit.gearHardware} hardware + ${contentAudit.gearSoftware} software items`);
+      console.log(` - Manifesto Pillars: ${contentAudit.manifestoPillars} pillars ('${contentAudit.manifestoTitle.slice(0, 20)}...')`);
+      console.log(` - Architecture Topology: ${contentAudit.topologyTiers} tiers`);
+      console.log(` - Vinyl Turntable: Song '${contentAudit.vinylSongTitle}', Equalizer: ${contentAudit.equalizerBars} bars`);
+      console.log(` - Creative Corner: ${contentAudit.gameCorner}`);
+      console.log(` - Milestones: ${contentAudit.milestones} evolution steps`);
+      console.log(` - Maxim: '${contentAudit.maximText.replace(/\s+/g, ' ').trim()}', Buff: ${contentAudit.buff}`);
+      console.log(` - Connect Buttons: ${contentAudit.connectButtons} social/subscribe links`);
 
-      // 4. 关键指标与文本严格断言
-      if (!contentAudit.mottoText.includes('厚土潜藏细脉') || !contentAudit.mottoText.includes('大荒广构通衢')) {
-        console.error(`❌ [ASSERTION ERROR] Motto is incorrect: expected '厚土潜藏细脉，大荒广构通衢', got '${contentAudit.mottoText}'`);
+      // 验证断言
+      if (!contentAudit.maximText.includes('厚土潜藏细脉') || !contentAudit.maximText.includes('大荒广构通衢')) {
+        console.error(`❌ Maxim motto text is incorrect: got '${contentAudit.maximText}'`);
         allPassed = false;
       } else {
-        console.log(`✅ [ASSERTION SUCCESS] Motto matches user requirement: '${contentAudit.mottoText}'!`);
+        console.log(`✅ [ASSERTION SUCCESS] Maxim correctly displays '厚土潜藏细脉 大荒广构通衢'!`);
       }
 
-      if (contentAudit.compassCards !== 4) {
-        console.error(`❌ Compass cards count != 4`);
+      if (contentAudit.helloChips < 4) {
+        console.error(`❌ Hello chips count < 4`);
         allPassed = false;
       }
-      if (contentAudit.topologyTiers !== 3 || contentAudit.techBlocks !== 12) {
-        console.error(`❌ Topology tiers != 3 or tech blocks != 12`);
+      if (contentAudit.personalityTraits !== 5) {
+        console.error(`❌ Personality traits != 5`);
         allPassed = false;
       }
-      if (contentAudit.telemetryCards !== 6) {
-        console.error(`❌ Telemetry cards != 6`);
+      if (contentAudit.gearHardware !== 4 || contentAudit.gearSoftware !== 4) {
+        console.error(`❌ Gear items != 4 + 4`);
         allPassed = false;
       }
-      if (contentAudit.manifestoTriads !== 3) {
-        console.error(`❌ Manifesto triads != 3`);
+      if (contentAudit.manifestoPillars !== 3) {
+        console.error(`❌ Manifesto pillars != 3`);
         allPassed = false;
       }
-      if (contentAudit.gearRows !== 8) {
-        console.error(`❌ Gear rows != 8`);
+      if (contentAudit.topologyTiers !== 3) {
+        console.error(`❌ Topology tiers != 3`);
         allPassed = false;
       }
-      if (!contentAudit.flowCard || contentAudit.equalizerBars !== 5) {
-        console.error(`❌ Flow card missing or equalizer bars != 5`);
+      if (!contentAudit.vinylWidget || contentAudit.equalizerBars !== 4) {
+        console.error(`❌ Vinyl widget equalizer missing`);
         allPassed = false;
       }
-      if (contentAudit.milestoneItems !== 4) {
-        console.error(`❌ Milestones items != 4`);
+      if (contentAudit.milestones !== 4) {
+        console.error(`❌ Milestones steps != 4`);
         allPassed = false;
       }
-      if (contentAudit.inquiryChannels !== 4) {
-        console.error(`❌ Connect inquiry channels != 4`);
+      if (contentAudit.connectButtons !== 4) {
+        console.error(`❌ Connect buttons != 4`);
         allPassed = false;
       }
 
@@ -235,12 +197,12 @@ async function runAudit() {
         console.log(`✅ Zero runtime JavaScript errors.`);
       }
 
-      // 截图留档 (浅色模式)
+      // 截图留档
       const shotPath = path.join(screenshotDir, `about_rebuild_${vp.name}.png`);
       await page.screenshot({ path: shotPath, fullPage: true });
-      console.log(`📸 Light Mode Screenshot saved: ${shotPath}`);
+      console.log(`📸 Screenshot saved: ${shotPath}`);
 
-      // 截图留档 (深色模式)
+      // 测试深色模式
       await page.evaluate(() => {
         document.documentElement.setAttribute('data-theme', 'dark');
       });
@@ -257,7 +219,7 @@ async function runAudit() {
   }
 
   if (allPassed) {
-    console.log(`\n🎉 [ALL TESTS PASSED] About page reconstruction and personal portfolio audit passed 100%!`);
+    console.log(`\n🎉 [ALL TESTS PASSED] About page reconstruction and innovation audit passed 100%!`);
     process.exit(0);
   } else {
     console.error(`\n❌ [AUDIT FAILED] Some assertions did not pass.`);

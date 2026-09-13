@@ -821,16 +821,16 @@ export const siteConfig = {
     about: {
       title: '关于我',
       subtitle: '厚土潜藏细脉 · 大荒广构通衢',
-      floatingTagsLeft: ['全栈架构思考者', '数字花园造物者', '体验洁癖'],
+      floatingTagsLeft: ['全栈架构思考者', '数字花园建造者', '体验洁癖'],
       floatingTagsRight: ['系统秩序', '长效构建', '开放网络'],
       helloTips: '你好，很高兴认识你',
       helloLead: '你好，我在这里写作与构建',
-      helloDescription: '学生 / 开发者 / 写作者 / 系统整理者',
+      helloDescription: '全栈架构思考者 · 内容工程探索者 · 数字花园建造者',
       siteTips: {
-        tips: '追求',
-        titleTop: '源于',
-        titleBottom: '热爱而去感受',
-        words: ['源于热爱', '敬畏秩序', '持续构建', '写给未来'],
+        tips: '基调',
+        titleTop: '深耕',
+        titleBottom: '厚土潜藏细脉',
+        words: ['潜藏细脉', '广构通衢', '敬畏秩序', '长效沉淀'],
       },
       helloWordmark: 'Hello there!',
       skills: {
@@ -947,7 +947,7 @@ export const siteConfig = {
         ] satisfies AboutConnectItem[],
       },
       maxim: {
-        tips: '核心座右铭',
+        tips: '座右铭',
         top: '厚土潜藏细脉',
         bottom: '大荒广构通衢',
       },
@@ -957,14 +957,14 @@ export const siteConfig = {
         bottom: '比一次性的热闹更重要',
       },
       game: {
-        tips: '正在沉迷',
-        title: '构建主题与写作系统',
-        summary: '把内容、界面与交互收束成长期可迭代的个人产品。',
+        tips: '沉浸热爱',
+        title: '数字造物与极客实验',
+        summary: '把内容、界面与交互收束成真正能穿越周期的个人作品。',
       },
       comic: {
-        tips: '最近在看',
+        tips: '关注的主题',
         title: '关注的主题',
-        items: ['接口设计', '阅读体验', '设计系统', '站点性能'],
+        items: ['系统架构', '设计系统', '阅读体验', '人机协同'],
       },
       likeTech: {
         tips: '偏好',

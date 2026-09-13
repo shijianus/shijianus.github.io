@@ -12,658 +12,640 @@ interface Props {
 
 const { stats } = Astro.props;
 const about = siteConfig.pages.about;
-const author = siteConfig.site.author;
+const skillMarquee = [...siteConfig.home.hero.skillFlow, ...siteConfig.home.hero.chips];
 ---
 
-<section id="about-page" class="creator-portfolio-shell">
-  <!-- ========================================================
-       1. 造物者身份总览展台 (Creator Hero Stage & Live Telemetry)
-       ======================================================== -->
-  <div class="creator-hero-card">
-    <div class="creator-hero-backdrop"></div>
-    <div class="creator-hero-body">
-      <!-- 头像与动态呼吸光环 -->
-      <div class="creator-avatar-wrap">
-        <div class="creator-avatar-halo"></div>
-        <div class="creator-avatar-inner">
-          <img src={author.avatar} alt={author.name} class="creator-avatar-img" loading="eager" />
-          <span class="creator-status-orb" title="状态：活跃中"></span>
-        </div>
-      </div>
-
-      <!-- 身份标识与核心定位 -->
-      <div class="creator-identity">
-        <div class="creator-title-row">
-          <h1 class="creator-name">{author.name}</h1>
-          <span class="creator-alias">(世健)</span>
-          <span class="creator-tag-badge">Builder & Architect</span>
-        </div>
-        
-        <p class="creator-headline">
-          {author.role}
-        </p>
-
-        <!-- 核心座右铭与精神信仰 -->
-        <div class="creator-motto-banner">
-          <div class="creator-motto-quote">
-            <span class="motto-mark">“</span>
-            <strong class="motto-text">{about.maxim.top}，{about.maxim.bottom}</strong>
-            <span class="motto-mark">”</span>
-          </div>
-          <p class="motto-annotation">
-            深潜底层，像隐秘水脉般打磨不可见的坚实地基；横贯广陆，以现代工程构建跨越时空的知识通衢。
-          </p>
-        </div>
-
-        <!-- 实时遥测指标胶囊 -->
-        <div class="creator-telemetry-bar">
-          <div class="telemetry-pill">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-            <span>UTC-8 / PST (太平洋时区)</span>
-          </div>
-
-          <div class="telemetry-pill live-clock-pill">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-            <span id="about-live-clock">--:--:-- PST</span>
-          </div>
-
-          <div class="telemetry-pill status-pill">
-            <span class="pulse-beacon"></span>
-            <span>持续重构与深度写作中</span>
-          </div>
-
-          <div class="telemetry-pill tech-base-pill">
-            <span class="tech-dot"></span>
-            <span>Astro v6 · Edge D1 · Zero Cold Start</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========================================================
-       2. 核心定位：四大工程哲学罗盘 (Developer Compass)
-       ======================================================== -->
-  <div class="section-title-wrap">
-    <span class="section-pill">01 / PHILOSOPHY</span>
-    <h2 class="section-title">四大造物维度与工程罗盘</h2>
-    <p class="section-desc">以此确立个人技术追求的坐标系，在复杂多变的技术潮水中锚定长期主义与工匠精神。</p>
-  </div>
-
-  <div class="compass-grid">
-    <div class="compass-card">
-      <div class="compass-card__header">
-        <div class="compass-icon architecture">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
-        </div>
-        <span class="compass-tag">ORDER & ROBUSTNESS</span>
-      </div>
-      <h3 class="compass-title">系统秩序与长效架构</h3>
-      <p class="compass-text">
-        推崇不可变数据流与严格类型安全。把个人博客当作十年级软件产品构建，拒绝临时拼凑与一次性脚手架代码。
-      </p>
-      <div class="compass-features">
-        <span>#清晰边界</span>
-        <span>#类型守卫</span>
-        <span>#架构整洁</span>
-      </div>
+<section id="about-page">
+  <!-- 1. 顶部作者形象与浮动标签 -->
+  <div class="author-box">
+    <div class="author-tag-left">
+      {about.floatingTagsLeft.map((item) => (
+        <span class="author-tag">{item}</span>
+      ))}
     </div>
 
-    <div class="compass-card">
-      <div class="compass-card__header">
-        <div class="compass-icon craft">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24"></path><path d="m14.83 9.17 4.24-4.24"></path><path d="m14.83 14.83 4.24 4.24"></path><path d="m9.17 14.83-4.24 4.24"></path></svg>
-        </div>
-        <span class="compass-tag">ERGONOMICS & CRAFT</span>
-      </div>
-      <h3 class="compass-title">人体工学与体验洁癖</h3>
-      <p class="compass-text">
-        严苛追求 60fps 丝滑动效、零布局位移 (CLS 0) 与亚像素级字距排版。视觉微交互与键盘流，处处关照读者的身心感知。
-      </p>
-      <div class="compass-features">
-        <span>#亚像素精修</span>
-        <span>#零回流闪烁</span>
-        <span>#触感反馈</span>
-      </div>
+    <div class="author-img">
+      <img src={siteConfig.site.author.avatar} alt={siteConfig.site.author.name} loading="eager" />
+      <span class="online-indicator" title="当前在线 · 持续构建中"></span>
     </div>
 
-    <div class="compass-card">
-      <div class="compass-card__header">
-        <div class="compass-icon literature">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-        </div>
-        <span class="compass-tag">DEEP THINKING</span>
-      </div>
-      <h3 class="compass-title">深度慢思考与长文归档</h3>
-      <p class="compass-text">
-        远离算法信息茧房与碎片快餐化投喂。以结构化长文深入拆解工程痛点与技术决策，让知识具备随时间复利增值的长效厚度。
-      </p>
-      <div class="compass-features">
-        <span>#结构化长文</span>
-        <span>#反碎片化</span>
-        <span>#知识复利</span>
-      </div>
-    </div>
-
-    <div class="compass-card">
-      <div class="compass-card__header">
-        <div class="compass-icon sovereignty">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-        </div>
-        <span class="compass-tag">DATA SOVEREIGNTY</span>
-      </div>
-      <h3 class="compass-title">开放网络与数据主权</h3>
-      <p class="compass-text">
-        坚守第一方数据完全自主，不依赖封闭中心化商业平台。基于开放 Web 标准、去中心化边缘分布式存储与无障碍语义落地。
-      </p>
-      <div class="compass-features">
-        <span>#数据自主</span>
-        <span>#边缘计算</span>
-        <span>#开放互联</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========================================================
-       3. 工程技术栈三层全景控制台 (Engineering Stack Topology)
-       ======================================================== -->
-  <div class="section-title-wrap">
-    <span class="section-pill">02 / CAPABILITY MATRIX</span>
-    <h2 class="section-title">全栈工程架构与技术拓扑</h2>
-    <p class="section-desc">从浏览器交互表现层、编译渲染管道到底层全球分布式边缘运算的全链路技术选型。</p>
-  </div>
-
-  <div class="topology-deck">
-    <!-- 层级 1：客户端感知层 -->
-    <div class="topology-tier">
-      <div class="tier-badge-col">
-        <span class="tier-number">01</span>
-        <span class="tier-label">感知交互层</span>
-        <span class="tier-sub">Client & UX</span>
-      </div>
-      <div class="tier-content-grid">
-        <div class="tech-block">
-          <div class="tech-block__head">
-            <strong class="tech-name">Astro 6</strong>
-            <span class="tech-role">Islands 架构</span>
-          </div>
-          <p class="tech-desc">极致静态优先渲染，按需注水交互岛屿，实现近乎 0kb 初始 JS 负载与闪电般的首屏加载速度。</p>
-        </div>
-
-        <div class="tech-block">
-          <div class="tech-block__head">
-            <strong class="tech-name">React 19</strong>
-            <span class="tech-role">动态交互岛</span>
-          </div>
-          <p class="tech-desc">承载实时留言互动、全局控制中心、账号偏好面板等高交互复杂状态，组件生命周期严谨可控。</p>
-        </div>
-
-        <div class="tech-block">
-          <div class="tech-block__head">
-            <strong class="tech-name">TypeScript</strong>
-            <span class="tech-role">全链路类型守卫</span>
-          </div>
-          <p class="tech-desc">严格类型约束，从 Content Collections 模式校验到 API 传输契约，全工程零类型妥协与重构保障。</p>
-        </div>
-
-        <div class="tech-block">
-          <div class="tech-block__head">
-            <strong class="tech-name">Tailwind CSS v4</strong>
-            <span class="tech-role">现代原子样式</span>
-          </div>
-          <p class="tech-desc">自研设计系统变量融合，毫秒级原子化编译，打造极致统一的圆角、阴影、微对比度与多主题阶梯。</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- 层级 2：内容编译管道 -->
-    <div class="topology-tier">
-      <div class="tier-badge-col">
-        <span class="tier-number">02</span>
-        <span class="tier-label">排版编译管道</span>
-        <span class="tier-sub">Content Engine</span>
-      </div>
-      <div class="tier-content-grid">
-        <div class="tech-block">
-          <div class="tech-block__head">
-            <strong class="tech-name">MDX & Shiki</strong>
-            <span class="tech-role">代码高亮与动态渲染</span>
-          </div>
-          <p class="tech-desc">双主题深浅自适应语法高亮，支持在 Markdown 中无缝内嵌富媒体、标签卡与可交互组件。</p>
-        </div>
-
-        <div class="tech-block">
-          <div class="tech-block__head">
-            <strong class="tech-name">KaTeX & Math</strong>
-            <span class="tech-role">科学公式排版</span>
-          </div>
-          <p class="tech-desc">基于编译期预渲染的高性能数学公式引擎，严谨呈现复杂的算法推导、数学证明与公式体系。</p>
-        </div>
-
-        <div class="tech-block">
-          <div class="tech-block__head">
-            <strong class="tech-name">Mermaid & Markmap</strong>
-            <span class="tech-role">知识拓扑图谱</span>
-          </div>
-          <p class="tech-desc">支持在正文中以内联代码方式实时绘制时序图、系统架构图与可交互思维导图，降低认知复杂度。</p>
-        </div>
-
-        <div class="tech-block">
-          <div class="tech-block__head">
-            <strong class="tech-name">i18n 多语言引擎</strong>
-            <span class="tech-role">多语种分块转译</span>
-          </div>
-          <p class="tech-desc">自研长文分块语义无损翻译流水线，支持 6 种主流语言原生路由切换与账号中心偏好持久化绑定。</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- 层级 3：全球分布式边缘底座 -->
-    <div class="topology-tier">
-      <div class="tier-badge-col">
-        <span class="tier-number">03</span>
-        <span class="tier-label">分布式边缘底座</span>
-        <span class="tier-sub">Edge & Cloud</span>
-      </div>
-      <div class="tier-content-grid">
-        <div class="tech-block">
-          <div class="tech-block__head">
-            <strong class="tech-name">Cloudflare Pages</strong>
-            <span class="tech-role">全球 Anycast 边缘</span>
-          </div>
-          <p class="tech-desc">跨越全球 300+ 城市的边缘节点无感分发，实现全网极速直出与 100% 高可用抵御能力。</p>
-        </div>
-
-        <div class="tech-block">
-          <div class="tech-block__head">
-            <strong class="tech-name">Cloudflare D1</strong>
-            <span class="tech-role">边缘分布式 SQLite</span>
-          </div>
-          <p class="tech-desc">边缘毫秒读写原生留言数据、点赞与用户活动流，彻底消除中心化跨大西洋数据库网络往返延迟。</p>
-        </div>
-
-        <div class="tech-block">
-          <div class="tech-block__head">
-            <strong class="tech-name">Cloudflare Workers</strong>
-            <span class="tech-role">Serverless 无冷启动</span>
-          </div>
-          <p class="tech-desc">承载 Telegram 实时推送、防滥用频次限流、属地 IP 识别与无头 API 路由，毫秒级轻盈处理。</p>
-        </div>
-
-        <div class="tech-block">
-          <div class="tech-block__head">
-            <strong class="tech-name">GitOps 流水线</strong>
-            <span class="tech-role">多远端同步协同</span>
-          </div>
-          <p class="tech-desc">每次单步提交自动同步多源仓库（GitHub / Cloudflare Pages），构建时自动化运行全栈测试审计。</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========================================================
-       4. 数字花园运行数据看板 (Garden Telemetry)
-       ======================================================== -->
-  <div class="section-title-wrap">
-    <span class="section-pill">03 / TELEMETRY</span>
-    <h2 class="section-title">数字花园运行度量指标</h2>
-    <p class="section-desc">用严谨的数据量化创作历程与站点运行效率，保持透明与沉淀。</p>
-  </div>
-
-  <div class="garden-telemetry-grid">
-    <div class="telemetry-card">
-      <div class="telemetry-card__icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-      </div>
-      <div class="telemetry-card__val">{stats.posts}</div>
-      <strong class="telemetry-card__title">原创深度博文</strong>
-      <span class="telemetry-card__note">覆盖系统架构、前端工程与实践思考</span>
-    </div>
-
-    <div class="telemetry-card">
-      <div class="telemetry-card__icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-      </div>
-      <div class="telemetry-card__val">{stats.categories}</div>
-      <strong class="telemetry-card__title">体系化专题分类</strong>
-      <span class="telemetry-card__note">拆解技术层次，杜绝孤立信息孤岛</span>
-    </div>
-
-    <div class="telemetry-card">
-      <div class="telemetry-card__icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
-      </div>
-      <div class="telemetry-card__val">{stats.tags}</div>
-      <strong class="telemetry-card__title">精准知识标签</strong>
-      <span class="telemetry-card__note">多维交织的知识图谱与技术索引</span>
-    </div>
-
-    <div class="telemetry-card">
-      <div class="telemetry-card__icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-      </div>
-      <div class="telemetry-card__val">{stats.readingMinutes}m</div>
-      <strong class="telemetry-card__title">沉淀阅读分钟</strong>
-      <span class="telemetry-card__note">数百小时深度思考与长文推敲累积</span>
-    </div>
-
-    <div class="telemetry-card highlight-card">
-      <div class="telemetry-card__icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-      </div>
-      <div class="telemetry-card__val">100 / 100</div>
-      <strong class="telemetry-card__title">Lighthouse 极速评分</strong>
-      <span class="telemetry-card__note">Performance · Accessibility · Best Practices</span>
-    </div>
-
-    <div class="telemetry-card highlight-card">
-      <div class="telemetry-card__icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-      </div>
-      <div class="telemetry-card__val">&lt; 30ms</div>
-      <strong class="telemetry-card__title">全球边缘 TTFB 延迟</strong>
-      <span class="telemetry-card__note">Cloudflare Anycast 边缘覆盖 300+ 节点</span>
-    </div>
-  </div>
-
-  <!-- ========================================================
-       5. 造物初心与数字工匠宣言 (The Digital Craftsman Manifesto)
-       ======================================================== -->
-  <div class="section-title-wrap">
-    <span class="section-pill">04 / MANIFESTO</span>
-    <h2 class="section-title">数字工匠宣言与建站初心</h2>
-    <p class="section-desc">为什么在快餐信息与算法喧嚣的时代，依然坚持用双手打造一座属于自己的数字花园？</p>
-  </div>
-
-  <div class="manifesto-chamber">
-    <div class="manifesto-lead-box">
-      <div class="manifesto-lead-tag">CREATIVE CREED</div>
-      <h3 class="manifesto-lead-title">
-        在算法喧嚣的时代，构筑一座属于自己的数字花园。
-      </h3>
-      <p class="manifesto-lead-desc">
-        不迎合瞬息万变的快餐式热点，用代码与文字沉淀可穿越周期的长效价值。代码是建筑的筋骨，文字是思想的肌理，每一处留白与微交互都是对工匠精神的践行。
-      </p>
-    </div>
-
-    <div class="manifesto-triad">
-      <div class="manifesto-triad-item">
-        <div class="triad-icon-wrap">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-        </div>
-        <strong class="triad-title">性能即尊严</strong>
-        <p class="triad-text">
-          拒绝冗余的脚本依赖与无节制的运行时重绘。用精炼纯净的架构尊重读者的每一兆字节流量与每一次点击等待。
-        </p>
-      </div>
-
-      <div class="manifesto-triad-item">
-        <div class="triad-icon-wrap">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-        </div>
-        <strong class="triad-title">清晰胜于聪明</strong>
-        <p class="triad-text">
-          拒绝晦涩难解的黑魔法写法，拥抱直观自明的系统契约。让系统在历经数年演进后依然能被轻松维护与优雅扩展。
-        </p>
-      </div>
-
-      <div class="manifesto-triad-item">
-        <div class="triad-icon-wrap">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-        </div>
-        <strong class="triad-title">持续生长的常青树</strong>
-        <p class="triad-text">
-          将每一篇博文当作活文档（Living Document）。不仅记录成功的喜悦，更完整归档试错与重构的轨迹，让认知如树木般年年茁壮。
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========================================================
-       6. 生产力军械库与工程工作台 (Workstation & Gear Matrix)
-       ======================================================== -->
-  <div class="section-title-wrap">
-    <span class="section-pill">05 / WORKSTATION</span>
-    <h2 class="section-title">生产力军械库与工程装备</h2>
-    <p class="section-desc">物理硬件工作站与数字工具流的协同，支撑高效稳定的沉浸式创作与全栈构建。</p>
-  </div>
-
-  <div class="gear-matrix-grid">
-    <!-- 物理硬件板块 -->
-    <div class="gear-column-card">
-      <div class="gear-column-head">
-        <div class="gear-column-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-        </div>
-        <div>
-          <h3 class="gear-column-title">物理硬件工作台</h3>
-          <span class="gear-column-sub">Physical Hardware Workstation</span>
-        </div>
-      </div>
-
-      <div class="gear-item-list">
-        {about.gear.hardware.map((item) => (
-          <div class="gear-row">
-            <div class="gear-row__symbol">
-              {item.icon === 'laptop' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"></rect><line x1="2" y1="20" x2="22" y2="20"></line></svg>}
-              {item.icon === 'monitor' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="12" y1="17" x2="12" y2="21"></line></svg>}
-              {item.icon === 'keyboard' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="6" y2="8"></line><line x1="10" y1="8" x2="10" y2="8"></line><line x1="14" y1="8" x2="14" y2="8"></line><line x1="18" y1="8" x2="18" y2="8"></line><line x1="7" y1="16" x2="17" y2="16"></line></svg>}
-              {item.icon === 'headphones' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>}
-            </div>
-            <div class="gear-row__content">
-              <div class="gear-row__title-wrap">
-                <strong class="gear-row__name">{item.name}</strong>
-                {item.badge && <span class="gear-row__badge">{item.badge}</span>}
-              </div>
-              <p class="gear-row__desc">{item.desc}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-
-    <!-- 数字软件板块 -->
-    <div class="gear-column-card">
-      <div class="gear-column-head">
-        <div class="gear-column-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-        </div>
-        <div>
-          <h3 class="gear-column-title">数字软件工具箱</h3>
-          <span class="gear-column-sub">Digital Toolchain & Cloud</span>
-        </div>
-      </div>
-
-      <div class="gear-item-list">
-        {about.gear.software.map((item) => (
-          <div class="gear-row">
-            <div class="gear-row__symbol">
-              {item.icon === 'code' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>}
-              {item.icon === 'zap' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>}
-              {item.icon === 'figma' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H12v7H8.5A3.5 3.5 0 0 1 5 5.5z"></path><path d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12V2z"></path><path d="M12 12.5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 1 1-7 0z"></path><path d="M5 19.5A3.5 3.5 0 0 1 8.5 16H12v3.5a3.5 3.5 0 1 1-7 0z"></path><path d="M5 12.5A3.5 3.5 0 0 1 8.5 9H12v7H8.5A3.5 3.5 0 0 1 5 12.5z"></path></svg>}
-              {item.icon === 'cloud' && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>}
-            </div>
-            <div class="gear-row__content">
-              <div class="gear-row__title-wrap">
-                <strong class="gear-row__name">{item.name}</strong>
-                {item.badge && <span class="gear-row__badge">{item.badge}</span>}
-              </div>
-              <p class="gear-row__desc">{item.desc}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-
-  <!-- ========================================================
-       7. 专注心流与灵感音轨 (Flow Deck & Inspiration Soundtrack)
-       ======================================================== -->
-  <div class="section-title-wrap">
-    <span class="section-pill">06 / FLOW STATE</span>
-    <h2 class="section-title">专注心流与灵感音轨</h2>
-    <p class="section-desc">在理性严密的逻辑与行云流水的代码之间，让旋律成为思维穿梭的节拍器。</p>
-  </div>
-
-  <div class="flow-card">
-    <div class="flow-turntable-deck">
-      <div class="turntable-disc-shell">
-        <div class="turntable-vinyl-groove">
-          <div class="vinyl-core-hole">
-            <img src={about.soundtrack?.cover || '/media/audio/covers/way_back_home.jpg'} alt="Soundtrack Art" class="vinyl-core-art" />
-          </div>
-        </div>
-        <div class="turntable-stylus-arm"></div>
-      </div>
-    </div>
-
-    <div class="flow-track-details">
-      <div class="flow-status-tag">
-        <span class="pulse-audio-dot"></span>
-        <span>CURRENT INSPIRATION BEAT</span>
-      </div>
-
-      <h3 class="flow-track-title">{about.soundtrack?.song || 'Way Back Home'}</h3>
-      <span class="flow-track-artist">{about.soundtrack?.artist || 'Scop · SHAUN · 悠扬日常'}</span>
-
-      <p class="flow-track-summary">
-        {about.soundtrack?.summary || '敲下代码时，音乐是最好的白噪音；文字流淌时，旋律是心流的节拍器。在旋律与思考中保持优雅节奏。'}
-      </p>
-
-      <div class="flow-equalizer-display">
-        <div class="equalizer-bars">
-          <span class="bar bar-1"></span>
-          <span class="bar bar-2"></span>
-          <span class="bar bar-3"></span>
-          <span class="bar bar-4"></span>
-          <span class="bar bar-5"></span>
-        </div>
-        <span class="equalizer-label">Ambient Waveform 432Hz</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========================================================
-       8. 演进足迹与里程碑时间线 (Evolution Milestones)
-       ======================================================== -->
-  <div class="section-title-wrap">
-    <span class="section-pill">07 / EVOLUTION</span>
-    <h2 class="section-title">站点演进与造物足迹</h2>
-    <p class="section-desc">从一行简单的 Markdown，到高度工程化、全球边缘化分发的内容产品演进史。</p>
-  </div>
-
-  <div class="milestones-timeline">
-    <div class="milestone-item">
-      <div class="milestone-dot-col">
-        <span class="milestone-dot"></span>
-        <span class="milestone-line"></span>
-      </div>
-      <div class="milestone-content">
-        <div class="milestone-header">
-          <span class="milestone-year">2022</span>
-          <span class="milestone-tag">始于足下 (Genesis)</span>
-        </div>
-        <h4 class="milestone-title">建立第一处个人技术自留地</h4>
-        <p class="milestone-desc">
-          在本地敲下第一行博文，开启技术探索与日常笔记的结构化归档，确立了拒绝快餐化、保持长期沉淀的创作基调。
-        </p>
-      </div>
-    </div>
-
-    <div class="milestone-item">
-      <div class="milestone-dot-col">
-        <span class="milestone-dot"></span>
-        <span class="milestone-line"></span>
-      </div>
-      <div class="milestone-content">
-        <div class="milestone-header">
-          <span class="milestone-year">2024</span>
-          <span class="milestone-tag">架构涅槃 (Architectural Rebirth)</span>
-        </div>
-        <h4 class="milestone-title">全面迁移至现代前端架构</h4>
-        <p class="milestone-desc">
-          打破传统静态生成器的束缚，重构为组件化设计系统，拥抱 TypeScript 严格类型与原子化 CSS，确立产品级维护标准。
-        </p>
-      </div>
-    </div>
-
-    <div class="milestone-item">
-      <div class="milestone-dot-col">
-        <span class="milestone-dot"></span>
-        <span class="milestone-line"></span>
-      </div>
-      <div class="milestone-content">
-        <div class="milestone-header">
-          <span class="milestone-year">2026</span>
-          <span class="milestone-tag">旗舰成型 (Flagship Maturity)</span>
-        </div>
-        <h4 class="milestone-title">自研 Shijianus 旗舰主题与边缘原生底座</h4>
-        <p class="milestone-desc">
-          深度集成 Cloudflare D1 边缘原生留言系统、国际多币种收银台、多语言自动流水线与端到端自动化测试，达到工业级水准。
-        </p>
-      </div>
-    </div>
-
-    <div class="milestone-item">
-      <div class="milestone-dot-col">
-        <span class="milestone-dot active-dot"></span>
-      </div>
-      <div class="milestone-content">
-        <div class="milestone-header">
-          <span class="milestone-year active-year">未来</span>
-          <span class="milestone-tag active-tag">持续演进 (Continuous Evolution)</span>
-        </div>
-        <h4 class="milestone-title">构筑跨越时空的知识通衢</h4>
-        <p class="milestone-desc">
-          践行“厚土潜藏细脉，大荒广构通衢”之志，在系统架构、数字交互与人机智能协同创作的前沿持续深耕。
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========================================================
-       9. 保持连接与志同道合者矩阵 (Connect & Dialogue Matrix)
-       ======================================================== -->
-  <div class="section-title-wrap">
-    <span class="section-pill">08 / DIALOGUE</span>
-    <h2 class="section-title">与志同道合者同行</h2>
-    <p class="section-desc">无论是探讨前端工程、系统架构哲学，还是交流美学设计与深度长文，欢迎随时建立连接。</p>
-  </div>
-
-  <div class="inquiry-matrix-card">
-    <div class="inquiry-matrix-grid">
-      {about.connect.items.map((item) => (
-        <a 
-          class="inquiry-channel-card" 
-          href={item.href} 
-          target={item.href.startsWith('http') ? '_blank' : undefined} 
-          rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-        >
-          <div class="inquiry-channel-icon">
-            {item.icon === 'github' && <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>}
-            {item.icon === 'telegram' && <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>}
-            {item.icon === 'rss' && <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg>}
-            {item.icon === 'mail' && <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>}
-          </div>
-
-          <div class="inquiry-channel-info">
-            <strong class="inquiry-channel-title">{item.label}</strong>
-            <span class="inquiry-channel-desc">{item.desc}</span>
-          </div>
-
-          <div class="inquiry-channel-arrow">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-          </div>
-        </a>
+    <div class="author-tag-right">
+      {about.floatingTagsRight.map((item) => (
+        <span class="author-tag">{item}</span>
       ))}
     </div>
   </div>
+
+  <p class="p center logo large">{about.title}</p>
+  <p class="p center small">{about.subtitle}</p>
+
+  <!-- 2. 破冰打招呼与造物追求 -->
+  <div class="author-content">
+    <div class="author-content-item myInfoAndSayHello">
+      <div class="title1">{about.helloTips}</div>
+      <div class="title2">
+        我叫 <span class="inline-word">{siteConfig.site.author.name}</span> (世健)
+      </div>
+      <div class="title1">{about.helloDescription}</div>
+      <div class="hello-tag-chips">
+        <span>#Astro</span>
+        <span>#TypeScript</span>
+        <span>#Tailwind</span>
+        <span>#Cloudflare</span>
+        <span>#UI/UX</span>
+        <span>#系统架构</span>
+        <span>#数据主权</span>
+      </div>
+    </div>
+
+    <div class="author-content-item aboutsiteTips">
+      <div class="author-content-item-tips">{about.siteTips.tips}</div>
+      <h2>
+        {about.siteTips.titleTop}
+        <br />
+        {about.siteTips.titleBottom}
+        <div class="mask">
+          {about.siteTips.words.map((word, index) => (
+            <span data-show={index === about.siteTips.words.length - 1 ? true : undefined} data-up={index === about.siteTips.words.length - 2 ? true : undefined}>
+              {word}
+            </span>
+          ))}
+        </div>
+      </h2>
+      <p class="aboutsite-lead">
+        深潜底层打磨隐秘细脉，拓越远方构筑长效通衢。在信息快餐与算法喧嚣的时代，为你我保留一处专注慢思考、深度阅读与自由构建的数字静地。
+      </p>
+    </div>
+  </div>
+
+  <!-- 3. 全宽动态图腾横幅 -->
+  <div class="hello-about">
+    <div class="shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+    </div>
+    <div class="content">
+      <h1>{about.helloWordmark}</h1>
+    </div>
+  </div>
+
+  <!-- 4. 技能矩阵与生涯长期演进 -->
+  <div class="author-content">
+    <div class="author-content-item skills">
+      <div class="card-content">
+        <div class="author-content-item-tips">{about.skills.tips}</div>
+        <span class="author-content-item-title">{about.skills.title}</span>
+
+        <div class="skills-style-group">
+          <div class="skills-style-group__track">
+            {[...skillMarquee, ...skillMarquee].map((item) => (
+              <span>{item}</span>
+            ))}
+          </div>
+        </div>
+
+        <div class="skills-list">
+          {about.skills.items.map((item) => (
+            <div class="skill-info">
+              <div class="skill-icon" style={`background:${item.accent}`}>
+                <span>{item.icon}</span>
+              </div>
+              <div class="skill-name">
+                <span>{item.label}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <div class="author-content-item careers">
+      <div class="card-content">
+        <div class="author-content-item-tips">{about.careers.tips}</div>
+        <span class="author-content-item-title">{about.careers.title}</span>
+        <div class="careers-group">
+          {about.careers.items.map((item) => (
+            <div class="career-item">
+              <div class="circle" style={`background:${item.accent}`}></div>
+              <div class="name">{item.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <img class="author-content-img" src="/media/shijianus/system.jpg" alt="career board" loading="lazy" />
+    </div>
+  </div>
+
+  <!-- 5. 站点数据统计与世界坐标雷达 -->
+  <div class="author-content">
+    <div class="about-statistic author-content-item">
+      <div class="card-content">
+        <div class="author-content-item-tips">{about.statistics.tips}</div>
+        <span class="author-content-item-title">{about.statistics.title}</span>
+        <div class="about-statistic__grid">
+          <div>
+            <strong>{stats.posts}</strong>
+            <span>文章总量</span>
+          </div>
+          <div>
+            <strong>{stats.categories}</strong>
+            <span>专题分类</span>
+          </div>
+          <div>
+            <strong>{stats.tags}</strong>
+            <span>知识标签</span>
+          </div>
+          <div>
+            <strong>{stats.readingMinutes}</strong>
+            <span>阅读分钟</span>
+          </div>
+        </div>
+        <div class="banner-button-group">
+          <a class="banner-button" href={about.statistics.buttonHref}>
+            <span class="banner-button-text">{about.statistics.buttonLabel} →</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="author-content-item-group column mapAndInfo">
+      <div class="author-content-item map single">
+        <div class="map-inner">
+          <span class="map-title">
+            {about.map.title}
+            <b>{about.map.accent}</b>
+          </span>
+          <div class="map-live-info">
+            <div class="live-clock-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span id="about-live-clock">--:--:-- PST</span>
+            </div>
+            <div class="live-status-pill">
+              <span class="pulse-dot"></span>
+              <span>灵感涌现 · 持续构建中</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="author-content-item selfInfo single">
+        {about.selfInfo.map((item) => (
+          <div>
+            <span class="selfInfo-title">{item.label}</span>
+            <span class="selfInfo-content" style={`color:${item.accent}`}>{item.value}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. MBTI特质深度解析与数字工作室 -->
+  <div class="author-content">
+    <div class="author-content-item personalities">
+      <div class="card-content">
+        <div class="personality-top">
+          <div>
+            <div class="author-content-item-tips">{about.personality.tips}</div>
+            <div class="personality-badge">{about.personality.type}</div>
+            <span class="author-content-item-title personality-title">{about.personality.title}</span>
+          </div>
+        </div>
+        
+        <p class="personality-summary">{about.personality.summary}</p>
+
+        {about.personality.traits && (
+          <div class="personality-traits-grid">
+            {about.personality.traits.map((trait) => (
+              <div class="trait-item">
+                <div class="trait-header">
+                  <span class="trait-label">{trait.label}</span>
+                  <span class="trait-value">{trait.value}%</span>
+                </div>
+                <div class="trait-bar">
+                  <div class="trait-fill" style={`width: ${trait.value}%`}></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div class="personality-link-wrap">
+          <a class="personality-more-link" href={about.personality.link} target="_blank" rel="noopener noreferrer">
+            深入了解 16Personalities
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="author-content-item myphoto">
+      <img class="author-content-img" src={siteConfig.site.author.cover} alt={about.photoTitle} loading="lazy" />
+      <div class="photo-overlay-tag">
+        <span class="photo-icon">✦</span>
+        <span>Clean Desk, Clear Mind · 工作台一角</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. 我的装备与生产力工作流 (Hardware & Software) -->
+  {about.gear && (
+    <div class="author-content">
+      <div class="author-content-item gear-card hardware">
+        <div class="card-content">
+          <div class="author-content-item-tips">硬件装备 / Hardware</div>
+          <span class="author-content-item-title">生产力工作站</span>
+          <p class="gear-desc">工欲善其事，必先利其器。打造高效率、低干扰的沉浸创作物理空间。</p>
+          <div class="gear-grid">
+            {about.gear.hardware.map((item) => (
+              <div class="gear-item">
+                <div class="gear-item__icon">
+                  {item.icon === 'laptop' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="20" x2="22" y2="20"></line></svg>}
+                  {item.icon === 'monitor' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>}
+                  {item.icon === 'keyboard' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="6" y2="8.01"></line><line x1="10" y1="8" x2="10" y2="8.01"></line><line x1="14" y1="8" x2="14" y2="8.01"></line><line x1="18" y1="8" x2="18" y2="8.01"></line><line x1="6" y1="12" x2="6" y2="12.01"></line><line x1="18" y1="12" x2="18" y2="12.01"></line><line x1="7" y1="16" x2="17" y2="16"></line></svg>}
+                  {item.icon === 'headphones' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>}
+                </div>
+                <div class="gear-item__content">
+                  <div class="gear-item__name">
+                    <strong>{item.name}</strong>
+                    {item.badge && <span class="gear-badge">{item.badge}</span>}
+                  </div>
+                  <span class="gear-item__desc">{item.desc}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div class="author-content-item gear-card software">
+        <div class="card-content">
+          <div class="author-content-item-tips">软件环境 / Dev Stack</div>
+          <span class="author-content-item-title">数字工具箱</span>
+          <p class="gear-desc">极简、敏捷与高信息密度。将现代工具链与自动化流程融为一体。</p>
+          <div class="gear-grid">
+            {about.gear.software.map((item) => (
+              <div class="gear-item">
+                <div class="gear-item__icon software-icon">
+                  {item.icon === 'code' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>}
+                  {item.icon === 'zap' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>}
+                  {item.icon === 'figma' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H12v7H8.5A3.5 3.5 0 0 1 5 5.5z"></path><path d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12V2z"></path><path d="M12 12.5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 1 1-7 0z"></path><path d="M5 19.5A3.5 3.5 0 0 1 8.5 16H12v3.5a3.5 3.5 0 1 1-7 0z"></path><path d="M5 12.5A3.5 3.5 0 0 1 8.5 9H12v7H8.5A3.5 3.5 0 0 1 5 12.5z"></path></svg>}
+                  {item.icon === 'cloud' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>}
+                </div>
+                <div class="gear-item__content">
+                  <div class="gear-item__name">
+                    <strong>{item.name}</strong>
+                    {item.badge && <span class="gear-badge">{item.badge}</span>}
+                  </div>
+                  <span class="gear-item__desc">{item.desc}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+
+  <!-- 8. 数字花园建站宣言与造物初心 -->
+  {about.manifesto && (
+    <div class="author-content">
+      <div class="author-content-item single manifesto-card">
+        <div class="card-content">
+          <div class="manifesto-header">
+            <span class="manifesto-pill">
+              <span class="manifesto-pill__sparkle">✦</span>
+              {about.manifesto.tips}
+            </span>
+            <h2 class="manifesto-title">{about.manifesto.title}</h2>
+            <p class="manifesto-subtitle">{about.manifesto.subtitle}</p>
+          </div>
+
+          <div class="manifesto-pillars">
+            {about.manifesto.pillars.map((pillar) => (
+              <div class="pillar-card">
+                <div class="pillar-card__head">
+                  <span class="pillar-card__tag">{pillar.tag}</span>
+                  <div class="pillar-card__icon">
+                    {pillar.icon === 'shield' && <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>}
+                    {pillar.icon === 'feather' && <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>}
+                    {pillar.icon === 'hammer' && <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"></path><path d="M17.64 15 22 10.64"></path><path d="m20.91 3.26-6.36 6.36"></path></svg>}
+                  </div>
+                </div>
+                <strong class="pillar-card__title">{pillar.title}</strong>
+                <p class="pillar-card__desc">{pillar.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+
+  <!-- 8.5 全栈工程架构三层拓扑与云端底座 (Topology & Cloud Deck) -->
+  <div class="author-content">
+    <div class="author-content-item single topology-card">
+      <div class="card-content">
+        <div class="author-content-item-tips">系统架构 / Architecture Topology</div>
+        <span class="author-content-item-title">全栈工程架构与云端底座</span>
+        <p class="topology-lead">
+          从浏览器感知交互、排版编译管道到底层全球分布式边缘运算的全链路技术选型。
+        </p>
+
+        <div class="topology-tiers-grid">
+          <!-- Tier 1: 客户端感知层 -->
+          <div class="topology-tier-box">
+            <div class="topology-tier-head">
+              <span class="tier-badge-num">01</span>
+              <div class="tier-badge-title">
+                <strong>感知交互层</strong>
+                <span>Client & UX Tier</span>
+              </div>
+            </div>
+            <div class="topology-chips-flow">
+              <div class="topology-item">
+                <span class="tier-dot blue"></span>
+                <strong class="item-name">Astro 6</strong>
+                <span class="item-role">Islands 极速渲染</span>
+              </div>
+              <div class="topology-item">
+                <span class="tier-dot blue"></span>
+                <strong class="item-name">React 19</strong>
+                <span class="item-role">动态交互状态岛</span>
+              </div>
+              <div class="topology-item">
+                <span class="tier-dot blue"></span>
+                <strong class="item-name">TypeScript</strong>
+                <span class="item-role">全链路类型守卫</span>
+              </div>
+              <div class="topology-item">
+                <span class="tier-dot blue"></span>
+                <strong class="item-name">Tailwind CSS</strong>
+                <span class="item-role">现代原子设计系统</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tier 2: 排版编译管道 -->
+          <div class="topology-tier-box">
+            <div class="topology-tier-head">
+              <span class="tier-badge-num">02</span>
+              <div class="tier-badge-title">
+                <strong>排版编译管道</strong>
+                <span>Content Engine</span>
+              </div>
+            </div>
+            <div class="topology-chips-flow">
+              <div class="topology-item">
+                <span class="tier-dot green"></span>
+                <strong class="item-name">MDX & Shiki</strong>
+                <span class="item-role">双主题自适应高亮</span>
+              </div>
+              <div class="topology-item">
+                <span class="tier-dot green"></span>
+                <strong class="item-name">KaTeX Math</strong>
+                <span class="item-role">严谨科学公式排版</span>
+              </div>
+              <div class="topology-item">
+                <span class="tier-dot green"></span>
+                <strong class="item-name">Mermaid 图谱</strong>
+                <span class="item-role">知识拓扑可视化</span>
+              </div>
+              <div class="topology-item">
+                <span class="tier-dot green"></span>
+                <strong class="item-name">i18n 多语言</strong>
+                <span class="item-role">多语种语义分块转译</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tier 3: 分布式边缘底座 -->
+          <div class="topology-tier-box">
+            <div class="topology-tier-head">
+              <span class="tier-badge-num">03</span>
+              <div class="tier-badge-title">
+                <strong>分布式边缘底座</strong>
+                <span>Edge & Cloud</span>
+              </div>
+            </div>
+            <div class="topology-chips-flow">
+              <div class="topology-item">
+                <span class="tier-dot purple"></span>
+                <strong class="item-name">Cloudflare Pages</strong>
+                <span class="item-role">全球 Anycast 边缘</span>
+              </div>
+              <div class="topology-item">
+                <span class="tier-dot purple"></span>
+                <strong class="item-name">Cloudflare D1</strong>
+                <span class="item-role">边缘分布式 SQLite</span>
+              </div>
+              <div class="topology-item">
+                <span class="tier-dot purple"></span>
+                <strong class="item-name">Workers Serverless</strong>
+                <span class="item-role">零冷启动轻量路由</span>
+              </div>
+              <div class="topology-item">
+                <span class="tier-dot purple"></span>
+                <strong class="item-name">GitOps 流水线</strong>
+                <span class="item-role">多远端双向自动同步</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. 灵感黑胶唱机与次元精神角落 -->
+  <div class="author-content">
+    <div class="author-content-item like-music">
+      <div class="card-content">
+        <div class="author-content-item-tips">{about.soundtrack ? about.soundtrack.tips : about.likeMusic.tips}</div>
+        <span class="author-content-item-title">{about.soundtrack ? about.soundtrack.title : about.likeMusic.title}</span>
+        
+        <!-- 黑胶唱片动效与音波组件 -->
+        <div class="vinyl-player-widget">
+          <div class="vinyl-disc-container">
+            <div class="vinyl-disc">
+              <div class="vinyl-grooves"></div>
+              <img class="vinyl-cover" src={about.soundtrack?.cover || '/media/audio/covers/way_back_home.jpg'} alt="Record Cover" />
+              <div class="vinyl-center-hole"></div>
+            </div>
+            <div class="vinyl-stylus"></div>
+          </div>
+          
+          <div class="vinyl-meta">
+            <div class="vinyl-title-row">
+              <strong class="vinyl-song-title">{about.soundtrack?.song || 'Way Back Home'}</strong>
+              <div class="equalizer-bars">
+                <span class="bar bar-1"></span>
+                <span class="bar bar-2"></span>
+                <span class="bar bar-3"></span>
+                <span class="bar bar-4"></span>
+              </div>
+            </div>
+            <span class="vinyl-artist">{about.soundtrack?.artist || 'Inspiration Soundtrack'}</span>
+            <p class="vinyl-summary">{about.soundtrack?.summary || about.likeMusic.summary}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="author-content-item game-yuanshen">
+      <div class="card-content">
+        <div class="author-content-item-tips">{about.game.tips}</div>
+        <span class="author-content-item-title">{about.game.title}</span>
+        <div class="content-bottom">
+          <div class="tips">{about.game.summary}</div>
+          <div class="comic-box">
+            {about.comic.items.map((item) => (
+              <span class="comic-item">{item}</span>
+            ))}
+          </div>
+        </div>
+        <div class="loading-bar-wrap">
+          <div class="loading-bar-inner"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9.5 站点演进足迹与造物里程碑 (Evolution Milestones) -->
+  <div class="author-content">
+    <div class="author-content-item single milestones-card">
+      <div class="card-content">
+        <div class="author-content-item-tips">演进足迹 / Milestones</div>
+        <span class="author-content-item-title">站点演进与造物足迹</span>
+        <p class="milestones-lead">
+          从一行简单的 Markdown，到高度工程化、全球边缘化分发的内容产品演进史。
+        </p>
+
+        <div class="milestones-track">
+          <div class="milestone-node">
+            <div class="node-indicator">
+              <span class="node-dot"></span>
+              <span class="node-line"></span>
+            </div>
+            <div class="node-body">
+              <div class="node-meta">
+                <span class="node-year">2022</span>
+                <span class="node-tag">始于足下 (Genesis)</span>
+              </div>
+              <strong class="node-title">建立第一处个人技术自留地</strong>
+              <p class="node-desc">在本地敲下第一行博文，开启技术探索与日常笔记的结构化归档，确立了拒绝快餐化、保持长期沉淀的创作基调。</p>
+            </div>
+          </div>
+
+          <div class="milestone-node">
+            <div class="node-indicator">
+              <span class="node-dot"></span>
+              <span class="node-line"></span>
+            </div>
+            <div class="node-body">
+              <div class="node-meta">
+                <span class="node-year">2024</span>
+                <span class="node-tag">架构涅槃 (Architectural Rebirth)</span>
+              </div>
+              <strong class="node-title">全面迁移至现代前端工程架构</strong>
+              <p class="node-desc">打破传统静态生成器的束缚，重构为组件化设计系统，拥抱 TypeScript 严格类型与原子化 CSS，确立产品级维护标准。</p>
+            </div>
+          </div>
+
+          <div class="milestone-node">
+            <div class="node-indicator">
+              <span class="node-dot"></span>
+              <span class="node-line"></span>
+            </div>
+            <div class="node-body">
+              <div class="node-meta">
+                <span class="node-year">2026</span>
+                <span class="node-tag current-tag">旗舰成型 (Flagship Maturity)</span>
+              </div>
+              <strong class="node-title">自研 Shijianus 旗舰主题与边缘原生底座</strong>
+              <p class="node-desc">深度集成 Cloudflare D1 边缘原生留言系统、国际多币种收银台、多语言自动流水线与端到端自动化测试，达到工业级水准。</p>
+            </div>
+          </div>
+
+          <div class="milestone-node">
+            <div class="node-indicator">
+              <span class="node-dot future-dot"></span>
+            </div>
+            <div class="node-body">
+              <div class="node-meta">
+                <span class="node-year future-year">未来</span>
+                <span class="node-tag future-tag">持续演进 (Continuous Evolution)</span>
+              </div>
+              <strong class="node-title">构筑跨越时空的知识通衢</strong>
+              <p class="node-desc">践行“厚土潜藏细脉，大荒广构通衢”之志，在系统架构、数字交互与人机智能协同创作的前沿持续深耕。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. 箴言与状态加成 -->
+  <div class="author-content">
+    <div class="author-content-item maxim">
+      <div class="card-content">
+        <div class="author-content-item-tips">{about.maxim.tips}</div>
+        <span class="maxim-title">
+          <span>{about.maxim.top}</span>
+          <span>{about.maxim.bottom}</span>
+        </span>
+        <p class="maxim-annotation">深潜底层打磨隐秘细脉，拓越远方构筑长效通衢。</p>
+      </div>
+    </div>
+
+    <div class="author-content-item buff">
+      <div class="card-content">
+        <div class="author-content-item-tips">{about.buff.tips}</div>
+        <span class="buff-title">
+          <span>{about.buff.top}</span>
+          <span>{about.buff.bottom}</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. 保持连接与志同道合者矩阵 -->
+  {about.connect && (
+    <div class="author-content">
+      <div class="author-content-item single connect-card">
+        <div class="card-content">
+          <div class="connect-head">
+            <div class="author-content-item-tips">{about.connect.tips}</div>
+            <span class="author-content-item-title">{about.connect.title}</span>
+            <p class="connect-summary">{about.connect.summary}</p>
+          </div>
+
+          <div class="connect-buttons-grid">
+            {about.connect.items.map((item) => (
+              <a class="connect-btn" href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}>
+                <div class="connect-btn__icon">
+                  {item.icon === 'github' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>}
+                  {item.icon === 'telegram' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>}
+                  {item.icon === 'rss' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg>}
+                  {item.icon === 'mail' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>}
+                </div>
+                <div class="connect-btn__info">
+                  <strong>{item.label}</strong>
+                  <span>{item.desc}</span>
+                </div>
+                <span class="connect-btn__arrow">→</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
 </section>
 
 <!-- 实时时钟与微交互运行脚本 -->
 <script is:inline>
   (() => {
-    // 实时 PST 太平洋时间更新
+    // 1. 实时 PST/PDT 太平洋时间更新
     const updateClock = () => {
       const clockEl = document.getElementById('about-live-clock');
       if (!clockEl) return;
@@ -687,1110 +669,528 @@ const author = siteConfig.site.author;
 </script>
 
 <style>
-  /* ========================================================
-     Shijianus 个人旗舰总览展台专属样式 (Creator Portfolio Shell)
-     收敛圆角 8px~12px，极致排版层级，深浅双模高对比度
-     ======================================================== */
-
-  .creator-portfolio-shell {
-    display: flex;
-    flex-direction: column;
-    gap: 36px;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding-bottom: 64px;
+  /* ----------------------------------------------------
+     关于页深度重构与专属创新样式 (About Modern Dashboard)
+     ---------------------------------------------------- */
+  
+  /* 头像与在线绿点脉冲 */
+  .online-indicator {
+    position: absolute;
+    right: 6px;
+    bottom: 8px;
+    width: 24px;
+    height: 24px;
+    border: 4px solid var(--card-bg, #ffffff);
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+    animation: online-pulse 2.5s ease-in-out infinite;
+    z-index: 3;
   }
 
-  /* 通用章节标题装饰 */
-  .section-title-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-    margin-top: 12px;
+  @keyframes online-pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
   }
 
-  .section-pill {
+  /* 打招呼微标签流 */
+  .hello-tag-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .hello-tag-chips span {
     display: inline-flex;
     align-items: center;
     padding: 3px 10px;
     border-radius: 6px;
-    background: rgba(66, 90, 239, 0.08);
-    border: 1px solid rgba(66, 90, 239, 0.2);
-    color: #425aef;
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(8px);
+    color: #ffffff;
     font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.02em;
   }
 
-  [data-theme='dark'] .section-pill {
-    background: rgba(99, 125, 255, 0.15);
-    border-color: rgba(99, 125, 255, 0.3);
-    color: #8da4ff;
+  .aboutsite-lead {
+    margin-top: 12px;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.75;
   }
 
-  .section-title {
-    margin: 0;
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--text-color, #1e293b);
-    letter-spacing: -0.02em;
-  }
-
-  [data-theme='dark'] .section-title {
-    color: #f1f5f9;
-  }
-
-  .section-desc {
-    margin: 0;
-    font-size: 13.5px;
-    line-height: 1.6;
-    color: var(--text-color-secondary, #64748b);
-  }
-
-  [data-theme='dark'] .section-desc {
-    color: #94a3b8;
-  }
-
-  /* ----------------------------------------------------
-     1. 造物者身份总览展台 (Creator Hero Stage)
-     ---------------------------------------------------- */
-  .creator-hero-card {
-    position: relative;
-    border-radius: 12px;
-    background: var(--card-bg, #ffffff);
-    border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
-    overflow: hidden;
-    padding: 32px 36px;
-  }
-
-  [data-theme='dark'] .creator-hero-card {
-    background: #141a29;
-    border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.4);
-  }
-
-  .creator-hero-backdrop {
-    position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 600px;
-    height: 400px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(66, 90, 239, 0.08) 0%, rgba(66, 90, 239, 0) 70%);
-    pointer-events: none;
-  }
-
-  [data-theme='dark'] .creator-hero-backdrop {
-    background: radial-gradient(circle, rgba(99, 125, 255, 0.12) 0%, rgba(99, 125, 255, 0) 70%);
-  }
-
-  .creator-hero-body {
-    position: relative;
-    display: flex;
-    align-items: flex-start;
-    gap: 32px;
-    z-index: 2;
-  }
-
-  @media (max-width: 768px) {
-    .creator-hero-body {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 20px;
-    }
-  }
-
-  .creator-avatar-wrap {
-    position: relative;
-    flex-shrink: 0;
-  }
-
-  .creator-avatar-halo {
-    position: absolute;
-    inset: -6px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, rgba(66, 90, 239, 0.4), rgba(16, 185, 129, 0.3));
-    filter: blur(8px);
-    opacity: 0.75;
-  }
-
-  .creator-avatar-inner {
-    position: relative;
-    width: 104px;
-    height: 104px;
-    border-radius: 50%;
-    border: 3px solid #ffffff;
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
-    overflow: hidden;
-  }
-
-  [data-theme='dark'] .creator-avatar-inner {
-    border-color: #1e293b;
-  }
-
-  .creator-avatar-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
-  .creator-status-orb {
-    position: absolute;
-    bottom: 4px;
-    right: 4px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: #10b981;
-    border: 3px solid #ffffff;
-    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
-  }
-
-  [data-theme='dark'] .creator-status-orb {
-    border-color: #141a29;
-  }
-
-  .creator-identity {
+  /* 地图时区与实时时钟 */
+  .map-inner {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    flex: 1;
+    justify-content: space-between;
+    height: 100%;
+    gap: 14px;
   }
 
-  .creator-title-row {
+  .map-live-info {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 10px;
     flex-wrap: wrap;
   }
 
-  @media (max-width: 768px) {
-    .creator-title-row {
-      justify-content: center;
-    }
-  }
-
-  .creator-name {
-    margin: 0;
-    font-size: 28px;
-    font-weight: 900;
-    color: var(--text-color, #0f172a);
-    letter-spacing: -0.03em;
-  }
-
-  [data-theme='dark'] .creator-name {
-    color: #f8fafc;
-  }
-
-  .creator-alias {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text-color-secondary, #64748b);
-  }
-
-  .creator-tag-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 3px 8px;
-    border-radius: 6px;
-    background: #425aef;
-    color: #ffffff;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-  }
-
-  .creator-headline {
-    margin: 0;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-color, #334155);
-    line-height: 1.5;
-  }
-
-  [data-theme='dark'] .creator-headline {
-    color: #cbd5e1;
-  }
-
-  /* 核心座右铭黄金展示区 */
-  .creator-motto-banner {
-    margin-top: 4px;
-    padding: 16px 20px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, rgba(66, 90, 239, 0.05) 0%, rgba(16, 185, 129, 0.04) 100%);
-    border: 1px solid rgba(66, 90, 239, 0.15);
-    border-left: 4px solid #425aef;
-  }
-
-  [data-theme='dark'] .creator-motto-banner {
-    background: linear-gradient(135deg, rgba(66, 90, 239, 0.12) 0%, rgba(16, 185, 129, 0.08) 100%);
-    border-color: rgba(99, 125, 255, 0.25);
-    border-left: 4px solid #637dff;
-  }
-
-  .creator-motto-quote {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  @media (max-width: 768px) {
-    .creator-motto-quote {
-      justify-content: center;
-    }
-  }
-
-  .motto-mark {
-    font-size: 22px;
-    font-family: Georgia, serif;
-    color: #425aef;
-    line-height: 1;
-  }
-
-  [data-theme='dark'] .motto-mark {
-    color: #8da4ff;
-  }
-
-  .motto-text {
-    font-size: 17px;
-    font-weight: 800;
-    color: #425aef;
-    letter-spacing: 0.02em;
-  }
-
-  [data-theme='dark'] .motto-text {
-    color: #9cb1ff;
-  }
-
-  .motto-annotation {
-    margin: 6px 0 0 0;
-    font-size: 12.5px;
-    line-height: 1.6;
-    color: var(--text-color-secondary, #64748b);
-  }
-
-  [data-theme='dark'] .motto-annotation {
-    color: #94a3b8;
-  }
-
-  /* 遥测指标胶囊条 */
-  .creator-telemetry-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 6px;
-  }
-
-  @media (max-width: 768px) {
-    .creator-telemetry-bar {
-      justify-content: center;
-    }
-  }
-
-  .telemetry-pill {
+  .live-clock-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 5px 11px;
+    padding: 4px 12px;
     border-radius: 6px;
-    background: rgba(0, 0, 0, 0.03);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    font-size: 11.5px;
-    font-weight: 600;
-    color: var(--text-color-secondary, #475569);
+    background: var(--card-bg);
+    border: var(--style-border-always);
+    box-shadow: var(--shadow-border);
+    color: var(--font-color);
+    font-size: 12px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
   }
 
-  [data-theme='dark'] .telemetry-pill {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.08);
-    color: #cbd5e1;
-  }
-
-  .live-clock-pill {
-    background: rgba(66, 90, 239, 0.06);
-    border-color: rgba(66, 90, 239, 0.18);
+  .live-clock-badge svg {
     color: #425aef;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  .live-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    color: #059669;
+    font-size: 12px;
     font-weight: 700;
   }
 
-  [data-theme='dark'] .live-clock-pill {
-    background: rgba(99, 125, 255, 0.12);
-    border-color: rgba(99, 125, 255, 0.25);
-    color: #8da4ff;
+  [data-theme='dark'] .live-status-pill {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
   }
 
-  .pulse-beacon {
-    width: 7px;
-    height: 7px;
+  .pulse-dot {
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: #10b981;
-    animation: beacon-pulse 2s infinite ease-in-out;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35);
+    animation: dot-beat 1.8s infinite;
   }
 
-  @keyframes beacon-pulse {
-    0% { transform: scale(0.9); opacity: 0.6; }
-    50% { transform: scale(1.3); opacity: 1; }
-    100% { transform: scale(0.9); opacity: 0.6; }
+  @keyframes dot-beat {
+    0%, 100% { transform: scale(0.9); opacity: 0.8; }
+    50% { transform: scale(1.25); opacity: 1; }
   }
 
-  .tech-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #f59e0b;
-  }
-
-  /* ----------------------------------------------------
-     2. 四大工程哲学罗盘 (Developer Compass)
-     ---------------------------------------------------- */
-  .compass-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-
-  @media (max-width: 768px) {
-    .compass-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .compass-card {
-    border-radius: 10px;
-    background: var(--card-bg, #ffffff);
-    border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
-    padding: 24px;
+  /* MBTI 特质卡片 */
+  .personality-top {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .compass-card:hover {
-    transform: translateY(-2px);
-    border-color: rgba(66, 90, 239, 0.3);
-    box-shadow: 0 8px 24px -4px rgba(66, 90, 239, 0.08);
-  }
-
-  [data-theme='dark'] .compass-card {
-    background: #141a29;
-    border-color: rgba(255, 255, 255, 0.08);
-  }
-
-  [data-theme='dark'] .compass-card:hover {
-    border-color: rgba(99, 125, 255, 0.4);
-    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.4);
-  }
-
-  .compass-card__header {
-    display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
+    gap: 12px;
   }
 
-  .compass-icon {
-    width: 40px;
-    height: 40px;
+  .personality-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    margin-top: 4px;
+    border-radius: 4px;
+    background: #425aef;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+
+  .personality-title {
+    margin-top: 6px;
+    font-size: 1.7rem;
+  }
+
+  .personality-summary {
+    margin: 10px 0 0;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
+  .personality-traits-grid {
+    display: grid;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .trait-item {
+    display: grid;
+    gap: 4px;
+  }
+
+  .trait-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--font-color);
+  }
+
+  .trait-value {
+    color: #425aef;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .trait-bar {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--secondbg);
+    overflow: hidden;
+  }
+
+  .trait-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #425aef, #00c6ff);
+    transition: width 1s ease-out;
+  }
+
+  .personality-link-wrap {
+    margin-top: 16px;
+  }
+
+  .personality-more-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #425aef;
+    font-size: 12px;
+    font-weight: 700;
+    transition: transform 0.2s;
+  }
+
+  .personality-more-link:hover {
+    transform: translateX(3px);
+  }
+
+  /* 工作台照片蒙版标签 */
+  .myphoto {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .photo-overlay-tag {
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    background: rgba(17, 24, 39, 0.75);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .photo-icon {
+    color: #f59e0b;
+  }
+
+  /* 生产力装备网格 */
+  .gear-card {
+    min-height: 280px;
+  }
+
+  .gear-desc {
+    margin: 6px 0 16px;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .gear-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .gear-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 14px;
     border-radius: 8px;
+    background: var(--secondbg);
+    border: 1px solid transparent;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+  }
+
+  .gear-item:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, #425aef 25%, transparent);
+  }
+
+  .gear-item__icon {
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  .compass-icon.architecture {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 6px;
     background: rgba(66, 90, 239, 0.1);
     color: #425aef;
   }
 
-  .compass-icon.craft {
+  .software-icon {
     background: rgba(16, 185, 129, 0.1);
     color: #10b981;
   }
 
-  .compass-icon.literature {
-    background: rgba(245, 158, 11, 0.1);
-    color: #f59e0b;
-  }
-
-  .compass-icon.sovereignty {
-    background: rgba(168, 85, 247, 0.1);
-    color: #a855f7;
-  }
-
-  .compass-tag {
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    color: var(--text-color-secondary, #94a3b8);
-  }
-
-  .compass-title {
-    margin: 0;
-    font-size: 16.5px;
-    font-weight: 800;
-    color: var(--text-color, #1e293b);
-  }
-
-  [data-theme='dark'] .compass-title {
-    color: #f1f5f9;
-  }
-
-  .compass-text {
-    margin: 0;
-    font-size: 13.5px;
-    line-height: 1.65;
-    color: var(--text-color-secondary, #475569);
-    flex: 1;
-  }
-
-  [data-theme='dark'] .compass-text {
-    color: #94a3b8;
-  }
-
-  .compass-features {
+  .gear-item__content {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .gear-item__name {
+    display: flex;
+    align-items: center;
     gap: 6px;
-    margin-top: 4px;
   }
 
-  .compass-features span {
-    font-size: 11px;
-    font-weight: 700;
-    color: #425aef;
-    background: rgba(66, 90, 239, 0.06);
-    padding: 2px 8px;
-    border-radius: 4px;
-  }
-
-  [data-theme='dark'] .compass-features span {
-    color: #8da4ff;
-    background: rgba(99, 125, 255, 0.12);
-  }
-
-  /* ----------------------------------------------------
-     3. 全栈工程技术拓扑三层控制台 (Engineering Stack Topology)
-     ---------------------------------------------------- */
-  .topology-deck {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .topology-tier {
-    display: flex;
-    border-radius: 10px;
-    background: var(--card-bg, #ffffff);
-    border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
-    overflow: hidden;
-  }
-
-  [data-theme='dark'] .topology-tier {
-    background: #141a29;
-    border-color: rgba(255, 255, 255, 0.08);
-  }
-
-  @media (max-width: 860px) {
-    .topology-tier {
-      flex-direction: column;
-    }
-  }
-
-  .tier-badge-col {
-    width: 170px;
-    flex-shrink: 0;
-    background: rgba(66, 90, 239, 0.03);
-    border-right: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 4px;
-  }
-
-  [data-theme='dark'] .tier-badge-col {
-    background: rgba(255, 255, 255, 0.02);
-    border-color: rgba(255, 255, 255, 0.08);
-  }
-
-  @media (max-width: 860px) {
-    .tier-badge-col {
-      width: 100%;
-      border-right: none;
-      border-bottom: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
-      padding: 16px 20px;
-      flex-direction: row;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 12px;
-    }
-
-    [data-theme='dark'] .tier-badge-col {
-      border-bottom-color: rgba(255, 255, 255, 0.08);
-    }
-  }
-
-  .tier-number {
-    font-size: 20px;
-    font-weight: 900;
-    color: #425aef;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    line-height: 1;
-  }
-
-  [data-theme='dark'] .tier-number {
-    color: #8da4ff;
-  }
-
-  .tier-label {
-    font-size: 14.5px;
-    font-weight: 800;
-    color: var(--text-color, #1e293b);
-  }
-
-  [data-theme='dark'] .tier-label {
-    color: #f1f5f9;
-  }
-
-  .tier-sub {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-color-secondary, #94a3b8);
-  }
-
-  .tier-content-grid {
-    flex: 1;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    padding: 20px 24px;
-  }
-
-  @media (max-width: 640px) {
-    .tier-content-grid {
-      grid-template-columns: 1fr;
-      padding: 16px;
-    }
-  }
-
-  .tech-block {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 10px 14px;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.015);
-    border: 1px solid rgba(0, 0, 0, 0.04);
-  }
-
-  [data-theme='dark'] .tech-block {
-    background: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.05);
-  }
-
-  .tech-block__head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-  }
-
-  .tech-name {
-    font-size: 13.5px;
-    font-weight: 800;
-    color: var(--text-color, #1e293b);
-  }
-
-  [data-theme='dark'] .tech-name {
-    color: #f1f5f9;
-  }
-
-  .tech-role {
-    font-size: 11px;
-    font-weight: 600;
-    color: #425aef;
-  }
-
-  [data-theme='dark'] .tech-role {
-    color: #8da4ff;
-  }
-
-  .tech-desc {
-    margin: 0;
-    font-size: 12px;
-    line-height: 1.55;
-    color: var(--text-color-secondary, #64748b);
-  }
-
-  [data-theme='dark'] .tech-desc {
-    color: #94a3b8;
-  }
-
-  /* ----------------------------------------------------
-     4. 数字花园运行数据看板 (Garden Telemetry)
-     ---------------------------------------------------- */
-  .garden-telemetry-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-  }
-
-  @media (max-width: 860px) {
-    .garden-telemetry-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (max-width: 520px) {
-    .garden-telemetry-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .telemetry-card {
-    border-radius: 10px;
-    background: var(--card-bg, #ffffff);
-    border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    transition: transform 0.2s ease;
-  }
-
-  .telemetry-card:hover {
-    transform: translateY(-2px);
-  }
-
-  [data-theme='dark'] .telemetry-card {
-    background: #141a29;
-    border-color: rgba(255, 255, 255, 0.08);
-  }
-
-  .telemetry-card.highlight-card {
-    background: linear-gradient(135deg, rgba(66, 90, 239, 0.04) 0%, rgba(16, 185, 129, 0.04) 100%);
-    border-color: rgba(66, 90, 239, 0.2);
-  }
-
-  [data-theme='dark'] .telemetry-card.highlight-card {
-    background: linear-gradient(135deg, rgba(66, 90, 239, 0.1) 0%, rgba(16, 185, 129, 0.06) 100%);
-    border-color: rgba(99, 125, 255, 0.3);
-  }
-
-  .telemetry-card__icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    background: rgba(66, 90, 239, 0.08);
-    color: #425aef;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 4px;
-  }
-
-  [data-theme='dark'] .telemetry-card__icon {
-    background: rgba(99, 125, 255, 0.15);
-    color: #8da4ff;
-  }
-
-  .telemetry-card__val {
-    font-size: 26px;
-    font-weight: 900;
-    color: var(--text-color, #0f172a);
-    line-height: 1;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  }
-
-  [data-theme='dark'] .telemetry-card__val {
-    color: #f8fafc;
-  }
-
-  .telemetry-card.highlight-card .telemetry-card__val {
-    color: #425aef;
-  }
-
-  [data-theme='dark'] .telemetry-card.highlight-card .telemetry-card__val {
-    color: #9cb1ff;
-  }
-
-  .telemetry-card__title {
-    font-size: 13.5px;
-    font-weight: 800;
-    color: var(--text-color, #1e293b);
-  }
-
-  [data-theme='dark'] .telemetry-card__title {
-    color: #e2e8f0;
-  }
-
-  .telemetry-card__note {
-    font-size: 11.5px;
-    color: var(--text-color-secondary, #64748b);
-    line-height: 1.4;
-  }
-
-  [data-theme='dark'] .telemetry-card__note {
-    color: #94a3b8;
-  }
-
-  /* ----------------------------------------------------
-     5. 造物初心与数字工匠宣言 (Manifesto)
-     ---------------------------------------------------- */
-  .manifesto-chamber {
-    border-radius: 12px;
-    background: var(--card-bg, #ffffff);
-    border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
-    padding: 32px;
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-  }
-
-  [data-theme='dark'] .manifesto-chamber {
-    background: #141a29;
-    border-color: rgba(255, 255, 255, 0.08);
-  }
-
-  .manifesto-lead-box {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    border-bottom: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
-    padding-bottom: 24px;
-  }
-
-  [data-theme='dark'] .manifesto-lead-box {
-    border-bottom-color: rgba(255, 255, 255, 0.08);
-  }
-
-  .manifesto-lead-tag {
-    font-size: 11px;
-    font-weight: 800;
-    color: #425aef;
-    letter-spacing: 0.08em;
-  }
-
-  [data-theme='dark'] .manifesto-lead-tag {
-    color: #8da4ff;
-  }
-
-  .manifesto-lead-title {
-    margin: 0;
-    font-size: 22px;
-    font-weight: 900;
-    color: var(--text-color, #0f172a);
-    line-height: 1.4;
-  }
-
-  [data-theme='dark'] .manifesto-lead-title {
-    color: #f8fafc;
-  }
-
-  .manifesto-lead-desc {
-    margin: 0;
-    font-size: 14.5px;
-    line-height: 1.7;
-    color: var(--text-color-secondary, #475569);
-  }
-
-  [data-theme='dark'] .manifesto-lead-desc {
-    color: #cbd5e1;
-  }
-
-  .manifesto-triad {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-  }
-
-  @media (max-width: 768px) {
-    .manifesto-triad {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .manifesto-triad-item {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 16px;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.02);
-    border: 1px solid rgba(0, 0, 0, 0.04);
-  }
-
-  [data-theme='dark'] .manifesto-triad-item {
-    background: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.06);
-  }
-
-  .triad-icon-wrap {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    background: rgba(66, 90, 239, 0.1);
-    color: #425aef;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  [data-theme='dark'] .triad-icon-wrap {
-    background: rgba(99, 125, 255, 0.15);
-    color: #8da4ff;
-  }
-
-  .triad-title {
-    font-size: 15px;
-    font-weight: 800;
-    color: var(--text-color, #1e293b);
-  }
-
-  [data-theme='dark'] .triad-title {
-    color: #f1f5f9;
-  }
-
-  .triad-text {
-    margin: 0;
+  .gear-item__name strong {
+    color: var(--font-color);
     font-size: 13px;
-    line-height: 1.6;
-    color: var(--text-color-secondary, #64748b);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  [data-theme='dark'] .triad-text {
-    color: #94a3b8;
-  }
-
-  /* ----------------------------------------------------
-     6. 生产力军械库与工作流 (Workstation & Gear Matrix)
-     ---------------------------------------------------- */
-  .gear-matrix-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-
-  @media (max-width: 768px) {
-    .gear-matrix-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .gear-column-card {
-    border-radius: 10px;
-    background: var(--card-bg, #ffffff);
-    border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-  }
-
-  [data-theme='dark'] .gear-column-card {
-    background: #141a29;
-    border-color: rgba(255, 255, 255, 0.08);
-  }
-
-  .gear-column-head {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .gear-column-icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 8px;
-    background: rgba(66, 90, 239, 0.1);
-    color: #425aef;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  [data-theme='dark'] .gear-column-icon {
-    background: rgba(99, 125, 255, 0.15);
-    color: #8da4ff;
-  }
-
-  .gear-column-title {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 800;
-    color: var(--text-color, #1e293b);
-  }
-
-  [data-theme='dark'] .gear-column-title {
-    color: #f1f5f9;
-  }
-
-  .gear-column-sub {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-color-secondary, #94a3b8);
-  }
-
-  .gear-item-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .gear-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 10px 12px;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.02);
-    border: 1px solid rgba(0, 0, 0, 0.04);
-  }
-
-  [data-theme='dark'] .gear-row {
-    background: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.05);
-  }
-
-  .gear-row__symbol {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    background: rgba(66, 90, 239, 0.08);
-    color: #425aef;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  [data-theme='dark'] .gear-row__symbol {
-    background: rgba(99, 125, 255, 0.12);
-    color: #8da4ff;
-  }
-
-  .gear-row__content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .gear-row__title-wrap {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .gear-row__name {
-    font-size: 13.5px;
-    font-weight: 700;
-    color: var(--text-color, #1e293b);
-  }
-
-  [data-theme='dark'] .gear-row__name {
-    color: #f1f5f9;
-  }
-
-  .gear-row__badge {
-    font-size: 10px;
-    font-weight: 800;
+  .gear-badge {
     padding: 1px 6px;
     border-radius: 4px;
     background: #425aef;
     color: #ffffff;
+    font-size: 9px;
+    font-weight: 800;
+  }
+
+  .gear-item__desc {
+    color: var(--text-muted);
+    font-size: 11px;
     line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .gear-row__desc {
+  /* 数字花园建站宣言 */
+  .manifesto-card {
+    background: linear-gradient(135deg, rgba(66, 90, 239, 0.05) 0%, rgba(0, 198, 255, 0.05) 100%);
+    border: 1px solid color-mix(in srgb, #425aef 20%, var(--card-border));
+  }
+
+  .manifesto-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 22px;
+  }
+
+  .manifesto-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 12px;
+    border-radius: 999px;
+    background: rgba(66, 90, 239, 0.1);
+    color: #425aef;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+
+  .manifesto-pill__sparkle {
+    color: #f59e0b;
+  }
+
+  .manifesto-title {
+    margin: 4px 0 0;
+    color: var(--font-color);
+    font-size: clamp(1.4rem, 2.8vw, 1.9rem);
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  .manifesto-subtitle {
     margin: 0;
-    font-size: 12px;
-    line-height: 1.5;
-    color: var(--text-color-secondary, #64748b);
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.7;
   }
 
-  [data-theme='dark'] .gear-row__desc {
-    color: #94a3b8;
+  .manifesto-pillars {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
   }
 
-  /* ----------------------------------------------------
-     7. 专注心流与灵感音轨 (Flow Deck)
-     ---------------------------------------------------- */
-  .flow-card {
-    border-radius: 12px;
-    background: var(--card-bg, #ffffff);
-    border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
-    padding: 28px 32px;
+  .pillar-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    border-radius: 8px;
+    background: var(--card-bg);
+    border: var(--style-border-always);
+    box-shadow: var(--shadow-border);
+    transition: transform 0.25s ease;
+  }
+
+  .pillar-card:hover {
+    transform: translateY(-3px);
+  }
+
+  .pillar-card__head {
     display: flex;
     align-items: center;
-    gap: 36px;
+    justify-content: space-between;
   }
 
-  [data-theme='dark'] .flow-card {
-    background: #141a29;
-    border-color: rgba(255, 255, 255, 0.08);
+  .pillar-card__tag {
+    color: #425aef;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .pillar-card__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background: var(--secondbg);
+    color: #425aef;
+  }
+
+  .pillar-card__title {
+    color: var(--font-color);
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.3;
+  }
+
+  .pillar-card__desc {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  /* 灵感黑胶卡片沉浸暗色播放器与游戏卡片配平 */
+  .author-content-item.like-music {
+    width: calc(50% - 10px) !important;
+    background: linear-gradient(135deg, #181c2f 0%, #0f172a 100%) !important;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .author-content-item.like-music .author-content-item-tips {
+    color: #38bdf8 !important;
+  }
+
+  .author-content-item.like-music .author-content-item-title {
+    color: #ffffff !important;
+  }
+
+  .author-content-item.game-yuanshen {
+    width: calc(50% - 10px) !important;
   }
 
   @media (max-width: 768px) {
-    .flow-card {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 20px;
-      padding: 24px 20px;
+    .author-content-item.like-music,
+    .author-content-item.game-yuanshen {
+      width: 100% !important;
     }
   }
 
-  .flow-turntable-deck {
+  /* 黑胶唱机卡片与音波律动 */
+  .vinyl-player-widget {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    margin-top: 18px;
+  }
+
+  .vinyl-disc-container {
     position: relative;
-    width: 140px;
-    height: 140px;
+    width: 100px;
+    height: 100px;
     flex-shrink: 0;
   }
 
-  .turntable-disc-shell {
+  .vinyl-disc {
     position: relative;
-    width: 140px;
-    height: 140px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .turntable-vinyl-groove {
-    width: 130px;
-    height: 130px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
-    background: repeating-radial-gradient(
-      circle at center,
-      #1e293b 0,
-      #1e293b 2px,
-      #0f172a 3px,
-      #0f172a 5px
-    );
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: vinyl-spin 12s linear infinite;
+    background: #18181b;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    animation: vinyl-spin 10s linear infinite;
+    overflow: hidden;
   }
 
-  [data-theme='dark'] .turntable-vinyl-groove {
-    background: repeating-radial-gradient(
-      circle at center,
-      #090d16 0,
-      #090d16 2px,
-      #020617 3px,
-      #020617 5px
-    );
+  .vinyl-grooves {
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    border: 1px dashed rgba(255, 255, 255, 0.12);
+  }
+
+  .vinyl-cover {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+  }
+
+  .vinyl-center-hole {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ffffff;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
   }
 
   @keyframes vinyl-spin {
@@ -1798,175 +1198,304 @@ const author = siteConfig.site.author;
     to { transform: rotate(360deg); }
   }
 
-  .vinyl-core-hole {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 3px solid #f8fafc;
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.4);
-  }
-
-  .vinyl-core-art {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .turntable-stylus-arm {
-    position: absolute;
-    top: 4px;
-    right: 2px;
-    width: 28px;
-    height: 48px;
-    border-right: 3px solid #94a3b8;
-    border-top: 3px solid #94a3b8;
-    border-top-right-radius: 12px;
-    transform-origin: top right;
-    transform: rotate(20deg);
-  }
-
-  .flow-track-details {
+  .vinyl-meta {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    flex: 1;
+    gap: 4px;
+    min-width: 0;
   }
 
-  .flow-status-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 10.5px;
-    font-weight: 800;
-    color: #425aef;
-    letter-spacing: 0.08em;
-  }
-
-  [data-theme='dark'] .flow-status-tag {
-    color: #8da4ff;
-  }
-
-  @media (max-width: 768px) {
-    .flow-status-tag {
-      justify-content: center;
-    }
-  }
-
-  .pulse-audio-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #10b981;
-  }
-
-  .flow-track-title {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 900;
-    color: var(--text-color, #0f172a);
-    letter-spacing: -0.02em;
-  }
-
-  [data-theme='dark'] .flow-track-title {
-    color: #f8fafc;
-  }
-
-  .flow-track-artist {
-    font-size: 13.5px;
-    font-weight: 700;
-    color: #425aef;
-  }
-
-  [data-theme='dark'] .flow-track-artist {
-    color: #8da4ff;
-  }
-
-  .flow-track-summary {
-    margin: 2px 0 0 0;
-    font-size: 13px;
-    line-height: 1.6;
-    color: var(--text-color-secondary, #64748b);
-  }
-
-  [data-theme='dark'] .flow-track-summary {
-    color: #94a3b8;
-  }
-
-  .flow-equalizer-display {
+  .vinyl-title-row {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-top: 6px;
   }
 
-  @media (max-width: 768px) {
-    .flow-equalizer-display {
-      justify-content: center;
-    }
+  .vinyl-song-title {
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 800;
   }
 
   .equalizer-bars {
     display: flex;
     align-items: flex-end;
     gap: 3px;
-    height: 18px;
+    height: 14px;
   }
 
   .equalizer-bars .bar {
     width: 3px;
     border-radius: 2px;
-    background: #425aef;
-    animation: bar-dance 1.4s ease-in-out infinite alternate;
+    background: #38bdf8;
+    animation: sound-bounce 1.2s ease-in-out infinite alternate;
   }
 
-  [data-theme='dark'] .equalizer-bars .bar {
-    background: #8da4ff;
+  .bar-1 { height: 6px; animation-delay: 0.1s; }
+  .bar-2 { height: 14px; animation-delay: 0.35s; }
+  .bar-3 { height: 9px; animation-delay: 0.2s; }
+  .bar-4 { height: 12px; animation-delay: 0.5s; }
+
+  @keyframes sound-bounce {
+    0% { height: 4px; }
+    100% { height: 14px; }
   }
 
-  .bar-1 { height: 35%; animation-delay: 0.1s; }
-  .bar-2 { height: 85%; animation-delay: 0.3s; }
-  .bar-3 { height: 50%; animation-delay: 0.2s; }
-  .bar-4 { height: 95%; animation-delay: 0.4s; }
-  .bar-5 { height: 60%; animation-delay: 0.15s; }
-
-  @keyframes bar-dance {
-    0% { height: 20%; }
-    50% { height: 100%; }
-    100% { height: 40%; }
+  .vinyl-artist {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    font-weight: 700;
   }
 
-  .equalizer-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-color-secondary, #94a3b8);
+  .vinyl-summary {
+    margin: 4px 0 0;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 12px;
+    line-height: 1.6;
   }
 
-  /* ----------------------------------------------------
-     8. 演进足迹与里程碑时间线 (Evolution Milestones)
-     ---------------------------------------------------- */
-  .milestones-timeline {
-    border-radius: 12px;
-    background: var(--card-bg, #ffffff);
-    border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
-    padding: 28px 32px;
+  /* 游戏卡片 Loading 光带 */
+  .loading-bar-wrap {
+    margin-top: 18px;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.15);
+    overflow: hidden;
+  }
+
+  .loading-bar-inner {
+    width: 60%;
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #f59e0b, #ec4899);
+    animation: bar-glide 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes bar-glide {
+    0% { width: 30%; transform: translateX(0); }
+    100% { width: 75%; transform: translateX(35%); }
+  }
+
+  /* 社交连接矩阵 */
+  .connect-card {
+    background: var(--card-bg);
+  }
+
+  .connect-head {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 4px;
+    margin-bottom: 20px;
   }
 
-  [data-theme='dark'] .milestones-timeline {
-    background: #141a29;
-    border-color: rgba(255, 255, 255, 0.08);
+  .connect-summary {
+    margin: 4px 0 0;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.7;
   }
 
-  .milestone-item {
+  .connect-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .connect-btn {
     display: flex;
-    gap: 20px;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    background: var(--secondbg);
+    border: 1px solid transparent;
+    transition: transform 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+  }
+
+  .connect-btn:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, #425aef 25%, transparent);
+    background: var(--card-bg);
+  }
+
+  .connect-btn__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    background: rgba(66, 90, 239, 0.1);
+    color: #425aef;
+  }
+
+  .connect-btn__info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 2px;
+  }
+
+  .connect-btn__info strong {
+    color: var(--font-color);
+    font-size: 13px;
+    line-height: 1.2;
+  }
+
+  .connect-btn__info span {
+    color: var(--text-muted);
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .connect-btn__arrow {
+    margin-left: auto;
+    color: var(--text-muted);
+    font-weight: 800;
+    transition: transform 0.2s;
+  }
+
+  .connect-btn:hover .connect-btn__arrow {
+    transform: translateX(3px);
+    color: #425aef;
+  }
+
+  /* 全栈工程架构三层拓扑卡片 (Anzhiyu UI Style) */
+  .topology-card {
+    background: linear-gradient(135deg, rgba(66, 90, 239, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%);
+    border: 1px solid color-mix(in srgb, #425aef 20%, var(--card-border));
+  }
+
+  .topology-lead {
+    margin: 6px 0 18px;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .topology-tiers-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  @media (max-width: 900px) {
+    .topology-tiers-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .topology-tier-box {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 18px;
+    border-radius: 8px;
+    background: var(--card-bg);
+    border: var(--style-border-always);
+    box-shadow: var(--shadow-border);
+  }
+
+  .topology-tier-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--secondbg);
+    padding-bottom: 10px;
+  }
+
+  .tier-badge-num {
+    font-size: 18px;
+    font-weight: 900;
+    color: #425aef;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    line-height: 1;
+  }
+
+  .tier-badge-title {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tier-badge-title strong {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--font-color);
+  }
+
+  .tier-badge-title span {
+    font-size: 10.5px;
+    color: var(--text-muted);
+  }
+
+  .topology-chips-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .topology-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: var(--secondbg);
+    font-size: 11.5px;
+  }
+
+  .tier-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .tier-dot.blue { background: #425aef; }
+  .tier-dot.green { background: #10b981; }
+  .tier-dot.purple { background: #8b5cf6; }
+
+  .item-name {
+    font-weight: 700;
+    color: var(--font-color);
+  }
+
+  .item-role {
+    margin-left: auto;
+    font-size: 10.5px;
+    color: var(--text-muted);
+  }
+
+  /* 站点演进足迹里程碑卡片 (Anzhiyu UI Style) */
+  .milestones-card {
+    background: var(--card-bg);
+    border: var(--style-border-always);
+  }
+
+  .milestones-lead {
+    margin: 6px 0 20px;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .milestones-track {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .milestone-node {
+    display: flex;
+    gap: 16px;
     position: relative;
   }
 
-  .milestone-dot-col {
+  .node-indicator {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1974,225 +1503,119 @@ const author = siteConfig.site.author;
     flex-shrink: 0;
   }
 
-  .milestone-dot {
+  .node-dot {
     width: 12px;
     height: 12px;
     border-radius: 50%;
     background: #425aef;
-    border: 3px solid #ffffff;
-    box-shadow: 0 0 0 2px rgba(66, 90, 239, 0.2);
+    border: 3px solid var(--card-bg);
+    box-shadow: 0 0 0 2px rgba(66, 90, 239, 0.25);
+    margin-top: 3px;
     z-index: 2;
-    margin-top: 4px;
   }
 
-  [data-theme='dark'] .milestone-dot {
-    background: #8da4ff;
-    border-color: #141a29;
-    box-shadow: 0 0 0 2px rgba(99, 125, 255, 0.3);
-  }
-
-  .milestone-dot.active-dot {
+  .node-dot.future-dot {
     background: #10b981;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
-    animation: beacon-pulse 2s infinite ease-in-out;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.35);
+    animation: dot-beat 1.8s infinite;
   }
 
-  .milestone-line {
+  .node-line {
     flex: 1;
     width: 2px;
-    background: rgba(66, 90, 239, 0.15);
-    margin-top: 6px;
-    margin-bottom: -16px;
+    background: color-mix(in srgb, #425aef 20%, transparent);
+    margin-top: 4px;
+    margin-bottom: -12px;
   }
 
-  [data-theme='dark'] .milestone-line {
-    background: rgba(99, 125, 255, 0.2);
-  }
-
-  .milestone-content {
+  .node-body {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 4px;
-    padding-bottom: 8px;
+    padding-bottom: 6px;
   }
 
-  .milestone-header {
+  .node-meta {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
   }
 
-  .milestone-year {
-    font-size: 14px;
+  .node-year {
+    font-size: 13px;
     font-weight: 900;
     color: #425aef;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 
-  [data-theme='dark'] .milestone-year {
-    color: #8da4ff;
-  }
-
-  .milestone-year.active-year {
+  .node-year.future-year {
     color: #10b981;
   }
 
-  .milestone-tag {
-    font-size: 11px;
+  .node-tag {
+    font-size: 10px;
     font-weight: 700;
     padding: 1px 7px;
     border-radius: 4px;
-    background: rgba(66, 90, 239, 0.08);
+    background: rgba(66, 90, 239, 0.1);
     color: #425aef;
   }
 
-  [data-theme='dark'] .milestone-tag {
-    background: rgba(99, 125, 255, 0.15);
-    color: #8da4ff;
+  .node-tag.current-tag {
+    background: rgba(66, 90, 239, 0.15);
+    color: #425aef;
   }
 
-  .milestone-tag.active-tag {
-    background: rgba(16, 185, 129, 0.1);
+  .node-tag.future-tag {
+    background: rgba(16, 185, 129, 0.12);
     color: #10b981;
   }
 
-  .milestone-title {
-    margin: 0;
-    font-size: 15px;
+  .node-title {
+    font-size: 14.5px;
     font-weight: 800;
-    color: var(--text-color, #1e293b);
+    color: var(--font-color);
   }
 
-  [data-theme='dark'] .milestone-title {
-    color: #f1f5f9;
-  }
-
-  .milestone-desc {
+  .node-desc {
     margin: 0;
-    font-size: 13px;
+    font-size: 12.5px;
     line-height: 1.6;
-    color: var(--text-color-secondary, #64748b);
+    color: var(--text-muted);
   }
 
-  [data-theme='dark'] .milestone-desc {
-    color: #94a3b8;
+  .maxim-annotation {
+    margin: 8px 0 0;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
   }
 
-  /* ----------------------------------------------------
-     9. 保持连接与志同道合者矩阵 (Inquiry Matrix)
-     ---------------------------------------------------- */
-  .inquiry-matrix-card {
-    border-radius: 12px;
-    background: var(--card-bg, #ffffff);
-    border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
-    padding: 24px;
-  }
-
-  [data-theme='dark'] .inquiry-matrix-card {
-    background: #141a29;
-    border-color: rgba(255, 255, 255, 0.08);
-  }
-
-  .inquiry-matrix-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-
-  @media (max-width: 640px) {
-    .inquiry-matrix-grid {
-      grid-template-columns: 1fr;
+  /* 响应式断点优化 */
+  @media (max-width: 1024px) {
+    .manifesto-pillars {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+    .connect-buttons-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  .inquiry-channel-card {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 16px 18px;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.02);
-    border: 1px solid rgba(0, 0, 0, 0.04);
-    text-decoration: none;
-    transition: all 0.2s ease;
-  }
-
-  .inquiry-channel-card:hover {
-    transform: translateY(-2px);
-    background: rgba(66, 90, 239, 0.04);
-    border-color: rgba(66, 90, 239, 0.25);
-  }
-
-  [data-theme='dark'] .inquiry-channel-card {
-    background: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.05);
-  }
-
-  [data-theme='dark'] .inquiry-channel-card:hover {
-    background: rgba(99, 125, 255, 0.1);
-    border-color: rgba(99, 125, 255, 0.35);
-  }
-
-  .inquiry-channel-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    background: rgba(66, 90, 239, 0.1);
-    color: #425aef;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: transform 0.2s ease;
-  }
-
-  .inquiry-channel-card:hover .inquiry-channel-icon {
-    transform: scale(1.08);
-  }
-
-  [data-theme='dark'] .inquiry-channel-icon {
-    background: rgba(99, 125, 255, 0.15);
-    color: #8da4ff;
-  }
-
-  .inquiry-channel-info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    flex: 1;
-  }
-
-  .inquiry-channel-title {
-    font-size: 14.5px;
-    font-weight: 800;
-    color: var(--text-color, #1e293b);
-  }
-
-  [data-theme='dark'] .inquiry-channel-title {
-    color: #f1f5f9;
-  }
-
-  .inquiry-channel-desc {
-    font-size: 12px;
-    color: var(--text-color-secondary, #64748b);
-  }
-
-  [data-theme='dark'] .inquiry-channel-desc {
-    color: #94a3b8;
-  }
-
-  .inquiry-channel-arrow {
-    color: var(--text-color-secondary, #94a3b8);
-    transition: transform 0.2s ease, color 0.2s ease;
-  }
-
-  .inquiry-channel-card:hover .inquiry-channel-arrow {
-    transform: translateX(4px);
-    color: #425aef;
-  }
-
-  [data-theme='dark'] .inquiry-channel-card:hover .inquiry-channel-arrow {
-    color: #8da4ff;
+  @media (max-width: 768px) {
+    .gear-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .connect-buttons-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .vinyl-player-widget {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .personality-title {
+      font-size: 1.4rem;
+    }
   }
 </style>
