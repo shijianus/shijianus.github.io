@@ -1018,6 +1018,12 @@ export type TranslationDict = Record<'en' | 'fr' | 'es' | 'de', string>;
  * Multilingual dictionaries covering navigation, actions, controls, widgets, comments, and profile drawers.
  */
 export const MULTILINGUAL_DICTIONARY: Record<string, TranslationDict> = {
+  // Author & Identity Localization (Same creator across cultures)
+  'shijianus (時間)': { en: 'Kevin Sparks', fr: 'Léon Boven', es: 'Kevin Sparks', de: 'Kevin Sparks' },
+  '時間': { en: 'Kevin Sparks', fr: 'Léon Boven', es: 'Kevin Sparks', de: 'Kevin Sparks' },
+  '厚土潜藏细脉 大荒广构通衢': { en: 'Nurture deep roots quietly · Build broad paths forward', fr: "Enracinement discret · Voies larges vers l'avenir", es: 'Nurture deep roots quietly · Build broad paths forward', de: 'Nurture deep roots quietly · Build broad paths forward' },
+  '00后大学在读 · Web 全栈初探者 · 数字花园建造者': { en: 'Undergraduate (b. 2006) · Web Explorer · Digital Gardener', fr: 'Étudiant (né en 2006) · Explorateur Web · Jardinier numérique', es: 'Undergraduate (b. 2006) · Web Explorer · Digital Gardener', de: 'Undergraduate (b. 2006) · Web Explorer · Digital Gardener' },
+
   // Navigation & Core Pages
   '首页': { en: 'Home', fr: 'Accueil', es: 'Inicio', de: 'Startseite' },
   '归档': { en: 'Archives', fr: 'Archives', es: 'Archivos', de: 'Archiv' },

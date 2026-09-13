@@ -210,14 +210,14 @@ export const siteConfig = {
     description: '用 Astro、React 和 Tailwind 搭建一套高信息密度、重阅读体验、能长期维护的个人博客。',
     author: {
       name: 'shijianus',
-      role: '全栈架构思考者 · 内容工程探索者 · 数字花园建造者',
+      role: '00后大学在读 · Web 全栈初探者 · 数字花园建造者',
       motto: '厚土潜藏细脉 大荒广构通衢',
-      bio: '深潜底层打磨隐秘细脉，拓越远方构筑长效通衢。把博客做成真正能持续生长的内容系统。',
+      bio: '生于 2006 年，计算机在读大学生。深潜底层打磨隐秘细脉，拓越远方构筑长效通衢。把博客做成真正能持续生长的数字花园。',
       email: 'shijianus@epocanvas.com',
       location: 'UTC-8',
       avatar: '/media/shijianus/avatar.jpg',
       cover: '/media/shijianus/geek-cover.jpg',
-      statusLabel: '持续重构中',
+      statusLabel: '求索构建中',
     },
   },
   theme: {
@@ -821,11 +821,11 @@ export const siteConfig = {
     about: {
       title: '关于我',
       subtitle: '厚土潜藏细脉 · 大荒广构通衢',
-      floatingTagsLeft: ['全栈架构思考者', '数字花园建造者', '体验洁癖'],
-      floatingTagsRight: ['系统秩序', '长效构建', '开放网络'],
+      floatingTagsLeft: ['00后大学生', '计算机在读', '体验洁癖'],
+      floatingTagsRight: ['开源求索', '长效构建', '数字花园'],
       helloTips: '你好，很高兴认识你',
       helloLead: '你好，我在这里写作与构建',
-      helloDescription: '全栈架构思考者 · 内容工程探索者 · 数字花园建造者',
+      helloDescription: '00后大学在读 · Web 全栈初探者 · 数字花园建造者',
       siteTips: {
         tips: '基调',
         titleTop: '深耕',
@@ -867,9 +867,9 @@ export const siteConfig = {
         accent: 'UTC-8',
       },
       selfInfo: [
-        { label: '生于', value: '2002', accent: '#43a6c6' },
-        { label: '职业方向', value: '软件工程', accent: '#c69043' },
-        { label: '当前阶段', value: '大学生', accent: '#b04fe6' },
+        { label: '生于', value: '2006', accent: '#43a6c6' },
+        { label: '职业方向', value: 'Web 全栈求索', accent: '#c69043' },
+        { label: '当前阶段', value: '在读大学生', accent: '#b04fe6' },
       ],
       personality: {
         tips: '性格',
@@ -890,10 +890,10 @@ export const siteConfig = {
         tips: '生产力工具',
         title: '我的装备与工作流',
         hardware: [
-          { name: '16" MacBook Pro M系列', desc: '主力开发机 · 视网膜色彩与持久强劲性能', icon: 'laptop', badge: 'Main' },
-          { name: '27" 4K 极客超清屏', desc: '双屏扩展 · 多任务排版与代码严苛审查', icon: 'monitor' },
-          { name: 'Keychron 客制化机械键盘', desc: '线性手感 · 清脆节拍伴随每一次灵感敲击', icon: 'keyboard' },
-          { name: 'Sony WH-1000XM5', desc: '旗舰降噪 · 一键沉浸无干扰创作心流', icon: 'headphones' },
+          { name: '联想小新 Pro / 拯救者便携本', desc: '自习室与寝室主力 · 陪我熬夜跑实验写代码的高性价比伙伴', icon: 'laptop', badge: 'Daily' },
+          { name: '红米 / AOC 24寸 护眼显示屏', desc: '桌面副屏扩展 · 平价实用，双屏分屏查文档编码更专注', icon: 'monitor' },
+          { name: '国产客制化红轴机械键盘', desc: '轻柔静音 · 宿舍不扰室友，长时间打字指尖轻快舒适', icon: 'keyboard' },
+          { name: '实用入耳式降噪耳机', desc: '自习防线 · 图书馆与宿舍里隔绝杂音、开启心流沉浸', icon: 'headphones' },
         ] satisfies AboutGearItem[],
         software: [
           { name: 'Cursor & VS Code', desc: 'Tokyo Night 主题 · 现代智能结对与流畅编码', icon: 'code', badge: 'Editor' },
