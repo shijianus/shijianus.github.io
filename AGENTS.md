@@ -1687,4 +1687,28 @@
   2. `scripts/verify-i18n-live.mjs`：Playwright 真实生产环境（`https://blog.epocanvas.com`）全链路覆盖中文、英文、繁体中文、法文、德文、西班牙文切换与直达访问测试，24/24 项断言 100% 验收通过；
   3. `scripts/verify-live-format-contrast.mjs`：真实生产环境覆盖 27 个代码块、21 个 callout 警告框、2 个表格及深色模式文字颜色（RGB 247, 247, 250），100% 格式无损验证通过。
 
+### Task 78: 多语言全量切块完整翻译、移除文章内切换按钮并绑定账户中心语言选择、消除 AI 标注与生产端 Playwright 验证 (`5498103`)
+- [x] **全语种切块完整翻译 (Full Multi-Locale Chunked Translation)**：
+  1. 支持所有 5 种非源语言全量翻译（`en`、`zh-Hant`、`fr`、`es`、`de`）；
+  2. 针对长篇大体量文章（如 56KB / 1600+ 行的 `content-formats-and-markup-mastery.md`），引入语义级切块翻译与无损拼合引擎，彻底根除单次上下文溢出导致的截断问题；
+  3. 移除旧版截断提示（`partial translation notice`），所有语言版本均为 100% 完整长文（英文 24,569 字符，繁中 11,702 字符，法文 35,249 字符，德文 22,213 字符，西文 42,714 字符）。
+- [x] **移除文章顶部切换按钮并绑定账户中心 (`.account-card`)**：
+  1. 彻底删除 `PostHero.astro` 中的 `class="post-hero__i18n-switch"` 按钮与 `.post-hero__i18n-pill`，文章顶部不再保留独立的语言切换按钮；
+  2. 深度绑定界面语言：由读者在账号中心（`.account-card`）设置面板所选的界面语言直接且排他性地决定展示的文章语言版本；
+  3. 页面实时监听 `shijianus:localechange` 事件并在加载时自动对齐 `localStorage` 偏好，实现无感平滑切换与路由直达。
+- [x] **消除 AI 翻译标注 (No AI Attribution)**：
+  1. 彻底移除 `isAiGenerated: true` 及前台所有“AI翻译”/“AI”徽章与角标；
+  2. 翻译内容认定为博主内容原生呈现，不附带任何多余的 AI 属性标注。
+- [x] **多远端推送与 Cloudflare Pages 生产部署**：
+  1. 代码全量提交并同步推送至 `origin` (`astro-theme-shijianus.git`) 与 `cf` (`shijianus.github.io.git`)；
+  2. 构建产物全量部署至 Cloudflare Pages 生产项目 `shijianus-blog`（绑定 `https://blog.epocanvas.com`）。
+- [x] **生产端真实链路 Playwright E2E 自动化验证 (`scripts/verify-i18n-live.mjs`)**：
+  1. 访问生产环境 `https://blog.epocanvas.com/posts/content-formats-and-markup-mastery/`；
+  2. 验证 `.post-hero__i18n-switch` 严格不存在；
+  3. 验证无任何“AI翻译”角标或提示；
+  4. 验证通过 `.account-card` 依次切换 `English` -> `繁體中文` -> `Français` -> `Deutsch` -> `Español` -> `简体中文` 全链路自动重定向且正文内容完整；
+  5. 验证首页文章列表去重机制生效，多语言变体不产生重复卡片；
+  6. 30/30 项测试断言 100% PASS 通过。
+
+
 

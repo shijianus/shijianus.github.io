@@ -13,11 +13,6 @@ import { chromium } from 'playwright';
 
 const BASE_URL = 'https://blog.epocanvas.com';
 const ZH_PATH = '/posts/content-formats-and-markup-mastery/';
-const EN_PATH = '/posts/content-formats-and-markup-mastery-en/';
-const ZH_HANT_PATH = '/posts/content-formats-and-markup-mastery-zh-hant/';
-const FR_PATH = '/posts/content-formats-and-markup-mastery-fr/';
-const ES_PATH = '/posts/content-formats-and-markup-mastery-es/';
-const DE_PATH = '/posts/content-formats-and-markup-mastery-de/';
 
 async function run() {
   console.log('[MCP-i18n-E2E] 🚀 Starting live Cloudflare Pages Playwright E2E verification...');
@@ -71,155 +66,130 @@ async function run() {
     const hasAiBadge = allBadgesText.some((t) => t === 'AI翻译' || t === 'AI 翻译' || t === '· AI 翻译');
     assert(!hasAiBadge, 'No "AI翻译" label/badge on the article');
 
-    // ─────────────────────────────────────────────────────
-    // Test 2: Switch language to English in .account-card → redirects to EN
-    // ─────────────────────────────────────────────────────
-    console.log('\n─── Test 2: Switch to English via .account-card → auto redirects to EN ───');
-    
-    // Open the account drawer with settings tab
-    await page.evaluate(() => {
-      window.dispatchEvent(new CustomEvent('shijianus:open-account', { detail: { tab: 'settings' } }));
-    });
-    await page.waitForTimeout(600);
+    // Helper: open account card settings and switch locale
+    async function switchLocaleViaAccountCard(localeLabel, expectedUrlPart) {
+      await page.evaluate(() => {
+        window.dispatchEvent(new CustomEvent('shijianus:open-account', { detail: { tab: 'settings' } }));
+      });
+      await page.waitForTimeout(800);
 
-    // Find and click the English button in .account-card
-    const enBtn = await page.$('.account-locale-btn:has-text("English")');
-    assert(enBtn !== null, 'Found English button in .account-card (.account-locale-btn)');
+      const btn = page.locator('.account-locale-btn', { hasText: localeLabel }).first();
+      const count = await btn.count();
+      assert(count > 0, `Found "${localeLabel}" button in .account-card`);
 
-    if (enBtn) {
-      await Promise.all([
-        page.waitForURL(/content-formats-and-markup-mastery-en/, { timeout: 15000 }),
-        enBtn.click(),
-      ]);
-      await page.waitForLoadState('networkidle');
-      console.log(`  Navigated to: ${page.url()}`);
-      assert(page.url().includes('content-formats-and-markup-mastery-en'), 'Auto-navigated to EN article slug');
-
-      const enTitle = await page.$eval('h1', (el) => el.textContent?.trim() ?? '');
-      console.log(`  EN Title: "${enTitle.slice(0, 80)}"`);
-      assert(/[a-zA-Z]{4,}/.test(enTitle), 'EN article has English title');
-
-      // Check article body is full and complete (not truncated)
-      const enBodyText = await page.$eval('#article-container', (el) => el.innerText || el.textContent || '');
-      console.log(`  EN Body Length: ${enBodyText.length} characters`);
-      assert(enBodyText.length > 20000, `EN body is complete and extensive (>20,000 chars, got ${enBodyText.length})`);
-
-      // Check that there is NO truncation blockquote notice
-      const blockquotes = await page.$$eval('blockquote', (els) => els.map((el) => el.textContent?.trim() ?? ''));
-      const hasTruncationNotice = blockquotes.some((b) => b.includes('partial translation') || b.includes('Partial translation'));
-      assert(!hasTruncationNotice, 'No truncation notice found — article is 100% complete');
-
-      // Check no switcher on EN page
-      const enSwitcher = await page.$('.post-hero__i18n-switch');
-      assert(enSwitcher === null, 'No .post-hero__i18n-switch on EN article page');
+      if (count > 0) {
+        await btn.click();
+        await page.waitForURL(expectedUrlPart, { timeout: 15000 });
+        await page.waitForLoadState('networkidle');
+        await page.waitForTimeout(500);
+      }
     }
+
+    // ─────────────────────────────────────────────────────
+    // Test 2: Switch to English via .account-card
+    // ─────────────────────────────────────────────────────
+    console.log('\n─── Test 2: Switch to English via .account-card ───');
+    await switchLocaleViaAccountCard('English', /content-formats-and-markup-mastery-en/);
+    console.log(`  Navigated to: ${page.url()}`);
+    assert(page.url().includes('content-formats-and-markup-mastery-en'), 'Auto-navigated to EN article slug');
+
+    const enTitle = await page.$eval('h1', (el) => el.textContent?.trim() ?? '');
+    console.log(`  EN Title: "${enTitle.slice(0, 80)}"`);
+    assert(/[a-zA-Z]{4,}/.test(enTitle), 'EN article has English title');
+
+    const enBodyText = await page.$eval('#article-container', (el) => el.innerText || el.textContent || '');
+    console.log(`  EN Body Length: ${enBodyText.length} characters`);
+    assert(enBodyText.length > 20000, `EN body is complete and extensive (>20,000 chars, got ${enBodyText.length})`);
+
+    const blockquotes = await page.$$eval('blockquote', (els) => els.map((el) => el.textContent?.trim() ?? ''));
+    const hasTruncationNotice = blockquotes.some((b) => b.includes('partial translation') || b.includes('Partial translation'));
+    assert(!hasTruncationNotice, 'No truncation notice found — article is 100% complete');
+
+    const enSwitcher = await page.$('.post-hero__i18n-switch');
+    assert(enSwitcher === null, 'No .post-hero__i18n-switch on EN article page');
 
     // ─────────────────────────────────────────────────────
     // Test 3: Switch to Traditional Chinese (zh-Hant) in .account-card
     // ─────────────────────────────────────────────────────
     console.log('\n─── Test 3: Switch to Traditional Chinese in .account-card ───');
-    await page.evaluate(() => {
-      window.dispatchEvent(new CustomEvent('shijianus:open-account', { detail: { tab: 'settings' } }));
-    });
-    await page.waitForTimeout(600);
+    await switchLocaleViaAccountCard('繁體中文', /content-formats-and-markup-mastery-zh-hant/);
+    console.log(`  Navigated to: ${page.url()}`);
+    assert(page.url().includes('content-formats-and-markup-mastery-zh-hant'), 'Auto-navigated to zh-Hant article slug');
 
-    const hantBtn = await page.$('.account-locale-btn:has-text("繁體中文")');
-    assert(hantBtn !== null, 'Found 繁體中文 button in .account-card');
+    const hantTitle = await page.$eval('h1', (el) => el.textContent?.trim() ?? '');
+    console.log(`  zh-Hant Title: "${hantTitle.slice(0, 80)}"`);
+    assert(hantTitle.includes('靜態') || hantTitle.includes('格式') || hantTitle.includes('排版') || hantTitle.includes('SSG'), 'zh-Hant article title is present');
 
-    if (hantBtn) {
-      await Promise.all([
-        page.waitForURL(/content-formats-and-markup-mastery-zh-hant/, { timeout: 15000 }),
-        hantBtn.click(),
-      ]);
-      await page.waitForLoadState('networkidle');
-      console.log(`  Navigated to: ${page.url()}`);
-      assert(page.url().includes('content-formats-and-markup-mastery-zh-hant'), 'Auto-navigated to zh-Hant article slug');
-
-      const hantTitle = await page.$eval('h1', (el) => el.textContent?.trim() ?? '');
-      console.log(`  zh-Hant Title: "${hantTitle.slice(0, 80)}"`);
-      assert(hantTitle.includes('靜態') || hantTitle.includes('格式') || hantTitle.includes('排版') || hantTitle.includes('SSG'), 'zh-Hant article title is present');
-
-      const hantBodyText = await page.$eval('#article-container', (el) => el.innerText || el.textContent || '');
-      console.log(`  zh-Hant Body Length: ${hantBodyText.length} characters`);
-      assert(hantBodyText.length > 10000, `zh-Hant body is complete (>10,000 chars, got ${hantBodyText.length})`);
-    }
+    const hantBodyText = await page.$eval('#article-container', (el) => el.innerText || el.textContent || '');
+    console.log(`  zh-Hant Body Length: ${hantBodyText.length} characters`);
+    assert(hantBodyText.length > 10000, `zh-Hant body is complete (>10,000 chars, got ${hantBodyText.length})`);
 
     // ─────────────────────────────────────────────────────
     // Test 4: Switch to French (fr) in .account-card
     // ─────────────────────────────────────────────────────
     console.log('\n─── Test 4: Switch to French in .account-card ───');
-    await page.evaluate(() => {
-      window.dispatchEvent(new CustomEvent('shijianus:open-account', { detail: { tab: 'settings' } }));
-    });
-    await page.waitForTimeout(600);
+    await switchLocaleViaAccountCard('Français', /content-formats-and-markup-mastery-fr/);
+    console.log(`  Navigated to: ${page.url()}`);
+    assert(page.url().includes('content-formats-and-markup-mastery-fr'), 'Auto-navigated to fr article slug');
 
-    const frBtn = await page.$('.account-locale-btn:has-text("Français")');
-    assert(frBtn !== null, 'Found Français button in .account-card');
+    const frTitle = await page.$eval('h1', (el) => el.textContent?.trim() ?? '');
+    console.log(`  French Title: "${frTitle.slice(0, 80)}"`);
+    assert(frTitle.includes('Guide') || frTitle.includes('statiques') || /[a-zA-Z]{4,}/.test(frTitle), 'French article title is present');
 
-    if (frBtn) {
-      await Promise.all([
-        page.waitForURL(/content-formats-and-markup-mastery-fr/, { timeout: 15000 }),
-        frBtn.click(),
-      ]);
-      await page.waitForLoadState('networkidle');
-      console.log(`  Navigated to: ${page.url()}`);
-      assert(page.url().includes('content-formats-and-markup-mastery-fr'), 'Auto-navigated to fr article slug');
-
-      const frTitle = await page.$eval('h1', (el) => el.textContent?.trim() ?? '');
-      console.log(`  French Title: "${frTitle.slice(0, 80)}"`);
-      assert(/[a-zA-Z]{4,}/.test(frTitle), 'French article title is present');
-
-      const frBodyText = await page.$eval('#article-container', (el) => el.innerText || el.textContent || '');
-      console.log(`  French Body Length: ${frBodyText.length} characters`);
-      assert(frBodyText.length > 20000, `French body is complete (>20,000 chars, got ${frBodyText.length})`);
-    }
+    const frBodyText = await page.$eval('#article-container', (el) => el.innerText || el.textContent || '');
+    console.log(`  French Body Length: ${frBodyText.length} characters`);
+    assert(frBodyText.length > 20000, `French body is complete (>20,000 chars, got ${frBodyText.length})`);
 
     // ─────────────────────────────────────────────────────
-    // Test 5: Switch back to Simplified Chinese (zh-CN)
+    // Test 5: Switch to German (de) in .account-card
     // ─────────────────────────────────────────────────────
-    console.log('\n─── Test 5: Switch back to Simplified Chinese in .account-card ───');
-    await page.evaluate(() => {
-      window.dispatchEvent(new CustomEvent('shijianus:open-account', { detail: { tab: 'settings' } }));
-    });
-    await page.waitForTimeout(600);
+    console.log('\n─── Test 5: Switch to German in .account-card ───');
+    await switchLocaleViaAccountCard('Deutsch', /content-formats-and-markup-mastery-de/);
+    console.log(`  Navigated to: ${page.url()}`);
+    assert(page.url().includes('content-formats-and-markup-mastery-de'), 'Auto-navigated to de article slug');
 
-    const zhBtn = await page.$('.account-locale-btn:has-text("简体中文")');
-    assert(zhBtn !== null, 'Found 简体中文 button in .account-card');
-
-    if (zhBtn) {
-      await Promise.all([
-        page.waitForURL(/content-formats-and-markup-mastery\/?$/, { timeout: 15000 }),
-        zhBtn.click(),
-      ]);
-      await page.waitForLoadState('networkidle');
-      console.log(`  Navigated back to: ${page.url()}`);
-      assert(!page.url().includes('-fr') && !page.url().includes('-en') && !page.url().includes('-zh-hant'), 'Returned to main Chinese URL');
-
-      const restoredTitle = await page.$eval('h1', (el) => el.textContent?.trim() ?? '');
-      assert(
-        restoredTitle.includes('静态站点') || restoredTitle.includes('SSG'),
-        `Chinese title restored (got: "${restoredTitle.slice(0, 60)}")`
-      );
-    }
-
-    // ─────────────────────────────────────────────────────
-    // Test 6: Verify German (de) & Spanish (es) direct access
-    // ─────────────────────────────────────────────────────
-    console.log('\n─── Test 6: Verify German and Spanish article routes ───');
-    await page.goto(BASE_URL + DE_PATH, { waitUntil: 'networkidle', timeout: 30000 });
     const deTitle = await page.$eval('h1', (el) => el.textContent?.trim() ?? '');
     console.log(`  German Title: "${deTitle.slice(0, 80)}"`);
-    assert(deTitle.length > 5, 'German article page loads successfully');
+    assert(deTitle.includes('Leitfaden') || deTitle.includes('statische') || /[a-zA-Z]{4,}/.test(deTitle), 'German article title is present');
 
-    await page.goto(BASE_URL + ES_PATH, { waitUntil: 'networkidle', timeout: 30000 });
+    const deBodyText = await page.$eval('#article-container', (el) => el.innerText || el.textContent || '');
+    console.log(`  German Body Length: ${deBodyText.length} characters`);
+    assert(deBodyText.length > 15000, `German body is complete (>15,000 chars, got ${deBodyText.length})`);
+
+    // ─────────────────────────────────────────────────────
+    // Test 6: Switch to Spanish (es) in .account-card
+    // ─────────────────────────────────────────────────────
+    console.log('\n─── Test 6: Switch to Spanish in .account-card ───');
+    await switchLocaleViaAccountCard('Español', /content-formats-and-markup-mastery-es/);
+    console.log(`  Navigated to: ${page.url()}`);
+    assert(page.url().includes('content-formats-and-markup-mastery-es'), 'Auto-navigated to es article slug');
+
     const esTitle = await page.$eval('h1', (el) => el.textContent?.trim() ?? '');
     console.log(`  Spanish Title: "${esTitle.slice(0, 80)}"`);
-    assert(esTitle.length > 5, 'Spanish article page loads successfully');
+    assert(esTitle.includes('Guía') || esTitle.includes('sitios') || /[a-zA-Z]{4,}/.test(esTitle), 'Spanish article title is present');
+
+    const esBodyText = await page.$eval('#article-container', (el) => el.innerText || el.textContent || '');
+    console.log(`  Spanish Body Length: ${esBodyText.length} characters`);
+    assert(esBodyText.length > 20000, `Spanish body is complete (>20,000 chars, got ${esBodyText.length})`);
 
     // ─────────────────────────────────────────────────────
-    // Test 7: Homepage deduplication check
+    // Test 7: Switch back to Simplified Chinese (zh-CN)
     // ─────────────────────────────────────────────────────
-    console.log('\n─── Test 7: Homepage deduplication check ───');
+    console.log('\n─── Test 7: Switch back to Simplified Chinese in .account-card ───');
+    await switchLocaleViaAccountCard('简体中文', /content-formats-and-markup-mastery\/?$/);
+    console.log(`  Navigated back to: ${page.url()}`);
+    assert(!page.url().includes('-es') && !page.url().includes('-de') && !page.url().includes('-fr') && !page.url().includes('-en') && !page.url().includes('-zh-hant'), 'Returned to main Chinese URL');
+
+    const restoredTitle = await page.$eval('h1', (el) => el.textContent?.trim() ?? '');
+    assert(
+      restoredTitle.includes('静态站点') || restoredTitle.includes('SSG'),
+      `Chinese title restored (got: "${restoredTitle.slice(0, 60)}")`
+    );
+
+    // ─────────────────────────────────────────────────────
+    // Test 8: Homepage deduplication check
+    // ─────────────────────────────────────────────────────
+    console.log('\n─── Test 8: Homepage deduplication check ───');
     await page.goto(BASE_URL + '/', { waitUntil: 'networkidle', timeout: 30000 });
     const allLinks = await page.$$eval('a[href*="/posts/"]', (els) => els.map((el) => el.getAttribute('href') ?? ''));
     const transVariants = allLinks.filter((l) =>
