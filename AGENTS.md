@@ -1741,7 +1741,36 @@
   3. 真实生产环境全视口自动化审计：打赏模块彻底不存在、实时 PST 时钟（`21:10:37 PST`）真实跳秒、MBTI 5 维特质条、装备工作台、数字花园宣言、黑胶音波律动全部 100% 渲染且 0 JS 报错；
   4. 生产端桌面与移动端高清视效截图留档。
 
-
-
-
-
+### Task 80: 关于页 (About) 个人旗舰总览展台全新原创重构、座右铭纠正「厚土潜藏细脉 大荒广构通衢」、彻底消除安知鱼痕迹与定位强化
+- [x] **核心座右铭与定位修正**：
+  1. 纠正座右铭错误，全站统一同步为：`厚土潜藏细脉，大荒广构通衢`；
+  2. 同步更新 `siteConfig.site.author.motto` 与 `siteConfig.pages.about.maxim`；
+  3. 将 `author.role` 修正为：`全栈架构思考者 · 内容工程探索者 · 数字花园建造者`；
+  4. 展台头部以显赫黄金艺术字与专属哲学释义完整展示座右铭精髓。
+- [x] **彻底根除安知鱼旧模版/抄袭痕迹**：
+  1. 彻底清除 `myInfoAndSayHello`、`aboutsiteTips` 滚动 mask、`hello-about` 巨幅大字与浮动图形；
+  2. 彻底清除 `game-yuanshen` 原神游戏卡、`careers` 圆形演进卡、`buff` 骰子加成卡等安知鱼同款元素；
+  3. 彻底清除打赏模块（`#about-reward` 与 `.reward`），关于页聚焦于个人展台与定位展示。
+- [x] **9 大全新原创核心模块与个人旗舰展台 (Creator Portfolio Showcase)**：
+  1. **造物者身份总览展台 (`creator-hero-card`)**：动态呼吸光环头像、在线状态指示球、Shijianus (世健) 名字与 Builder & Architect 专属徽章、核心定位标语、座右铭黄金横幅、实时 PST 跳秒时钟 (`#about-live-clock`) 与运行指标胶囊条；
+  2. **四大工程哲学罗盘 (`compass-grid`)**：系统秩序与长效架构 (Order & Robustness)、人体工学与体验洁癖 (Ergonomics & Craft)、深度慢思考与长文归档 (Deep Thinking)、开放网络与数据主权 (Data Sovereignty)；
+  3. **全栈工程技术拓扑三层控制台 (`topology-deck`)**：Layer 01 客户端感知层 (Astro 6 / React 19 / TS / Tailwind)、Layer 02 排版编译管道 (MDX / Shiki / KaTeX / Mermaid / i18n)、Layer 03 分布式边缘底座 (Cloudflare Pages / D1 / Workers / GitOps) 共 12 项技术深度解构；
+  4. **数字花园运行数据看板 (`garden-telemetry-grid`)**：原创长文数、专题分类、知识标签、阅读分钟、Lighthouse 100/100 极速性能、全球边缘 TTFB <30ms 延迟；
+  5. **造物初心与数字工匠宣言 (`manifesto-chamber`)**：性能即尊严、清晰胜于聪明、持续生长的常青树；
+  6. **生产力军械库与工程工作台 (`gear-matrix-grid`)**：物理硬件工作站 (MacBook Pro / 4K屏 / 客制化键盘 / Sony降噪) 与数字软件工具箱 (Cursor / Raycast / Figma / Cloudflare)；
+  7. **专注心流与灵感音轨 (`flow-card`)**：沉浸式黑胶唱机与 5 柱动态高光音频律动波形；
+  8. **演进足迹与里程碑时间线 (`milestones-timeline`)**：2022 始于足下、2024 架构涅槃、2026 旗舰成型、未来持续演进；
+  9. **保持连接与志同道合者矩阵 (`inquiry-matrix-card`)**：GitHub、Telegram、RSS、专属邮件信箱。
+- [x] **UI/UX Pro Max 规范与人体感官美学设计**：
+  1. 严格收敛圆角为 8px ~ 12px 标准精致微圆角，杜绝过度松垮的 AI 圆角；
+  2. 极客工程风格，微渐变边框与毛玻璃背景，浅色/深色模式 100% 高对比度适配；
+  3. 响应式布局：桌面端 (1440px)、平板端 (768px)、移动端 (375px) 全视口丝滑自适应。
+- [x] **自动化端到端测试套件全量通过 (`scripts/verify-about-rebuild.mjs`)**：
+  1. 严格断言座右铭严格包含“厚土潜藏细脉，大荒广构通衢”；
+  2. 严格断言打赏模块与安知鱼旧模版 0 存在（100% 清理）；
+  3. 严格断言 9 大模块全部存在且数据结构完整；
+  4. 多视口（1440/768/375）及浅/深色模式截图全部留档。
+- [x] **多远端推送与 Cloudflare Pages 生产部署验证**：
+  1. 提交至 Git 并同步推送至 `origin` 与 `cf`；
+  2. 部署至生产项目 `shijianus-blog`；
+  3. 运行生产端 Playwright E2E 测试脚本 (`scripts/verify-about-live.mjs`)，在 `https://blog.epocanvas.com/about/` 验证通过。

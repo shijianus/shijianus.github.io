@@ -210,9 +210,9 @@ export const siteConfig = {
     description: '用 Astro、React 和 Tailwind 搭建一套高信息密度、重阅读体验、能长期维护的个人博客。',
     author: {
       name: 'shijianus',
-      role: '厚土潜藏细脉 大荒广构通衢',
-      motto: '内容优先，结构优先，长期可维护。',
-      bio: '记录构建、实验、写作和日常技术判断，把博客做成一个真正能持续生长的内容系统。',
+      role: '全栈架构思考者 · 内容工程探索者 · 数字花园建造者',
+      motto: '厚土潜藏细脉 大荒广构通衢',
+      bio: '深潜底层打磨隐秘细脉，拓越远方构筑长效通衢。把博客做成真正能持续生长的内容系统。',
       email: 'shijianus@epocanvas.com',
       location: 'UTC-8',
       avatar: '/media/shijianus/avatar.jpg',
@@ -820,9 +820,9 @@ export const siteConfig = {
   pages: {
     about: {
       title: '关于我',
-      subtitle: '生而热烈 / 写而笃定',
-      floatingTagsLeft: ['内容优先创作者', '长期维护者', '体验洁癖'],
-      floatingTagsRight: ['构建系统', '前端工程', '写作记录'],
+      subtitle: '厚土潜藏细脉 · 大荒广构通衢',
+      floatingTagsLeft: ['全栈架构思考者', '数字花园造物者', '体验洁癖'],
+      floatingTagsRight: ['系统秩序', '长效构建', '开放网络'],
       helloTips: '你好，很高兴认识你',
       helloLead: '你好，我在这里写作与构建',
       helloDescription: '学生 / 开发者 / 写作者 / 系统整理者',
@@ -947,9 +947,9 @@ export const siteConfig = {
         ] satisfies AboutConnectItem[],
       },
       maxim: {
-        tips: '座右铭',
-        top: '生活明朗',
-        bottom: '万物可爱。',
+        tips: '核心座右铭',
+        top: '厚土潜藏细脉',
+        bottom: '大荒广构通衢',
       },
       buff: {
         tips: '加成',
