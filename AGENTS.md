@@ -1710,5 +1710,32 @@
   5. 验证首页文章列表去重机制生效，多语言变体不产生重复卡片；
   6. 30/30 项测试断言 100% PASS 通过。
 
+### Task 79: 关于页 (About) 彻底移除打赏板块、全面重构丰富内容、对齐全站设计语言与创新美学设计
+- [x] **彻底移除打赏与支持模块**：
+  1. 从 `/about/` 界面中彻底移除 `class="author-content-item single reward"` 及 `#about-reward`；
+  2. 清理 `RewardRegionPanel` 与打赏支持列表/按钮在关于页的挂载，后续将独立专页承接；
+  3. 自动化断言严格校验 `#about-reward` 与 `.author-content-item.reward` 为 `null`。
+- [x] **全面重构与极客美学丰富扩展 (11大核心板块深度呼应全站气质)**：
+  1. **作者形象区 (Author Box)**：居中头像配备呼吸在线指示灯（`online-indicator` 带脉冲光环），两侧浮动标签展示创作者定位；
+  2. **破冰与造物追求 (Say Hello & Pursuit)**：蓝紫渐变大字卡片搭配 `#Astro` `#TypeScript` `#Tailwind` `#UI/UX` `#Cloudflare` 芯片标签流，右侧搭配动态文字 mask 轮播；
+  3. **动态图腾横幅 (Kinetic Wordmark)**：巨幅大字 Typography 与三维极简光斑浮动；
+  4. **技能矩阵与生涯路线 (Skills & Careers)**：技能传送带 + 8 大核心能力品牌色徽标，生涯演进时间线；
+  5. **站点数据与实时坐标雷达 (Metrics & Live Timezone)**：4 维站点核心统计直达归档；地图区配备**实时跳动跳秒的 PST/PDT 太平洋时间时钟（`HH:MM:SS PST`）** 与 `🟢 灵感涌现 · 持续构建中` 状态雷达；
+  6. **MBTI 深度特质与数字工作台 (Personalities & Workbench)**：`INFJ-A 提倡者/架构思考者` 配备 5 维能量进度条（深度内省 82%、直觉远见 86%、人文感受 74%、秩序判断 90%、坚定果决 78%）与官方直达，右侧工作台实景照片带半透明精致浮层；
+  7. **生产力装备与工具箱 (My Gear & Dev Stack)**：分设硬件工作站（MacBook Pro、4K 极客超清屏、Keychron 客制化键盘、Sony 旗舰降噪耳机）与数字工具箱（Cursor/VS Code、Raycast、Figma、Cloudflare Pages & D1）；
+  8. **数字花园建站宣言 (Digital Garden Manifesto)**：全宽沉浸式卡片，阐释三大造物支柱（数据主权与自由表达、慢思考与长效价值、数字工匠精神）；
+  9. **灵感黑胶唱机与次元精神角落 (Soundtrack & Gaming Corner)**：黑胶圆盘动态旋转 + 封面，右侧 4 柱高光蓝色声波律动柱（Equalizer Bars）；游戏卡片配滑动呼吸光带与主题胶囊；
+  10. **座右铭与状态加成 (Maxim & Buff)**：高对比度文字排版与动感光泽加成；
+  11. **保持连接与社交矩阵 (Stay Connected & Links)**：全宽网格直达 GitHub、Telegram、RSS 订阅、邮件信箱。
+- [x] **UI/UX Pro Max 规范与响应式适配**：
+  1. 严格收敛圆角为 8px ~ 12px 标准精致圆角，消除松垮的超大 AI 味圆角；
+  2. 50%/50% 与 59%/39% 错落网格平衡，移动端单列自适应响应；
+  3. 深浅双色模式 100% 高对比度支持，黑胶唱机与代码卡片呈现高级质感。
+- [x] **自动化端到端测试套件全量通过 (`scripts/verify-about-rebuild.mjs`)**：
+  1. 覆盖桌面端（1440x900）、平板端（768x1024）、移动端（375x667）三重视口；
+  2. 严格断言打赏模块彻底移除（0 检出）、11 大板块全部存在、PST 时钟实时跳动、MBTI 5 条进度、装备 4+4 项、宣言 3 柱、唱机音波等 100% 验证通过；
+  3. 桌面与移动端浅色/深色模式全量截图审计留档。
+
+
 
 

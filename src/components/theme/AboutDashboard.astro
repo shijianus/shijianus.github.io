@@ -1,6 +1,5 @@
 ---
 import { siteConfig } from '../../config/site';
-import RewardRegionPanel from './RewardRegionPanel.astro';
 
 interface Props {
   stats: {
@@ -17,6 +16,7 @@ const skillMarquee = [...siteConfig.home.hero.skillFlow, ...siteConfig.home.hero
 ---
 
 <section id="about-page">
+  <!-- 1. 顶部作者形象与浮动标签 -->
   <div class="author-box">
     <div class="author-tag-left">
       {about.floatingTagsLeft.map((item) => (
@@ -26,6 +26,7 @@ const skillMarquee = [...siteConfig.home.hero.skillFlow, ...siteConfig.home.hero
 
     <div class="author-img">
       <img src={siteConfig.site.author.avatar} alt={siteConfig.site.author.name} loading="eager" />
+      <span class="online-indicator" title="当前在线 · 持续构建中"></span>
     </div>
 
     <div class="author-tag-right">
@@ -38,6 +39,7 @@ const skillMarquee = [...siteConfig.home.hero.skillFlow, ...siteConfig.home.hero
   <p class="p center logo large">{about.title}</p>
   <p class="p center small">{about.subtitle}</p>
 
+  <!-- 2. 破冰打招呼与造物追求 -->
   <div class="author-content">
     <div class="author-content-item myInfoAndSayHello">
       <div class="title1">{about.helloTips}</div>
@@ -45,6 +47,13 @@ const skillMarquee = [...siteConfig.home.hero.skillFlow, ...siteConfig.home.hero
         我叫 <span class="inline-word">{siteConfig.site.author.name}</span>
       </div>
       <div class="title1">{about.helloDescription}</div>
+      <div class="hello-tag-chips">
+        <span>#Astro</span>
+        <span>#TypeScript</span>
+        <span>#Tailwind</span>
+        <span>#UI/UX</span>
+        <span>#Cloudflare</span>
+      </div>
     </div>
 
     <div class="author-content-item aboutsiteTips">
@@ -61,15 +70,25 @@ const skillMarquee = [...siteConfig.home.hero.skillFlow, ...siteConfig.home.hero
           ))}
         </div>
       </h2>
+      <p class="aboutsite-lead">
+        在信息爆炸与快节奏时代，为你我保留一处专注慢思考、深度阅读与自由构建的数字静地。
+      </p>
     </div>
   </div>
 
+  <!-- 3. 全宽动态图腾横幅 -->
   <div class="hello-about">
+    <div class="shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+    </div>
     <div class="content">
       <h1>{about.helloWordmark}</h1>
     </div>
   </div>
 
+  <!-- 4. 技能矩阵与生涯长期演进 -->
   <div class="author-content">
     <div class="author-content-item skills">
       <div class="card-content">
@@ -116,6 +135,7 @@ const skillMarquee = [...siteConfig.home.hero.skillFlow, ...siteConfig.home.hero
     </div>
   </div>
 
+  <!-- 5. 站点数据统计与世界坐标雷达 -->
   <div class="author-content">
     <div class="about-statistic author-content-item">
       <div class="card-content">
@@ -124,15 +144,15 @@ const skillMarquee = [...siteConfig.home.hero.skillFlow, ...siteConfig.home.hero
         <div class="about-statistic__grid">
           <div>
             <strong>{stats.posts}</strong>
-            <span>文章</span>
+            <span>文章总量</span>
           </div>
           <div>
             <strong>{stats.categories}</strong>
-            <span>分类</span>
+            <span>专题分类</span>
           </div>
           <div>
             <strong>{stats.tags}</strong>
-            <span>标签</span>
+            <span>知识标签</span>
           </div>
           <div>
             <strong>{stats.readingMinutes}</strong>
@@ -141,7 +161,7 @@ const skillMarquee = [...siteConfig.home.hero.skillFlow, ...siteConfig.home.hero
         </div>
         <div class="banner-button-group">
           <a class="banner-button" href={about.statistics.buttonHref}>
-            <span class="banner-button-text">{about.statistics.buttonLabel}</span>
+            <span class="banner-button-text">{about.statistics.buttonLabel} →</span>
           </a>
         </div>
       </div>
@@ -149,10 +169,22 @@ const skillMarquee = [...siteConfig.home.hero.skillFlow, ...siteConfig.home.hero
 
     <div class="author-content-item-group column mapAndInfo">
       <div class="author-content-item map single">
-        <span class="map-title">
-          {about.map.title}
-          <b>{about.map.accent}</b>
-        </span>
+        <div class="map-inner">
+          <span class="map-title">
+            {about.map.title}
+            <b>{about.map.accent}</b>
+          </span>
+          <div class="map-live-info">
+            <div class="live-clock-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span id="about-live-clock">--:--:-- PST</span>
+            </div>
+            <div class="live-status-pill">
+              <span class="pulse-dot"></span>
+              <span>灵感涌现 · 持续构建中</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="author-content-item selfInfo single">
@@ -166,25 +198,212 @@ const skillMarquee = [...siteConfig.home.hero.skillFlow, ...siteConfig.home.hero
     </div>
   </div>
 
+  <!-- 6. MBTI特质深度解析与数字工作室 -->
   <div class="author-content">
     <div class="author-content-item personalities">
-      <div class="author-content-item-tips">性格</div>
-      <span class="author-content-item-title">{about.personality.title}</span>
-      <p class="post-tips">{about.personality.summary}</p>
+      <div class="card-content">
+        <div class="personality-top">
+          <div>
+            <div class="author-content-item-tips">{about.personality.tips}</div>
+            <div class="personality-badge">{about.personality.type}</div>
+            <span class="author-content-item-title personality-title">{about.personality.title}</span>
+          </div>
+        </div>
+        
+        <p class="personality-summary">{about.personality.summary}</p>
+
+        {about.personality.traits && (
+          <div class="personality-traits-grid">
+            {about.personality.traits.map((trait) => (
+              <div class="trait-item">
+                <div class="trait-header">
+                  <span class="trait-label">{trait.label}</span>
+                  <span class="trait-value">{trait.value}%</span>
+                </div>
+                <div class="trait-bar">
+                  <div class="trait-fill" style={`width: ${trait.value}%`}></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div class="personality-link-wrap">
+          <a class="personality-more-link" href={about.personality.link} target="_blank" rel="noopener noreferrer">
+            深入了解 16Personalities
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17l9.2-9.2M17 17V8H8"/></svg>
+          </a>
+        </div>
+      </div>
     </div>
 
     <div class="author-content-item myphoto">
       <img class="author-content-img" src={siteConfig.site.author.cover} alt={about.photoTitle} loading="lazy" />
+      <div class="photo-overlay-tag">
+        <span class="photo-icon">✦</span>
+        <span>Clean Desk, Clear Mind · 工作台一角</span>
+      </div>
     </div>
   </div>
 
+  <!-- 7. 我的装备与生产力工作流 (Hardware & Software) -->
+  {about.gear && (
+    <div class="author-content">
+      <div class="author-content-item gear-card hardware">
+        <div class="card-content">
+          <div class="author-content-item-tips">硬件装备 / Hardware</div>
+          <span class="author-content-item-title">生产力工作站</span>
+          <p class="gear-desc">工欲善其事，必先利其器。打造高效率、低干扰的沉浸创作物理空间。</p>
+          <div class="gear-grid">
+            {about.gear.hardware.map((item) => (
+              <div class="gear-item">
+                <div class="gear-item__icon">
+                  {item.icon === 'laptop' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="20" x2="22" y2="20"></line></svg>}
+                  {item.icon === 'monitor' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>}
+                  {item.icon === 'keyboard' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="6" y2="8.01"></line><line x1="10" y1="8" x2="10" y2="8.01"></line><line x1="14" y1="8" x2="14" y2="8.01"></line><line x1="18" y1="8" x2="18" y2="8.01"></line><line x1="6" y1="12" x2="6" y2="12.01"></line><line x1="18" y1="12" x2="18" y2="12.01"></line><line x1="7" y1="16" x2="17" y2="16"></line></svg>}
+                  {item.icon === 'headphones' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>}
+                </div>
+                <div class="gear-item__content">
+                  <div class="gear-item__name">
+                    <strong>{item.name}</strong>
+                    {item.badge && <span class="gear-badge">{item.badge}</span>}
+                  </div>
+                  <span class="gear-item__desc">{item.desc}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div class="author-content-item gear-card software">
+        <div class="card-content">
+          <div class="author-content-item-tips">软件环境 / Dev Stack</div>
+          <span class="author-content-item-title">数字工具箱</span>
+          <p class="gear-desc">极简、敏捷与高信息密度。将现代工具链与自动化流程融为一体。</p>
+          <div class="gear-grid">
+            {about.gear.software.map((item) => (
+              <div class="gear-item">
+                <div class="gear-item__icon software-icon">
+                  {item.icon === 'code' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>}
+                  {item.icon === 'zap' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>}
+                  {item.icon === 'figma' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H12v7H8.5A3.5 3.5 0 0 1 5 5.5z"></path><path d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12V2z"></path><path d="M12 12.5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 1 1-7 0z"></path><path d="M5 19.5A3.5 3.5 0 0 1 8.5 16H12v3.5a3.5 3.5 0 1 1-7 0z"></path><path d="M5 12.5A3.5 3.5 0 0 1 8.5 9H12v7H8.5A3.5 3.5 0 0 1 5 12.5z"></path></svg>}
+                  {item.icon === 'cloud' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>}
+                </div>
+                <div class="gear-item__content">
+                  <div class="gear-item__name">
+                    <strong>{item.name}</strong>
+                    {item.badge && <span class="gear-badge">{item.badge}</span>}
+                  </div>
+                  <span class="gear-item__desc">{item.desc}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+
+  <!-- 8. 数字花园建站宣言与造物初心 -->
+  {about.manifesto && (
+    <div class="author-content">
+      <div class="author-content-item single manifesto-card">
+        <div class="card-content">
+          <div class="manifesto-header">
+            <span class="manifesto-pill">
+              <span class="manifesto-pill__sparkle">✦</span>
+              {about.manifesto.tips}
+            </span>
+            <h2 class="manifesto-title">{about.manifesto.title}</h2>
+            <p class="manifesto-subtitle">{about.manifesto.subtitle}</p>
+          </div>
+
+          <div class="manifesto-pillars">
+            {about.manifesto.pillars.map((pillar) => (
+              <div class="pillar-card">
+                <div class="pillar-card__head">
+                  <span class="pillar-card__tag">{pillar.tag}</span>
+                  <div class="pillar-card__icon">
+                    {pillar.icon === 'shield' && <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>}
+                    {pillar.icon === 'feather' && <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>}
+                    {pillar.icon === 'hammer' && <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"></path><path d="M17.64 15 22 10.64"></path><path d="m20.91 3.26-6.36 6.36"></path></svg>}
+                  </div>
+                </div>
+                <strong class="pillar-card__title">{pillar.title}</strong>
+                <p class="pillar-card__desc">{pillar.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+
+  <!-- 9. 灵感黑胶唱机与次元精神角落 -->
+  <div class="author-content">
+    <div class="author-content-item like-music">
+      <div class="card-content">
+        <div class="author-content-item-tips">{about.soundtrack ? about.soundtrack.tips : about.likeMusic.tips}</div>
+        <span class="author-content-item-title">{about.soundtrack ? about.soundtrack.title : about.likeMusic.title}</span>
+        
+        <!-- 黑胶唱片动效与音波组件 -->
+        <div class="vinyl-player-widget">
+          <div class="vinyl-disc-container">
+            <div class="vinyl-disc">
+              <div class="vinyl-grooves"></div>
+              <img class="vinyl-cover" src={about.soundtrack?.cover || '/media/audio/covers/way_back_home.jpg'} alt="Record Cover" />
+              <div class="vinyl-center-hole"></div>
+            </div>
+            <div class="vinyl-stylus"></div>
+          </div>
+          
+          <div class="vinyl-meta">
+            <div class="vinyl-title-row">
+              <strong class="vinyl-song-title">{about.soundtrack?.song || 'Way Back Home'}</strong>
+              <div class="equalizer-bars">
+                <span class="bar bar-1"></span>
+                <span class="bar bar-2"></span>
+                <span class="bar bar-3"></span>
+                <span class="bar bar-4"></span>
+              </div>
+            </div>
+            <span class="vinyl-artist">{about.soundtrack?.artist || 'Inspiration Soundtrack'}</span>
+            <p class="vinyl-summary">{about.soundtrack?.summary || about.likeMusic.summary}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="author-content-item game-yuanshen">
+      <div class="card-content">
+        <div class="author-content-item-tips">{about.game.tips}</div>
+        <span class="author-content-item-title">{about.game.title}</span>
+        <div class="content-bottom">
+          <div class="tips">{about.game.summary}</div>
+          <div class="comic-box">
+            {about.comic.items.map((item) => (
+              <span class="comic-item">{item}</span>
+            ))}
+          </div>
+        </div>
+        <div class="loading-bar-wrap">
+          <div class="loading-bar-inner"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. 箴言与状态加成 -->
   <div class="author-content">
     <div class="author-content-item maxim">
-      <div class="author-content-item-tips">{about.maxim.tips}</div>
-      <span class="maxim-title">
-        <span>{about.maxim.top}</span>
-        <span>{about.maxim.bottom}</span>
-      </span>
+      <div class="card-content">
+        <div class="author-content-item-tips">{about.maxim.tips}</div>
+        <span class="maxim-title">
+          <span>{about.maxim.top}</span>
+          <span>{about.maxim.bottom}</span>
+        </span>
+      </div>
     </div>
 
     <div class="author-content-item buff">
@@ -198,92 +417,786 @@ const skillMarquee = [...siteConfig.home.hero.skillFlow, ...siteConfig.home.hero
     </div>
   </div>
 
-  <div class="author-content">
-    <div class="author-content-item game-yuanshen">
-      <div class="card-content">
-        <div class="author-content-item-tips">{about.game.tips}</div>
-        <span class="author-content-item-title">{about.game.title}</span>
-        <div class="content-bottom">
-          <div class="tips">{about.game.summary}</div>
-        </div>
-      </div>
-    </div>
+  <!-- 11. 保持连接与志同道合者矩阵 -->
+  {about.connect && (
+    <div class="author-content">
+      <div class="author-content-item single connect-card">
+        <div class="card-content">
+          <div class="connect-head">
+            <div class="author-content-item-tips">{about.connect.tips}</div>
+            <span class="author-content-item-title">{about.connect.title}</span>
+            <p class="connect-summary">{about.connect.summary}</p>
+          </div>
 
-    <div class="author-content-item comic-content">
-      <div class="card-content">
-        <div class="author-content-item-tips">{about.comic.tips}</div>
-        <span class="author-content-item-title">{about.comic.title}</span>
-        <div class="comic-box">
-          {about.comic.items.map((item) => (
-            <span class="comic-item">{item}</span>
-          ))}
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="author-content">
-    <div class="author-content-item like-technology">
-      <div class="card-content">
-        <div class="author-content-item-tips">{about.likeTech.tips}</div>
-        <span class="author-content-item-title">{about.likeTech.title}</span>
-        <div class="content-bottom">
-          <div class="tips">{about.likeTech.summary}</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="author-content-item like-music">
-      <div class="card-content">
-        <div class="author-content-item-tips">{about.likeMusic.tips}</div>
-        <span class="author-content-item-title">{about.likeMusic.title}</span>
-        <div class="content-bottom">
-          <div class="tips">{about.likeMusic.summary}</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="author-content">
-    <div class="author-content-item single reward" id="about-reward">
-      <div class="about-reward__head">
-        <div class="about-reward__copy">
-          <div class="author-content-item-tips">支持</div>
-          <span class="author-content-item-title">打赏与支持</span>
-          <div class="about-reward__summary">
-            <p>{siteConfig.support.reward.summary}</p>
+          <div class="connect-buttons-grid">
+            {about.connect.items.map((item) => (
+              <a class="connect-btn" href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}>
+                <div class="connect-btn__icon">
+                  {item.icon === 'github' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>}
+                  {item.icon === 'telegram' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>}
+                  {item.icon === 'rss' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg>}
+                  {item.icon === 'mail' && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>}
+                </div>
+                <div class="connect-btn__info">
+                  <strong>{item.label}</strong>
+                  <span>{item.desc}</span>
+                </div>
+                <span class="connect-btn__arrow">→</span>
+              </a>
+            ))}
           </div>
         </div>
-        <div class="support-panel-actions support-panel-actions--page">
-          <a class="support-panel-link" href={siteConfig.support.reward.historyHref}>{siteConfig.support.reward.historyLabel}</a>
-          <span class="support-panel-note">{siteConfig.post.copyright.rewardNote}</span>
-        </div>
-      </div>
-      <RewardRegionPanel variant="page" />
-      <div class="about-reward__list-head">
-        <strong>支持记录</strong>
-        <p>文章页和关于页共用同一套地区化支持入口，这里保留统一的记录视图。</p>
-      </div>
-      <div class="reward-list-all">
-        {about.rewards.map((item) => (
-          <div class="reward-list-item">
-            <div class="reward-list-item-name">{item.name}</div>
-            <div class="reward-list-bottom-group">
-              <div class="reward-list-item-money">{item.amount}</div>
-              <div class="reward-list-item-time">{item.date}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div class="about-reward">
-        <div class="about-reward__bars">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <a class="about-reward__button" href={siteConfig.support.reward.historyHref}>{siteConfig.support.reward.historyLabel}</a>
       </div>
     </div>
-  </div>
+  )}
 </section>
+
+<!-- 实时时钟与微交互运行脚本 -->
+<script is:inline>
+  (() => {
+    // 1. 实时 PST/PDT 太平洋时间更新
+    const updateClock = () => {
+      const clockEl = document.getElementById('about-live-clock');
+      if (!clockEl) return;
+      try {
+        const now = new Date();
+        const formatter = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'America/Los_Angeles',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false,
+        });
+        clockEl.textContent = `${formatter.format(now)} PST`;
+      } catch (err) {
+        // Fallback
+      }
+    };
+    updateClock();
+    setInterval(updateClock, 1000);
+  })();
+</script>
+
+<style>
+  /* ----------------------------------------------------
+     关于页深度重构与专属创新样式 (About Modern Dashboard)
+     ---------------------------------------------------- */
+  
+  /* 头像与在线绿点脉冲 */
+  .online-indicator {
+    position: absolute;
+    right: 6px;
+    bottom: 8px;
+    width: 24px;
+    height: 24px;
+    border: 4px solid var(--card-bg, #ffffff);
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+    animation: online-pulse 2.5s ease-in-out infinite;
+    z-index: 3;
+  }
+
+  @keyframes online-pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+  }
+
+  /* 打招呼微标签流 */
+  .hello-tag-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .hello-tag-chips span {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(8px);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .aboutsite-lead {
+    margin-top: 12px;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
+  /* 地图时区与实时时钟 */
+  .map-inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    gap: 14px;
+  }
+
+  .map-live-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .live-clock-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    background: var(--card-bg);
+    border: var(--style-border-always);
+    box-shadow: var(--shadow-border);
+    color: var(--font-color);
+    font-size: 12px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .live-clock-badge svg {
+    color: #425aef;
+  }
+
+  .live-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    color: #059669;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  [data-theme='dark'] .live-status-pill {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+  }
+
+  .pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35);
+    animation: dot-beat 1.8s infinite;
+  }
+
+  @keyframes dot-beat {
+    0%, 100% { transform: scale(0.9); opacity: 0.8; }
+    50% { transform: scale(1.25); opacity: 1; }
+  }
+
+  /* MBTI 特质卡片 */
+  .personality-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .personality-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    margin-top: 4px;
+    border-radius: 4px;
+    background: #425aef;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+
+  .personality-title {
+    margin-top: 6px;
+    font-size: 1.7rem;
+  }
+
+  .personality-summary {
+    margin: 10px 0 0;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
+  .personality-traits-grid {
+    display: grid;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .trait-item {
+    display: grid;
+    gap: 4px;
+  }
+
+  .trait-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--font-color);
+  }
+
+  .trait-value {
+    color: #425aef;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .trait-bar {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--secondbg);
+    overflow: hidden;
+  }
+
+  .trait-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #425aef, #00c6ff);
+    transition: width 1s ease-out;
+  }
+
+  .personality-link-wrap {
+    margin-top: 16px;
+  }
+
+  .personality-more-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #425aef;
+    font-size: 12px;
+    font-weight: 700;
+    transition: transform 0.2s;
+  }
+
+  .personality-more-link:hover {
+    transform: translateX(3px);
+  }
+
+  /* 工作台照片蒙版标签 */
+  .myphoto {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .photo-overlay-tag {
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    background: rgba(17, 24, 39, 0.75);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .photo-icon {
+    color: #f59e0b;
+  }
+
+  /* 生产力装备网格 */
+  .gear-card {
+    min-height: 280px;
+  }
+
+  .gear-desc {
+    margin: 6px 0 16px;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .gear-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .gear-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: var(--secondbg);
+    border: 1px solid transparent;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+  }
+
+  .gear-item:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, #425aef 25%, transparent);
+  }
+
+  .gear-item__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    background: rgba(66, 90, 239, 0.1);
+    color: #425aef;
+  }
+
+  .software-icon {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+  }
+
+  .gear-item__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .gear-item__name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .gear-item__name strong {
+    color: var(--font-color);
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .gear-badge {
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #425aef;
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 800;
+  }
+
+  .gear-item__desc {
+    color: var(--text-muted);
+    font-size: 11px;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* 数字花园建站宣言 */
+  .manifesto-card {
+    background: linear-gradient(135deg, rgba(66, 90, 239, 0.05) 0%, rgba(0, 198, 255, 0.05) 100%);
+    border: 1px solid color-mix(in srgb, #425aef 20%, var(--card-border));
+  }
+
+  .manifesto-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 22px;
+  }
+
+  .manifesto-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 12px;
+    border-radius: 999px;
+    background: rgba(66, 90, 239, 0.1);
+    color: #425aef;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+
+  .manifesto-pill__sparkle {
+    color: #f59e0b;
+  }
+
+  .manifesto-title {
+    margin: 4px 0 0;
+    color: var(--font-color);
+    font-size: clamp(1.4rem, 2.8vw, 1.9rem);
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  .manifesto-subtitle {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .manifesto-pillars {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .pillar-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    border-radius: 8px;
+    background: var(--card-bg);
+    border: var(--style-border-always);
+    box-shadow: var(--shadow-border);
+    transition: transform 0.25s ease;
+  }
+
+  .pillar-card:hover {
+    transform: translateY(-3px);
+  }
+
+  .pillar-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .pillar-card__tag {
+    color: #425aef;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .pillar-card__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background: var(--secondbg);
+    color: #425aef;
+  }
+
+  .pillar-card__title {
+    color: var(--font-color);
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.3;
+  }
+
+  .pillar-card__desc {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  /* 灵感黑胶卡片沉浸暗色播放器与游戏卡片配平 */
+  .author-content-item.like-music {
+    width: calc(50% - 10px) !important;
+    background: linear-gradient(135deg, #181c2f 0%, #0f172a 100%) !important;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .author-content-item.like-music .author-content-item-tips {
+    color: #38bdf8 !important;
+  }
+
+  .author-content-item.like-music .author-content-item-title {
+    color: #ffffff !important;
+  }
+
+  .author-content-item.game-yuanshen {
+    width: calc(50% - 10px) !important;
+  }
+
+  @media (max-width: 768px) {
+    .author-content-item.like-music,
+    .author-content-item.game-yuanshen {
+      width: 100% !important;
+    }
+  }
+
+  /* 黑胶唱机卡片与音波律动 */
+  .vinyl-player-widget {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    margin-top: 18px;
+  }
+
+  .vinyl-disc-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+  }
+
+  .vinyl-disc {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: #18181b;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    animation: vinyl-spin 10s linear infinite;
+    overflow: hidden;
+  }
+
+  .vinyl-grooves {
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    border: 1px dashed rgba(255, 255, 255, 0.12);
+  }
+
+  .vinyl-cover {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+  }
+
+  .vinyl-center-hole {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ffffff;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+  }
+
+  @keyframes vinyl-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .vinyl-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .vinyl-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .vinyl-song-title {
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 800;
+  }
+
+  .equalizer-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 14px;
+  }
+
+  .equalizer-bars .bar {
+    width: 3px;
+    border-radius: 2px;
+    background: #38bdf8;
+    animation: sound-bounce 1.2s ease-in-out infinite alternate;
+  }
+
+  .bar-1 { height: 6px; animation-delay: 0.1s; }
+  .bar-2 { height: 14px; animation-delay: 0.35s; }
+  .bar-3 { height: 9px; animation-delay: 0.2s; }
+  .bar-4 { height: 12px; animation-delay: 0.5s; }
+
+  @keyframes sound-bounce {
+    0% { height: 4px; }
+    100% { height: 14px; }
+  }
+
+  .vinyl-artist {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .vinyl-summary {
+    margin: 4px 0 0;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  /* 游戏卡片 Loading 光带 */
+  .loading-bar-wrap {
+    margin-top: 18px;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.15);
+    overflow: hidden;
+  }
+
+  .loading-bar-inner {
+    width: 60%;
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #f59e0b, #ec4899);
+    animation: bar-glide 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes bar-glide {
+    0% { width: 30%; transform: translateX(0); }
+    100% { width: 75%; transform: translateX(35%); }
+  }
+
+  /* 社交连接矩阵 */
+  .connect-card {
+    background: var(--card-bg);
+  }
+
+  .connect-head {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 20px;
+  }
+
+  .connect-summary {
+    margin: 4px 0 0;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .connect-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .connect-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    background: var(--secondbg);
+    border: 1px solid transparent;
+    transition: transform 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+  }
+
+  .connect-btn:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, #425aef 25%, transparent);
+    background: var(--card-bg);
+  }
+
+  .connect-btn__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    background: rgba(66, 90, 239, 0.1);
+    color: #425aef;
+  }
+
+  .connect-btn__info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 2px;
+  }
+
+  .connect-btn__info strong {
+    color: var(--font-color);
+    font-size: 13px;
+    line-height: 1.2;
+  }
+
+  .connect-btn__info span {
+    color: var(--text-muted);
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .connect-btn__arrow {
+    margin-left: auto;
+    color: var(--text-muted);
+    font-weight: 800;
+    transition: transform 0.2s;
+  }
+
+  .connect-btn:hover .connect-btn__arrow {
+    transform: translateX(3px);
+    color: #425aef;
+  }
+
+  /* 响应式断点优化 */
+  @media (max-width: 1024px) {
+    .manifesto-pillars {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+    .connect-buttons-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 768px) {
+    .gear-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .connect-buttons-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .vinyl-player-widget {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .personality-title {
+      font-size: 1.4rem;
+    }
+  }
+</style>

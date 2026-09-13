@@ -122,6 +122,33 @@ export type AboutReward = {
   date: string;
 };
 
+export type AboutGearItem = {
+  name: string;
+  desc: string;
+  icon: string;
+  badge?: string;
+};
+
+export type AboutManifestoPillar = {
+  title: string;
+  desc: string;
+  tag: string;
+  icon: string;
+};
+
+export type AboutTrait = {
+  label: string;
+  value: number;
+  desc: string;
+};
+
+export type AboutConnectItem = {
+  label: string;
+  href: string;
+  desc: string;
+  icon: string;
+};
+
 export type CommentProvider = 'local' | 'cloudflare' | 'giscus' | 'waline' | 'twikoo';
 
 export type RewardChannel = {
@@ -846,10 +873,79 @@ export const siteConfig = {
       ],
       personality: {
         tips: '性格',
-        title: 'INFJ / Builder',
-        summary: '偏好建立秩序、耐心打磨细节，对长期可维护的系统有天然执念。',
+        type: 'INFJ-A',
+        title: '提倡者 / 架构思考者',
+        summary: '偏好建立秩序、耐心打磨细节，对长期可维护的系统与极致体验有天然执念。',
+        link: 'https://www.16personalities.com/ch/infj-%E4%BA%BA%E6%A0%BC',
+        traits: [
+          { label: '专注深度 (Introverted)', value: 82, desc: '偏好独处构思与深度心流' },
+          { label: '直觉远见 (Intuitive)', value: 86, desc: '洞察系统全貌与长远演进' },
+          { label: '人文感受 (Feeling)', value: 74, desc: '关注使用者体验与情感共鸣' },
+          { label: '秩序判断 (Judging)', value: 90, desc: '严苛自律、追求清晰与条理' },
+          { label: '坚定果决 (Assertive)', value: 78, desc: '从容自信、笃定落实每一行代码' },
+        ] satisfies AboutTrait[],
       },
       photoTitle: '工作台',
+      gear: {
+        tips: '生产力工具',
+        title: '我的装备与工作流',
+        hardware: [
+          { name: '16" MacBook Pro M系列', desc: '主力开发机 · 视网膜色彩与持久强劲性能', icon: 'laptop', badge: 'Main' },
+          { name: '27" 4K 极客超清屏', desc: '双屏扩展 · 多任务排版与代码严苛审查', icon: 'monitor' },
+          { name: 'Keychron 客制化机械键盘', desc: '线性手感 · 清脆节拍伴随每一次灵感敲击', icon: 'keyboard' },
+          { name: 'Sony WH-1000XM5', desc: '旗舰降噪 · 一键沉浸无干扰创作心流', icon: 'headphones' },
+        ] satisfies AboutGearItem[],
+        software: [
+          { name: 'Cursor & VS Code', desc: 'Tokyo Night 主题 · 现代智能结对与流畅编码', icon: 'code', badge: 'Editor' },
+          { name: 'Raycast', desc: '工作流神经中枢 · 毫秒级快捷操作与管道调度', icon: 'zap' },
+          { name: 'Figma', desc: '界面原型绘制 · 像素级打磨与交互草图设计', icon: 'figma' },
+          { name: 'Cloudflare Pages & D1', desc: '全球边缘网络 · 零冷启动现代化分布式架构', icon: 'cloud', badge: 'Cloud' },
+        ] satisfies AboutGearItem[],
+      },
+      manifesto: {
+        tips: '造物初心',
+        title: '在算法喧嚣的时代，构筑一座属于自己的数字花园。',
+        subtitle: '不迎合瞬息万变的快餐式流量，用代码与文字沉淀可穿越周期的长效价值。',
+        pillars: [
+          {
+            title: '数据主权与自由表达',
+            desc: '不为算法推荐妥协，不被商业平台锁定。把每一次技术探索、深度思考与真实试错完整归档在自己的领地上。',
+            tag: 'Sovereignty',
+            icon: 'shield',
+          },
+          {
+            title: '慢思考与长效价值',
+            desc: '拒绝碎片化浮躁。以系统化、结构化的长文记录解决真实技术痛点的轨迹，让知识随时间复利持续增值。',
+            tag: 'Longevity',
+            icon: 'feather',
+          },
+          {
+            title: '数字工匠精神',
+            desc: '代码架构、字距留白、色彩平衡与微交互，处处皆是作品。追求极致的前端性能与符合人体感官的美学舒适。',
+            tag: 'Craftsmanship',
+            icon: 'hammer',
+          },
+        ] satisfies AboutManifestoPillar[],
+      },
+      soundtrack: {
+        tips: '灵感音轨',
+        title: '在旋律与代码间寻得心流',
+        summary: '敲下代码时，音乐是最好的白噪音；文字流淌时，旋律是心流的节拍器。在旋律与思考中保持节奏。',
+        song: 'Way Back Home / 彼女は旅に出る',
+        artist: 'Scop · SHAUN · 悠扬日常',
+        cover: '/media/audio/covers/way_back_home.jpg',
+      },
+      connect: {
+        tips: '保持连接',
+        title: '与志同道合者同行',
+        summary: '无论你想探讨前端工程、系统架构，还是交流写作体验与设计思考，欢迎随时与我连接。',
+        items: [
+          { label: 'GitHub', href: 'https://github.com/shijianus', desc: '查看开源项目与构建足迹', icon: 'github' },
+          { label: 'Telegram', href: 'https://t.me/chronoral', desc: '日常交流与即时互动探讨', icon: 'telegram' },
+          { label: 'RSS 订阅', href: '/rss.xml', desc: '通过现代阅读器第一时间获知更新', icon: 'rss' },
+          { label: '邮件信箱', href: 'mailto:contact@epocanvas.com', desc: '欢迎深度长信交流探讨', icon: 'mail' },
+        ] satisfies AboutConnectItem[],
+      },
       maxim: {
         tips: '座右铭',
         top: '生活明朗',
