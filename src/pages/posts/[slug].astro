@@ -558,22 +558,12 @@ const heroSummary = isUnlocked
               }
             });
 
-            // 2. On page load: only if user has explicitly chosen a manual locale preference
-            //    that differs from article's locale, auto-redirect to the matching translation.
-            const manualSelected = window.localStorage.getItem('shijianus-manual-locale-selected');
-            if (manualSelected && manualSelected !== currentLang && translations[manualSelected]) {
-              const sessionKey = 'i18n-auto-nav:' + i18nKey + ':' + manualSelected;
-              if (!window.sessionStorage.getItem(sessionKey)) {
-                window.sessionStorage.setItem(sessionKey, '1');
-                navigateToLang(manualSelected);
-              }
-            } else if (!manualSelected) {
-              // User has not manually locked a locale: align stored variant with current post's language
-              try {
-                window.localStorage.setItem('shijianus-locale-variant', currentLang);
-                document.documentElement.dataset.localeVariant = currentLang;
-                document.documentElement.lang = currentLang;
-              } catch {}
+            // 2. On page load: the language selected in the account card (interface language)
+            // determines which article language is displayed. If preferred language differs
+            // from current article language and a translation exists, immediately show that translation.
+            const preferredLocale = window.localStorage.getItem('shijianus-manual-locale-selected') || window.localStorage.getItem('shijianus-locale-variant');
+            if (preferredLocale && preferredLocale !== currentLang && translations[preferredLocale]) {
+              navigateToLang(preferredLocale);
             }
           } catch {}
         })();

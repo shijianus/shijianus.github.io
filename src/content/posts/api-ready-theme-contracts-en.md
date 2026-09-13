@@ -12,7 +12,6 @@ sticky: 2
 tags: ["API", "Config", "Architecture"]
 i18nKey: "api-ready-theme-contracts"
 lang: "en"
-isAiGenerated: true
 aiTranslatedFrom: "zh-CN"
 ---
 

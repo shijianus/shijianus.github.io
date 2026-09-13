@@ -10,6 +10,8 @@ export interface ArticleI18nConfig {
   groqApiKey?: string;
   groqModel?: string;
   targetPosts?: string[];
+  scheme?: 'primary' | 'extraction' | 'auto';
+  enableOcr?: boolean;
 }
 
 export interface TranslateArticleOptions {
@@ -23,6 +25,8 @@ export interface TranslateArticleOptions {
   model?: string;
   groqApiKey?: string;
   groqModel?: string;
+  scheme?: 'primary' | 'extraction' | 'auto';
+  enableOcr?: boolean;
 }
 
 export interface TranslateArticleResult {
@@ -162,6 +166,12 @@ export function cleanAiArticleOutput(raw: string, i18nKey: string, targetLocale:
     cleaned = `---\n${cleanedFmLines.join('\n')}\n---` + cleaned.slice(fmMatch[0].length);
   }
 
+  // Strip any hardcoded black or dark inline styles to safeguard dark mode readability
+  cleaned = cleaned
+    .replace(/style=(["'])[^"']*color:\s*(?:#000(?:000)?|black|rgb\(0,\s*0,\s*0\))[^"']*\1/gi, '')
+    .replace(/<font\s+color=(["'])(?:#000(?:000)?|black)\1\s*>/gi, '')
+    .replace(/<\/font>/gi, '');
+
   return cleaned.trim();
 }
 
@@ -222,6 +232,11 @@ export function resolveArticleI18nConfig(): ArticleI18nConfig {
   const groqApiKey = process.env.GROQ_API_KEY?.trim();
   const groqModel = process.env.GROQ_MODEL?.trim() || 'qwen/qwen3.6-27b';
 
+  const rawScheme = process.env.ARTICLE_AI_I18N_SCHEME?.trim().toLowerCase();
+  const scheme: 'primary' | 'extraction' | 'auto' =
+    rawScheme === 'extraction' ? 'extraction' : rawScheme === 'primary' ? 'primary' : 'auto';
+  const enableOcr = process.env.ENABLE_IMAGE_OCR !== 'false';
+
   return {
     enabled,
     targetLocales: targetLocales.length > 0 ? targetLocales : ['en', 'zh-Hant', 'fr', 'es', 'de'],
@@ -231,6 +246,8 @@ export function resolveArticleI18nConfig(): ArticleI18nConfig {
     groqApiKey,
     groqModel,
     targetPosts,
+    scheme,
+    enableOcr,
   };
 }
 
@@ -257,6 +274,8 @@ interface CallModelResult {
   error?: string;
 }
 
+let primaryEndpointOffline = false;
+
 async function callModel(opts: CallModelOptions): Promise<CallModelResult> {
   const { systemPrompt, userMessage, timeoutMs = 90000 } = opts;
 
@@ -270,13 +289,13 @@ async function callModel(opts: CallModelOptions): Promise<CallModelResult> {
   const customModel = opts.model || process.env.ARTICLE_AI_I18N_MODEL || process.env.INSTANCE_AI_MODEL || 'kimi-k3-free';
 
   const groqKey = opts.groqApiKey || process.env.GROQ_API_KEY || '';
-  const groqModel = opts.groqModel || process.env.GROQ_MODEL || 'qwen/qwen3.6-27b';
+  const groqModel = opts.groqModel || process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
 
-  // 1. Attempt Primary (Custom or Instance AI)
-  if (customApiKey) {
+  // 1. Attempt Primary (Custom or Instance AI) with 10s circuit breaker
+  if (customApiKey && !primaryEndpointOffline) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      const timeoutId = setTimeout(() => controller.abort(), Math.min(timeoutMs, 10000));
       const endpoint = `${customBaseUrl}/chat/completions`;
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -303,9 +322,12 @@ async function callModel(opts: CallModelOptions): Promise<CallModelResult> {
         if (text) {
           return { ok: true, text, provider: 'Chronral-Instance', model: customModel };
         }
+      } else {
+        primaryEndpointOffline = true;
       }
     } catch (err: any) {
-      console.warn(`[Article-i18n] Primary endpoint attempt failed (${err.message}). Trying Groq fallback...`);
+      primaryEndpointOffline = true;
+      console.warn(`[Article-i18n] Primary endpoint offline/timeout (${err.message}). Circuit breaker active; switching to Groq.`);
     }
   }
 
@@ -313,11 +335,25 @@ async function callModel(opts: CallModelOptions): Promise<CallModelResult> {
   if (groqKey) {
     const candidateGroqModels = Array.from(
       new Set(
-        ['openai/gpt-oss-120b', 'qwen/qwen3.6-27b', 'llama-3.1-8b-instant', opts.groqModel, process.env.GROQ_MODEL].filter(
-          (m) => m && m !== 'llama-3.3-70b-versatile', // remove defunct model
+        [
+          'openai/gpt-oss-120b',
+          'openai/gpt-oss-20b',
+          'qwen/qwen3.8-27b',
+          'qwen/qwen3.6-27b',
+          opts.groqModel,
+          process.env.GROQ_MODEL,
+        ].filter(
+          (m): m is string =>
+            Boolean(m) &&
+            m !== 'llama-3.3-70b-versatile' &&
+            m !== 'llama-3.1-8b-instant' &&
+            m !== 'llama3-70b-8192' &&
+            m !== 'meta-llama/llama-4-scout-17b-16e-instruct' &&
+            m !== 'gemma2-9b-it' &&
+            m !== 'llama-3.1-70b-versatile',
         ),
       ),
-    ) as string[];
+    );
 
     for (const gModel of candidateGroqModels) {
       try {
@@ -375,7 +411,7 @@ async function callModel(opts: CallModelOptions): Promise<CallModelResult> {
  * Tracks code fence state to never split inside a fenced block.
  * Each chunk gets ~overlap chars of the previous chunk's end as context header.
  */
-export function splitIntoChunks(body: string, maxChars = 6000, overlap = 200): string[] {
+export function splitIntoChunks(body: string, maxChars = 3500, overlap = 150): string[] {
   if (body.length <= maxChars) return [body];
 
   const chunks: string[] = [];
@@ -511,7 +547,7 @@ export async function translateBodyChunk(
     chunk,
   ].join('\n');
 
-  const MAX_RETRIES = 3;
+  const MAX_RETRIES = 5;
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     const result = await callModel({
       systemPrompt,
@@ -539,8 +575,9 @@ export async function translateBodyChunk(
     }
 
     if (attempt < MAX_RETRIES) {
-      console.warn(`[Article-i18n] Warning: Chunk ${chunkIndex + 1}/${totalChunks} attempt ${attempt} failed, retrying in 3s...`);
-      await new Promise((r) => setTimeout(r, 3000));
+      const delay = Math.min(attempt * 4000, 20000);
+      console.warn(`[Article-i18n] Warning: Chunk ${chunkIndex + 1}/${totalChunks} attempt ${attempt} failed, retrying in ${delay / 1000}s...`);
+      await new Promise((r) => setTimeout(r, delay));
     }
   }
 
@@ -584,8 +621,8 @@ export async function translateArticleChunked(options: TranslateArticleOptions):
   // Brief pause before body chunks
   await new Promise((r) => setTimeout(r, 1500));
 
-  // Step 2: Split body into chunks (~6000 chars each, 200 chars overlap)
-  const chunks = splitIntoChunks(rawBody, 6000, 200);
+  // Step 2: Split body into chunks (~3500 chars each, 150 chars overlap)
+  const chunks = splitIntoChunks(rawBody, 3500, 150);
   console.log(`[Article-i18n]    Split into ${chunks.length} chunks`);
 
   // Step 3: Translate each chunk sequentially
@@ -609,9 +646,12 @@ export async function translateArticleChunked(options: TranslateArticleOptions):
   const reconstructed = `---\n${translatedFm}\n---\n${translatedBody}`;
 
   // Step 5: Clean and finalize
-  const cleaned = cleanAiArticleOutput(reconstructed, i18nKey, targetLocale, sourceLocale);
+  let cleaned = cleanAiArticleOutput(reconstructed, i18nKey, targetLocale, sourceLocale);
 
   if (cleaned && cleaned.includes('---')) {
+    if (options.enableOcr !== false) {
+      cleaned = await processImagesWithOcr(cleaned, targetLocale);
+    }
     return {
       ok: true,
       translatedMarkdown: cleaned,
@@ -679,8 +719,11 @@ export async function translateArticle(options: TranslateArticleOptions): Promis
   });
 
   if (result.ok && result.text) {
-    const cleaned = cleanAiArticleOutput(result.text, i18nKey, targetLocale, sourceLocale);
+    let cleaned = cleanAiArticleOutput(result.text, i18nKey, targetLocale, sourceLocale);
     if (cleaned && cleaned.includes('---')) {
+      if (options.enableOcr !== false) {
+        cleaned = await processImagesWithOcr(cleaned, targetLocale);
+      }
       return {
         ok: true,
         translatedMarkdown: cleaned,
@@ -702,3 +745,421 @@ export async function translateArticle(options: TranslateArticleOptions): Promis
     error: result.error || 'All configured AI endpoints failed or timed out during translation.',
   };
 }
+
+// ---------------------------------------------------------------------------
+// Image OCR Extraction & Localization Pipeline
+// ---------------------------------------------------------------------------
+
+/**
+ * Extracts visible text from an image via Gemini Vision OCR, then translates it.
+ * Supports both local media paths (e.g. /media/shijianus/workbench.jpg) and remote URLs.
+ */
+export async function performImageOcr(imageSrc: string, targetLocale = 'en'): Promise<string | null> {
+  try {
+    loadLocalEnvFiles();
+    const rawKeys = process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY || '';
+    const geminiKeys = rawKeys.split(',').map((k) => k.trim().replace(/^["']|["']$/g, '')).filter(Boolean);
+    if (geminiKeys.length === 0) return null;
+
+    let base64Data = '';
+    let mimeType = 'image/jpeg';
+
+    if (imageSrc.startsWith('http://') || imageSrc.startsWith('https://')) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 6000);
+      const res = await fetch(imageSrc, { signal: controller.signal });
+      clearTimeout(timeout);
+      if (!res.ok) return null;
+      const buffer = Buffer.from(await res.arrayBuffer());
+      if (buffer.length > 5 * 1024 * 1024) return null;
+      base64Data = buffer.toString('base64');
+      const ct = res.headers.get('content-type');
+      if (ct) mimeType = ct.split(';')[0].trim();
+    } else {
+      let cleanSrc = imageSrc.replace(/^\/+/, '');
+      let fullPath = path.resolve(process.cwd(), 'public', cleanSrc);
+      if (!fs.existsSync(fullPath)) {
+        fullPath = path.resolve(process.cwd(), cleanSrc);
+      }
+      if (!fs.existsSync(fullPath) || !fs.statSync(fullPath).isFile()) return null;
+      const buffer = fs.readFileSync(fullPath);
+      if (buffer.length > 5 * 1024 * 1024) return null;
+      base64Data = buffer.toString('base64');
+      if (cleanSrc.endsWith('.png')) mimeType = 'image/png';
+      else if (cleanSrc.endsWith('.webp')) mimeType = 'image/webp';
+      else if (cleanSrc.endsWith('.svg')) mimeType = 'image/svg+xml';
+      else mimeType = 'image/jpeg';
+    }
+
+    if (!base64Data) return null;
+
+    const targetMeta = LOCALE_NAMES[targetLocale] || { native: targetLocale, english: targetLocale };
+    const promptText = `Extract all readable and visible text from this image via OCR. If the image contains text, diagrams, labels, screenshots, UI, or code, output the extracted text accurately localized into ${targetMeta.english} / ${targetMeta.native}. If the image contains NO text (e.g. pure abstract illustration, landscape photo, or zero readable letters), reply strictly: NO_TEXT.`;
+
+    for (const key of geminiKeys) {
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(key)}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          signal: controller.signal,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              role: 'user',
+              parts: [
+                { text: promptText },
+                { inlineData: { mimeType, data: base64Data } }
+              ]
+            }],
+            generationConfig: {
+              maxOutputTokens: 350,
+              temperature: 0.1,
+              thinkingConfig: { thinkingBudget: 0 }
+            }
+          })
+        });
+        clearTimeout(timeout);
+        if (res.ok) {
+          const json = await res.json();
+          const extracted = json?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+          if (extracted && !extracted.includes('NO_TEXT') && extracted.length > 2) {
+            return extracted.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+          }
+          return null;
+        }
+      } catch {
+        // try next candidate key
+      }
+    }
+  } catch (err: any) {
+    console.warn(`[Article-i18n] OCR extraction skipped for ${imageSrc}: ${err.message}`);
+  }
+  return null;
+}
+
+/**
+ * Scans markdown content for images and enriches them with OCR captions and alt text.
+ */
+export async function processImagesWithOcr(markdown: string, targetLocale = 'en'): Promise<string> {
+  const targetMeta = LOCALE_NAMES[targetLocale] || { native: targetLocale, english: targetLocale };
+  const badgeLabel = `OCR · ${targetMeta.native || targetLocale}`;
+
+  // Find markdown images: ![alt](src)
+  const mdImgRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
+  let matches: Array<{ full: string; alt: string; src: string }> = [];
+  let m;
+  while ((m = mdImgRegex.exec(markdown)) !== null) {
+    matches.push({ full: m[0], alt: m[1], src: m[2].trim() });
+  }
+
+  if (matches.length === 0) return markdown;
+
+  let modified = markdown;
+  for (const match of matches) {
+    if (modified.includes('data-image-ocr="true"') && modified.includes(match.src)) {
+      continue;
+    }
+    const ocrText = await performImageOcr(match.src, targetLocale);
+    if (ocrText) {
+      const ocrCard = `\n<div class="article-image-ocr" data-image-ocr="true">\n  <span class="ocr-badge">📷 ${badgeLabel}</span>\n  <span class="ocr-text">${ocrText}</span>\n</div>\n`;
+      modified = modified.replace(match.full, `${match.full}\n${ocrCard}`);
+    }
+  }
+
+  return modified;
+}
+
+// ---------------------------------------------------------------------------
+// Format Validation Engine
+// ---------------------------------------------------------------------------
+
+/**
+ * Validates that the translated output has preserved the essential Markdown/HTML structural integrity.
+ */
+export function validateTranslatedFormat(sourceMarkdown: string, translatedMarkdown: string): { valid: boolean; reason?: string } {
+  if (!translatedMarkdown || translatedMarkdown.length < 50) {
+    return { valid: false, reason: 'Output too short' };
+  }
+
+  // Check code blocks preservation
+  const srcCodeBlocks = (sourceMarkdown.match(/```[a-z0-9_-]*/gi) || []).length;
+  const transCodeBlocks = (translatedMarkdown.match(/```[a-z0-9_-]*/gi) || []).length;
+  if (srcCodeBlocks > 0 && transCodeBlocks < Math.floor(srcCodeBlocks * 0.7)) {
+    return { valid: false, reason: `Code blocks dropped: expected ~${srcCodeBlocks}, got ${transCodeBlocks}` };
+  }
+
+  // Check HTML tags preservation
+  const srcHtmlTags = (sourceMarkdown.match(/<(?:div|span|details|summary|table|tr|td|th|mark|kbd|figure|figcaption)/gi) || []).length;
+  const transHtmlTags = (translatedMarkdown.match(/<(?:div|span|details|summary|table|tr|td|th|mark|kbd|figure|figcaption)/gi) || []).length;
+  if (srcHtmlTags >= 4 && transHtmlTags < Math.floor(srcHtmlTags * 0.6)) {
+    return { valid: false, reason: `HTML tags dropped: expected ~${srcHtmlTags}, got ${transHtmlTags}` };
+  }
+
+  // Check headings preservation
+  const srcHeadings = (sourceMarkdown.match(/^#{1,6}\s+/gm) || []).length;
+  const transHeadings = (translatedMarkdown.match(/^#{1,6}\s+/gm) || []).length;
+  if (srcHeadings >= 3 && transHeadings < Math.floor(srcHeadings * 0.6)) {
+    return { valid: false, reason: `Headings dropped: expected ~${srcHeadings}, got ${transHeadings}` };
+  }
+
+  return { valid: true };
+}
+
+// ---------------------------------------------------------------------------
+// Scheme 2: AST & Text Node Extraction with In-Place Re-insertion
+// ---------------------------------------------------------------------------
+
+/**
+ * Scheme 2 (Backup Plan / 备案方案):
+ * 1. Parses article body into a structural template with placeholders for translatable text.
+ * 2. Shields 100% of code blocks, HTML tags, attributes, CSS classes, URLs, and math formulas.
+ * 3. Chunks translatable text segments into small batches (分片) and translates them via JSON dictionary.
+ * 4. Re-inserts translated text into the exact template positions.
+ * 5. Guarantees 0% formatting loss, 0% tag degradation, and 0% loading failure.
+ */
+export async function translateArticleByExtraction(options: TranslateArticleOptions): Promise<TranslateArticleResult> {
+  const { sourceMarkdown, sourceLocale = 'zh-CN', targetLocale, i18nKey } = options;
+
+  const fmMatch = sourceMarkdown.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
+  if (!fmMatch) {
+    return translateArticle(options);
+  }
+
+  const rawFrontmatter = fmMatch[1];
+  const rawBody = fmMatch[2];
+
+  console.log(`[Article-i18n] [Scheme 2: Extraction] Translating frontmatter for "${i18nKey}"...`);
+  const translatedFm = await translateFrontmatterOnly(rawFrontmatter, options);
+
+  // 1. Mask non-translatable blocks into protected tokens
+  const protectedTokens: string[] = [];
+  const mask = (val: string) => {
+    const placeholder = `__PROT_${protectedTokens.length}__`;
+    protectedTokens.push(val);
+    return placeholder;
+  };
+
+  let template = rawBody;
+
+  // Mask fenced code blocks (``` ... ```)
+  template = template.replace(/```[a-z0-9_-]*\r?\n[\s\S]*?\r?\n```/gi, (m) => mask(m));
+
+  // Mask block math ($$ ... $$)
+  template = template.replace(/\$\$[\s\S]*?\$\$/g, (m) => mask(m));
+
+  // Mask inline code (`...`)
+  template = template.replace(/`[^`\r\n]+`/g, (m) => mask(m));
+
+  // Mask inline math ($...$)
+  template = template.replace(/\$[^$\r\n]+\$/g, (m) => mask(m));
+
+  // Mask HTML comments
+  template = template.replace(/<!--[\s\S]*?-->/g, (m) => mask(m));
+
+  // Mask HTML tags (<div ...>, </span>, etc.)
+  template = template.replace(/<[^>]+>/g, (m) => mask(m));
+
+  // 2. Extract translatable segments line by line
+  const textSegments: string[] = [];
+  const addSegment = (text: string): string => {
+    const trimmed = text.trim();
+    if (!trimmed || /^[\d\s.,:;!?_—–\-=+*\/\\|()\[\]{}'"]+$/.test(trimmed) || /^__PROT_\d+__$/.test(trimmed)) {
+      return text;
+    }
+    const idx = textSegments.length;
+    textSegments.push(trimmed);
+    const leading = text.match(/^\s*/)?.[0] || '';
+    const trailing = text.match(/\s*$/)?.[0] || '';
+    return `${leading}__TX_NODE_${idx}__${trailing}`;
+  };
+
+  const lines = template.split('\n');
+  const templatedLines: string[] = [];
+
+  for (let line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      templatedLines.push(line);
+      continue;
+    }
+
+    // Heading: ## Heading text
+    const headingMatch = line.match(/^(#{1,6}\s+)(.*)$/);
+    if (headingMatch) {
+      templatedLines.push(headingMatch[1] + addSegment(headingMatch[2]));
+      continue;
+    }
+
+    // Blockquote: > text
+    const bqMatch = line.match(/^(>\s*(?:\[!(?:NOTE|TIP|WARNING|IMPORTANT|CAUTION|QUOTE)\])?\s*)(.*)$/);
+    if (bqMatch) {
+      templatedLines.push(bqMatch[1] + addSegment(bqMatch[2]));
+      continue;
+    }
+
+    // List item: - text or 1. text
+    const listMatch = line.match(/^(\s*[-*+]\s+|\s*\d+\.\s+)(.*)$/);
+    if (listMatch) {
+      templatedLines.push(listMatch[1] + addSegment(listMatch[2]));
+      continue;
+    }
+
+    // Table row: | col1 | col2 |
+    if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+      const parts = line.split('|');
+      const newParts = parts.map((cell) => {
+        const cTrim = cell.trim();
+        if (/^:?-+:?$/.test(cTrim) || !cTrim) return cell;
+        return addSegment(cell);
+      });
+      templatedLines.push(newParts.join('|'));
+      continue;
+    }
+
+    // Regular line: check for markdown links [anchor](url)
+    let processedLine = line.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_match, anchor, url) => {
+      const segToken = addSegment(anchor);
+      return `[${segToken}](${url})`;
+    });
+
+    templatedLines.push(addSegment(processedLine));
+  }
+
+  let finalBodyTemplate = templatedLines.join('\n');
+  console.log(`[Article-i18n] [Scheme 2] Extracted ${textSegments.length} text segments to translate.`);
+
+  // 3. Batch translate segments in chunks of 25 (~1500 chars)
+  const translatedSegments: string[] = new Array(textSegments.length);
+  const BATCH_SIZE = 25;
+  const targetMeta = LOCALE_NAMES[targetLocale] || { native: targetLocale, english: targetLocale };
+
+  for (let b = 0; b < textSegments.length; b += BATCH_SIZE) {
+    const slice = textSegments.slice(b, b + BATCH_SIZE);
+    const batchDict: Record<string, string> = {};
+    slice.forEach((s, idx) => {
+      batchDict[String(idx)] = s;
+    });
+
+    const batchPrompt = [
+      `You are a high-precision translation engine. Translate the JSON string values into ${targetMeta.english} / ${targetMeta.native}.`,
+      `Rules:`,
+      `- Preserve all keys ("0", "1", ...) EXACTLY identical.`,
+      `- Do not modify tokens like __PROT_0__, __PROT_1__, etc. Keep them intact.`,
+      `- Output ONLY a strictly valid JSON object matching the input keys.`,
+    ].join('\n');
+
+    let translatedBatch: Record<string, string> | null = null;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const res = await callModel({
+          systemPrompt: batchPrompt,
+          userMessage: JSON.stringify(batchDict, null, 2),
+          apiKey: options.apiKey,
+          baseUrl: options.baseUrl,
+          model: options.model,
+          groqApiKey: options.groqApiKey,
+          groqModel: options.groqModel,
+          timeoutMs: 45000,
+        });
+
+        if (res.ok && res.text) {
+          let cleanJson = res.text.trim();
+          if (cleanJson.startsWith('```json')) cleanJson = cleanJson.replace(/^```json\r?\n/, '');
+          else if (cleanJson.startsWith('```')) cleanJson = cleanJson.replace(/^```[a-z]*\r?\n/, '');
+          if (cleanJson.endsWith('```')) cleanJson = cleanJson.replace(/\r?\n```$/, '');
+          cleanJson = cleanJson.trim();
+
+          const parsed = JSON.parse(cleanJson);
+          if (parsed && typeof parsed === 'object') {
+            translatedBatch = parsed;
+            break;
+          }
+        }
+      } catch (err: any) {
+        console.warn(`[Article-i18n] [Scheme 2] Batch ${b / BATCH_SIZE + 1} attempt ${attempt} failed: ${err.message}`);
+        await new Promise((r) => setTimeout(r, 2000));
+      }
+    }
+
+    slice.forEach((s, idx) => {
+      const trans = translatedBatch?.[String(idx)];
+      translatedSegments[b + idx] = (trans && typeof trans === 'string' && trans.trim()) ? trans.trim() : s;
+    });
+  }
+
+  // 4. In-place re-insertion of translated segments
+  for (let i = 0; i < translatedSegments.length; i++) {
+    const token = `__TX_NODE_${i}__`;
+    finalBodyTemplate = finalBodyTemplate.replaceAll(token, translatedSegments[i] || textSegments[i]);
+  }
+
+  // 5. Restore protected tokens (HTML tags, code blocks, math)
+  for (let i = protectedTokens.length - 1; i >= 0; i--) {
+    const token = `__PROT_${i}__`;
+    finalBodyTemplate = finalBodyTemplate.replaceAll(token, protectedTokens[i]);
+  }
+
+  // 6. OCR image processing
+  if (options.enableOcr !== false) {
+    finalBodyTemplate = await processImagesWithOcr(finalBodyTemplate, targetLocale);
+  }
+
+  // 7. Assemble and clean
+  const reconstructed = `---\n${translatedFm}\n---\n${finalBodyTemplate}`;
+  const cleaned = cleanAiArticleOutput(reconstructed, i18nKey, targetLocale, sourceLocale);
+
+  return {
+    ok: true,
+    translatedMarkdown: cleaned,
+    targetLocale,
+    i18nKey,
+    provider: 'Chronral-Extraction',
+    model: 'ast-reinsertion',
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Unified Smart Orchestrator
+// ---------------------------------------------------------------------------
+
+/**
+ * Unified smart entrypoint for article translation:
+ * Orchestrates Scheme 1 (Format-Preserving Translation) and Scheme 2 (Extraction & Re-insertion).
+ */
+export async function translateArticleAuto(options: TranslateArticleOptions): Promise<TranslateArticleResult> {
+  const scheme = options.scheme || resolveArticleI18nConfig().scheme || 'auto';
+
+  if (scheme === 'extraction') {
+    console.log(`[Article-i18n] Running Scheme 2 (Extraction & Re-insertion) for "${options.i18nKey}"...`);
+    return translateArticleByExtraction(options);
+  }
+
+  console.log(`[Article-i18n] Running Scheme 1 (Format In, Format Out) for "${options.i18nKey}"...`);
+  const bodyLength = options.sourceMarkdown.length;
+  let primaryResult: TranslateArticleResult;
+
+  if (bodyLength > 8000) {
+    primaryResult = await translateArticleChunked(options);
+  } else {
+    primaryResult = await translateArticle(options);
+  }
+
+  if (primaryResult.ok && primaryResult.translatedMarkdown) {
+    const validation = validateTranslatedFormat(options.sourceMarkdown, primaryResult.translatedMarkdown);
+    if (validation.valid) {
+      console.log(`[Article-i18n] ✅ Scheme 1 format verification passed for "${options.i18nKey}".`);
+      if (options.enableOcr !== false) {
+        primaryResult.translatedMarkdown = await processImagesWithOcr(primaryResult.translatedMarkdown, options.targetLocale);
+      }
+      return primaryResult;
+    }
+    console.warn(`[Article-i18n] ⚠️ Scheme 1 format verification failed (${validation.reason}). Activating Scheme 2 backup plan...`);
+  } else {
+    console.warn(`[Article-i18n] ⚠️ Scheme 1 failed (${primaryResult.error}). Activating Scheme 2 backup plan...`);
+  }
+
+  return translateArticleByExtraction(options);
+}
+

@@ -63,10 +63,12 @@ The article starts with YAML Frontmatter delimited by `---`. You MUST preserve t
 - For internal relative URLs to other posts, keep the path structure (e.g. `/posts/some-slug/`) intact.
 - For images `![alt text](url)` — translate the `alt text` into ${TARGET_LOCALE_NAME}, keep the URL unchanged.
 
-#### 2.7 HTML & Custom Elements
-- Preserve all embedded HTML elements (`<details>`, `<summary>`, `<div>`, `<pre>`, `<span>`, `<kbd>`, `<mark>`, `<abbr>`, `<br>`, `<hr>`) and their CSS class names, `id` attributes, and data attributes unmodified.
-- Translate only the inner **textual content** within these HTML elements.
-- Do NOT modify any CSS class names, data-attributes, or IDs.
+#### 2.7 HTML & Custom Elements & Rich Component Integrity
+- **CRITICAL FORMAT RETENTION**: Preserve all embedded HTML elements (`<details>`, `<summary>`, `<div>`, `<pre>`, `<span>`, `<kbd>`, `<mark>`, `<abbr>`, `<br>`, `<hr>`, `<input>`, `<label>`, `<svg>`, `<path>`, `<figure>`, `<figcaption>`) and their CSS class names, `id` attributes, and data attributes 100% UNMODIFIED.
+- Translate only the inner human-readable **textual content** within these HTML elements.
+- Do NOT delete, omit, or strip any HTML tags.
+- Do NOT convert structured components (such as `.article-task-tracker`, `.task-checklist`, `.article-dropdown-switcher`, `.article-tabs`, `.badge`, `.status-card`, `.article-image-ocr`) into plain unformatted paragraphs.
+- Do NOT inject `<font color="black">` or any inline dark styles that would break in dark mode. Text must adapt smoothly to dark mode without hardcoded black font colors.
 
 #### 2.8 Lists
 - Translate every list item faithfully and naturally.

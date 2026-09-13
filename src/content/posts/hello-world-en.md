@@ -12,7 +12,6 @@ sticky: 3
 tags: ["Astro", "Tailwind", "Theme Refactor"]
 i18nKey: "hello-world"
 lang: "en"
-isAiGenerated: true
 aiTranslatedFrom: "zh-CN"
 ---
 

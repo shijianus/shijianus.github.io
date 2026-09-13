@@ -17,7 +17,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import yaml from 'js-yaml';
-import { translateArticle, translateArticleChunked, resolveArticleI18nConfig } from '../src/lib/server-article-i18n.ts';
+import {
+  translateArticle,
+  translateArticleChunked,
+  translateArticleByExtraction,
+  translateArticleAuto,
+  resolveArticleI18nConfig,
+} from '../src/lib/server-article-i18n.ts';
 
 const POSTS_DIR = path.resolve(process.cwd(), 'src/content/posts');
 const GENERATED_DIR = path.resolve(process.cwd(), 'src/.generated');
@@ -171,29 +177,27 @@ async function main() {
           skippedCount++;
           continue;
         } else {
-          // AI-generated translation exists: only re-generate if source article is newer
-          if (existingTranslation.mtime >= sourceArticle.mtime) {
+          // AI-generated translation exists: only re-generate if source article is newer or translation is undersized (truncated)
+          const isUndersized = sourceArticle.raw.length > 10000 && existingTranslation.raw.length < sourceArticle.raw.length * 0.4;
+          if (existingTranslation.mtime >= sourceArticle.mtime && !isUndersized) {
             skippedCount++;
             continue;
           }
-          console.log(`[Article-i18n] Source article "${key}" updated. Refreshing AI translation for ${targetLang}...`);
+          if (isUndersized) {
+            console.log(`[Article-i18n] Translation "${existingTranslation.filename}" is undersized (${existingTranslation.raw.length} vs source ${sourceArticle.raw.length} bytes). Regenerating full translation for ${targetLang}...`);
+          } else {
+            console.log(`[Article-i18n] Source article "${key}" updated. Refreshing AI translation for ${targetLang}...`);
+          }
         }
       }
 
       // Determine body size to pick translation strategy
       const bodyLength = sourceArticle.body ? sourceArticle.body.length : sourceArticle.raw.length;
-      const useChunked = bodyLength > 8000;
 
       console.log(`[Article-i18n] Generating ${targetLang} translation for "${key}" (Title: ${sourceArticle.title})...`);
-      if (useChunked) {
-        console.log(`[Article-i18n]    Body is ${bodyLength} chars - using chunked pipeline`);
-      } else {
-        console.log(`[Article-i18n]    Body is ${bodyLength} chars - using single-request translation`);
-      }
+      console.log(`[Article-i18n]    Body is ${bodyLength} chars - using smart dual-scheme orchestrator (scheme: ${config.scheme || 'auto'}, OCR: ${config.enableOcr ? 'on' : 'off'})`);
 
-      const translateFn = useChunked ? translateArticleChunked : translateArticle;
-
-      const result = await translateFn({
+      const result = await translateArticleAuto({
         sourceMarkdown: sourceArticle.raw,
         sourceLocale: sourceArticle.lang,
         targetLocale: targetLang,
@@ -204,6 +208,8 @@ async function main() {
         model: config.model,
         groqApiKey: config.groqApiKey,
         groqModel: config.groqModel,
+        scheme: config.scheme,
+        enableOcr: config.enableOcr,
       });
 
       if (result.ok && result.translatedMarkdown) {
