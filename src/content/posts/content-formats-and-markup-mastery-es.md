@@ -1,11 +1,11 @@
 ---
-title: "静态站点生成器（SSG）与博客主题内容格式全景指南：从主流支持到特异功能、下拉框交互与排版美化"
+title: "Guía panorámica de generadores de sitios estáticos (SSG) y formatos de contenido de temas: del soporte estándar a funciones avanzadas, menús desplegables y tipografía pulida"
 pubDate: 2026-08-28
 updatedDate: 2026-08-28
-description: "全面系统梳理 Hugo、Jekyll、Eleventy、Astro、Hexo、WordPress 等主流静态站点与博客系统的内容格式支持清单。从 Markdown、MDX、HTML、AsciiDoc、Org-mode、RST 到全量实装的 WordPress Post Formats、交互式下拉框切换器、手风琴折叠、KaTeX 数学公式、Mermaid 图表与密码加密特异功能。"
+description: "Una visión sistemática del soporte de formatos de contenido en los principales sistemas de blogs y sitios estáticos como Hugo, Jekyll, Eleventy, Astro, Hexo y WordPress. Desde Markdown, MDX, HTML, AsciiDoc, Org-mode, RST hasta formatos de publicación WordPress, selectores desplegables interactivos, acordeones, fórmulas matemáticas KaTeX, diagramas Mermaid y cifrado por contraseña."
 author: "shijianus"
-category: "系统设计"
-group: "技术规范"
+category: "Diseño de sistemas"
+group: "Especificaciones técnicas"
 featured: true
 sticky: 10
 postFormat: "standard"

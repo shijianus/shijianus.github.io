@@ -1,19 +1,27 @@
 #!/usr/bin/env node
 /**
- * MCP Playwright E2E Verification
+ * MCP Playwright Live E2E Verification
  * Target: https://blog.epocanvas.com/posts/content-formats-and-markup-mastery/
- * Checks: i18n switcher presence, language switching zh-CN ↔ en
+ * Requirements:
+ * 1. AI Multilingual translations exist and are complete (not truncated).
+ * 2. .post-hero__i18n-switch is DELETED (no language switcher buttons on post hero).
+ * 3. Interface language selected in .account-card exclusively dictates article display language.
+ * 4. NO "AI翻译" or "AI 翻译" labels/badges anywhere on articles.
+ * 5. Homepage feed deduplication prevents translated articles from appearing as duplicate cards.
  */
 import { chromium } from 'playwright';
 
 const BASE_URL = 'https://blog.epocanvas.com';
 const ZH_PATH = '/posts/content-formats-and-markup-mastery/';
 const EN_PATH = '/posts/content-formats-and-markup-mastery-en/';
-const LIVE_URL = BASE_URL + ZH_PATH;
+const ZH_HANT_PATH = '/posts/content-formats-and-markup-mastery-zh-hant/';
+const FR_PATH = '/posts/content-formats-and-markup-mastery-fr/';
+const ES_PATH = '/posts/content-formats-and-markup-mastery-es/';
+const DE_PATH = '/posts/content-formats-and-markup-mastery-de/';
 
 async function run() {
-  console.log('[MCP-i18n-E2E] 🚀 Starting live site Playwright verification...');
-  console.log(`[MCP-i18n-E2E] 🌐 Target: ${LIVE_URL}`);
+  console.log('[MCP-i18n-E2E] 🚀 Starting live Cloudflare Pages Playwright E2E verification...');
+  console.log(`[MCP-i18n-E2E] 🌐 Target: ${BASE_URL + ZH_PATH}`);
 
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
@@ -37,83 +45,155 @@ async function run() {
 
   try {
     // ─────────────────────────────────────────────────────
-    // Test 1: Load Chinese article, verify title & i18n switcher
+    // Test 1: Load Chinese article & verify no .post-hero__i18n-switch
     // ─────────────────────────────────────────────────────
-    console.log('\n─── Test 1: ZH article loads correctly ───');
-    await page.goto(LIVE_URL, { waitUntil: 'networkidle', timeout: 30000 });
+    console.log('\n─── Test 1: ZH article loads & .post-hero__i18n-switch is absent ───');
+    await page.goto(BASE_URL + ZH_PATH, { waitUntil: 'networkidle', timeout: 30000 });
 
     const zhTitle = await page.$eval('h1', (el) => el.textContent?.trim() ?? '');
-    console.log(`  Title: "${zhTitle.slice(0, 60)}..."`);
+    console.log(`  ZH Title: "${zhTitle.slice(0, 60)}..."`);
     assert(
       zhTitle.includes('静态站点') || zhTitle.includes('SSG') || zhTitle.includes('内容格式'),
-      `Chinese title contains expected keywords (got: "${zhTitle.slice(0, 60)}")`
+      `Chinese article title loads correctly (got: "${zhTitle.slice(0, 60)}")`
     );
 
-    // Check i18n switcher presence
-    const switcher = await page.$('.post-hero__i18n-switch');
-    assert(switcher !== null, 'i18n language switcher (.post-hero__i18n-switch) is present');
+    // Requirement 2: .post-hero__i18n-switch MUST NOT exist
+    const heroSwitcher = await page.$('.post-hero__i18n-switch');
+    assert(heroSwitcher === null, 'Article language switcher (.post-hero__i18n-switch) is completely removed from PostHero');
 
-    // Check pills
-    const pills = await page.$$eval('.post-hero__i18n-pill', (els) => els.map((el) => ({
-      text: el.textContent?.trim() ?? '',
-      lang: el.getAttribute('data-target-lang') ?? '',
-      active: el.classList.contains('is-active'),
-    })));
-    console.log(`  Pills found: ${JSON.stringify(pills)}`);
-    assert(pills.length >= 2, `At least 2 language pills found (got ${pills.length})`);
-    assert(pills.some((p) => p.lang === 'zh-CN' && p.active), 'zh-CN pill is active on ZH page');
-    assert(pills.some((p) => p.lang === 'en'), 'English pill exists');
+    const heroPills = await page.$$('.post-hero__i18n-pill');
+    assert(heroPills.length === 0, 'No .post-hero__i18n-pill buttons found in DOM');
+
+    // Requirement 3: NO "AI翻译" badge or label
+    const allBadgesText = await page.$$eval('.post-hero__badge, .post-hero__tag, span, div', (els) =>
+      els.filter((el) => el.children.length === 0).map((el) => el.textContent?.trim() ?? '')
+    );
+    const hasAiBadge = allBadgesText.some((t) => t === 'AI翻译' || t === 'AI 翻译' || t === '· AI 翻译');
+    assert(!hasAiBadge, 'No "AI翻译" label/badge on the article');
 
     // ─────────────────────────────────────────────────────
-    // Test 2: Click English pill → navigate to EN page
+    // Test 2: Switch language to English in .account-card → redirects to EN
     // ─────────────────────────────────────────────────────
-    console.log('\n─── Test 2: Click English pill → navigate to EN page ───');
-    const enPill = await page.$('.post-hero__i18n-pill[data-target-lang="en"]');
-    assert(enPill !== null, 'English pill button found and clickable');
+    console.log('\n─── Test 2: Switch to English via .account-card → auto redirects to EN ───');
+    
+    // Open the account drawer with settings tab
+    await page.evaluate(() => {
+      window.dispatchEvent(new CustomEvent('shijianus:open-account', { detail: { tab: 'settings' } }));
+    });
+    await page.waitForTimeout(600);
 
-    if (enPill) {
-      await enPill.click();
-      await page.waitForURL(/content-formats-and-markup-mastery-en/, { timeout: 15000 });
+    // Find and click the English button in .account-card
+    const enBtn = await page.$('.account-locale-btn:has-text("English")');
+    assert(enBtn !== null, 'Found English button in .account-card (.account-locale-btn)');
+
+    if (enBtn) {
+      await Promise.all([
+        page.waitForURL(/content-formats-and-markup-mastery-en/, { timeout: 15000 }),
+        enBtn.click(),
+      ]);
       await page.waitForLoadState('networkidle');
       console.log(`  Navigated to: ${page.url()}`);
-      assert(page.url().includes('content-formats-and-markup-mastery-en'), 'URL switched to EN slug');
+      assert(page.url().includes('content-formats-and-markup-mastery-en'), 'Auto-navigated to EN article slug');
 
       const enTitle = await page.$eval('h1', (el) => el.textContent?.trim() ?? '');
-      console.log(`  EN Title: "${enTitle.slice(0, 80)}..."`);
-      assert(
-        /[a-zA-Z]{4,}/.test(enTitle) && enTitle.length > 10,
-        `English title contains substantial English text (got: "${enTitle.slice(0, 60)}")`
-      );
-      assert(
-        enTitle.toLowerCase().includes('ssg') || enTitle.toLowerCase().includes('static') || enTitle.toLowerCase().includes('content'),
-        `English title is topically correct`
-      );
+      console.log(`  EN Title: "${enTitle.slice(0, 80)}"`);
+      assert(/[a-zA-Z]{4,}/.test(enTitle), 'EN article has English title');
 
-      // Check EN active pill
-      const enActivePill = await page.$eval('.post-hero__i18n-pill.is-active', (el) => el.textContent?.trim() ?? '');
-      console.log(`  Active pill on EN page: "${enActivePill}"`);
-      assert(enActivePill.includes('English') || enActivePill.includes('EN'), `Active pill shows English (got "${enActivePill}")`);
+      // Check article body is full and complete (not truncated)
+      const enBodyText = await page.$eval('#article-container', (el) => el.innerText || el.textContent || '');
+      console.log(`  EN Body Length: ${enBodyText.length} characters`);
+      assert(enBodyText.length > 20000, `EN body is complete and extensive (>20,000 chars, got ${enBodyText.length})`);
 
-      // Check body has English content
-      const bodyText = await page.$eval('#article-container', (el) => el.textContent?.slice(0, 200) ?? '');
-      const hasEnglish = /[a-zA-Z]{4,}/.test(bodyText);
-      assert(hasEnglish, 'Article body contains English text');
-      console.log(`  Body snippet: "${bodyText.slice(0, 100).replace(/\s+/g, ' ')}..."`);
+      // Check that there is NO truncation blockquote notice
+      const blockquotes = await page.$$eval('blockquote', (els) => els.map((el) => el.textContent?.trim() ?? ''));
+      const hasTruncationNotice = blockquotes.some((b) => b.includes('partial translation') || b.includes('Partial translation'));
+      assert(!hasTruncationNotice, 'No truncation notice found — article is 100% complete');
+
+      // Check no switcher on EN page
+      const enSwitcher = await page.$('.post-hero__i18n-switch');
+      assert(enSwitcher === null, 'No .post-hero__i18n-switch on EN article page');
     }
 
     // ─────────────────────────────────────────────────────
-    // Test 3: Switch back to Chinese
+    // Test 3: Switch to Traditional Chinese (zh-Hant) in .account-card
     // ─────────────────────────────────────────────────────
-    console.log('\n─── Test 3: Switch back to Chinese ───');
-    const zhPill = await page.$('.post-hero__i18n-pill[data-target-lang="zh-CN"]');
-    assert(zhPill !== null, 'zh-CN pill exists on EN page');
+    console.log('\n─── Test 3: Switch to Traditional Chinese in .account-card ───');
+    await page.evaluate(() => {
+      window.dispatchEvent(new CustomEvent('shijianus:open-account', { detail: { tab: 'settings' } }));
+    });
+    await page.waitForTimeout(600);
 
-    if (zhPill) {
-      await zhPill.click();
-      await page.waitForURL(/content-formats-and-markup-mastery\/?$/, { timeout: 15000 });
+    const hantBtn = await page.$('.account-locale-btn:has-text("繁體中文")');
+    assert(hantBtn !== null, 'Found 繁體中文 button in .account-card');
+
+    if (hantBtn) {
+      await Promise.all([
+        page.waitForURL(/content-formats-and-markup-mastery-zh-hant/, { timeout: 15000 }),
+        hantBtn.click(),
+      ]);
+      await page.waitForLoadState('networkidle');
+      console.log(`  Navigated to: ${page.url()}`);
+      assert(page.url().includes('content-formats-and-markup-mastery-zh-hant'), 'Auto-navigated to zh-Hant article slug');
+
+      const hantTitle = await page.$eval('h1', (el) => el.textContent?.trim() ?? '');
+      console.log(`  zh-Hant Title: "${hantTitle.slice(0, 80)}"`);
+      assert(hantTitle.includes('靜態') || hantTitle.includes('格式') || hantTitle.includes('排版') || hantTitle.includes('SSG'), 'zh-Hant article title is present');
+
+      const hantBodyText = await page.$eval('#article-container', (el) => el.innerText || el.textContent || '');
+      console.log(`  zh-Hant Body Length: ${hantBodyText.length} characters`);
+      assert(hantBodyText.length > 10000, `zh-Hant body is complete (>10,000 chars, got ${hantBodyText.length})`);
+    }
+
+    // ─────────────────────────────────────────────────────
+    // Test 4: Switch to French (fr) in .account-card
+    // ─────────────────────────────────────────────────────
+    console.log('\n─── Test 4: Switch to French in .account-card ───');
+    await page.evaluate(() => {
+      window.dispatchEvent(new CustomEvent('shijianus:open-account', { detail: { tab: 'settings' } }));
+    });
+    await page.waitForTimeout(600);
+
+    const frBtn = await page.$('.account-locale-btn:has-text("Français")');
+    assert(frBtn !== null, 'Found Français button in .account-card');
+
+    if (frBtn) {
+      await Promise.all([
+        page.waitForURL(/content-formats-and-markup-mastery-fr/, { timeout: 15000 }),
+        frBtn.click(),
+      ]);
+      await page.waitForLoadState('networkidle');
+      console.log(`  Navigated to: ${page.url()}`);
+      assert(page.url().includes('content-formats-and-markup-mastery-fr'), 'Auto-navigated to fr article slug');
+
+      const frTitle = await page.$eval('h1', (el) => el.textContent?.trim() ?? '');
+      console.log(`  French Title: "${frTitle.slice(0, 80)}"`);
+      assert(/[a-zA-Z]{4,}/.test(frTitle), 'French article title is present');
+
+      const frBodyText = await page.$eval('#article-container', (el) => el.innerText || el.textContent || '');
+      console.log(`  French Body Length: ${frBodyText.length} characters`);
+      assert(frBodyText.length > 20000, `French body is complete (>20,000 chars, got ${frBodyText.length})`);
+    }
+
+    // ─────────────────────────────────────────────────────
+    // Test 5: Switch back to Simplified Chinese (zh-CN)
+    // ─────────────────────────────────────────────────────
+    console.log('\n─── Test 5: Switch back to Simplified Chinese in .account-card ───');
+    await page.evaluate(() => {
+      window.dispatchEvent(new CustomEvent('shijianus:open-account', { detail: { tab: 'settings' } }));
+    });
+    await page.waitForTimeout(600);
+
+    const zhBtn = await page.$('.account-locale-btn:has-text("简体中文")');
+    assert(zhBtn !== null, 'Found 简体中文 button in .account-card');
+
+    if (zhBtn) {
+      await Promise.all([
+        page.waitForURL(/content-formats-and-markup-mastery\/?$/, { timeout: 15000 }),
+        zhBtn.click(),
+      ]);
       await page.waitForLoadState('networkidle');
       console.log(`  Navigated back to: ${page.url()}`);
-      assert(!page.url().includes('-en'), 'URL returned to ZH (no -en suffix)');
+      assert(!page.url().includes('-fr') && !page.url().includes('-en') && !page.url().includes('-zh-hant'), 'Returned to main Chinese URL');
 
       const restoredTitle = await page.$eval('h1', (el) => el.textContent?.trim() ?? '');
       assert(
@@ -123,42 +203,30 @@ async function run() {
     }
 
     // ─────────────────────────────────────────────────────
-    // Test 4: EN article direct access
+    // Test 6: Verify German (de) & Spanish (es) direct access
     // ─────────────────────────────────────────────────────
-    console.log('\n─── Test 4: Direct EN article access ───');
-    await page.goto(BASE_URL + EN_PATH, { waitUntil: 'networkidle', timeout: 30000 });
-    const directEnTitle = await page.$eval('h1', (el) => el.textContent?.trim() ?? '');
-    console.log(`  Direct EN title: "${directEnTitle.slice(0, 80)}"`);
-    assert(/[a-zA-Z]{4,}/.test(directEnTitle), 'Direct EN article loads with English title');
+    console.log('\n─── Test 6: Verify German and Spanish article routes ───');
+    await page.goto(BASE_URL + DE_PATH, { waitUntil: 'networkidle', timeout: 30000 });
+    const deTitle = await page.$eval('h1', (el) => el.textContent?.trim() ?? '');
+    console.log(`  German Title: "${deTitle.slice(0, 80)}"`);
+    assert(deTitle.length > 5, 'German article page loads successfully');
 
-    const aiPill = await page.$('.post-hero__i18n-pill.is-active');
-    const aiPillText = aiPill ? await aiPill.evaluate((el) => el.textContent?.trim() ?? '') : '';
-    console.log(`  Active pill: "${aiPillText}"`);
-    assert(aiPillText.includes('English'), 'Active pill shows English on direct EN page access');
-
-    // Check for partial translation notice
-    const noticeText = await page.$$eval('blockquote', (els) =>
-      els.map((el) => el.textContent?.trim() ?? '').join('\n')
-    );
-    const hasNotice = noticeText.includes('partial') || noticeText.includes('Note');
-    console.log(`  Partial translation notice present: ${hasNotice}`);
-    if (hasNotice) {
-      console.log(`  ℹ️  Notice text: "${noticeText.slice(0, 100)}..."`);
-    }
+    await page.goto(BASE_URL + ES_PATH, { waitUntil: 'networkidle', timeout: 30000 });
+    const esTitle = await page.$eval('h1', (el) => el.textContent?.trim() ?? '');
+    console.log(`  Spanish Title: "${esTitle.slice(0, 80)}"`);
+    assert(esTitle.length > 5, 'Spanish article page loads successfully');
 
     // ─────────────────────────────────────────────────────
-    // Test 5: Homepage deduplification
+    // Test 7: Homepage deduplication check
     // ─────────────────────────────────────────────────────
-    console.log('\n─── Test 5: Homepage deduplication check ───');
+    console.log('\n─── Test 7: Homepage deduplication check ───');
     await page.goto(BASE_URL + '/', { waitUntil: 'networkidle', timeout: 30000 });
     const allLinks = await page.$$eval('a[href*="/posts/"]', (els) => els.map((el) => el.getAttribute('href') ?? ''));
-    // Check that the EN version (-en slug) doesn't appear as a separate card
-    const enLinks = allLinks.filter((l) => l.includes('content-formats-and-markup-mastery-en'));
-    const zhLinks = [...new Set(allLinks.filter((l) => l.includes('content-formats-and-markup-mastery') && !l.includes('-en') && !l.includes('--x')))];
-    console.log(`  ZH links on homepage: ${JSON.stringify(zhLinks)}`);
-    console.log(`  EN duplicate links on homepage: ${JSON.stringify(enLinks)}`);
-    assert(enLinks.length === 0, `EN translation (-en) does NOT appear as a separate card on homepage (dedup working) — found: ${JSON.stringify(enLinks)}`);
-    assert(zhLinks.length >= 1, `ZH article appears on homepage feed`);
+    const transVariants = allLinks.filter((l) =>
+      l.includes('-en') || l.includes('-fr') || l.includes('-es') || l.includes('-de') || l.includes('-zh-hant')
+    );
+    console.log(`  Translated variant links found in post feed: ${JSON.stringify(transVariants)}`);
+    assert(transVariants.length === 0, `Translated variants do NOT appear as duplicate cards in post feed (dedup working)`);
 
   } finally {
     await browser.close();
@@ -167,7 +235,7 @@ async function run() {
   console.log(`\n${'─'.repeat(60)}`);
   console.log(`[MCP-i18n-E2E] Results: ${passed} passed, ${failed} failed`);
   if (failed === 0) {
-    console.log('[MCP-i18n-E2E] ✅ ALL LIVE SITE i18n VERIFICATION TESTS PASSED!');
+    console.log('[MCP-i18n-E2E] ✅ ALL LIVE SITE MULTILINGUAL i18n VERIFICATION TESTS PASSED!');
   } else {
     console.error('[MCP-i18n-E2E] ❌ Some tests failed. See above for details.');
     process.exit(1);

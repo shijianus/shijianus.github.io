@@ -218,12 +218,12 @@ export interface ThemeConfig {
     // Navigate to /posts/hello-world/
     await page.goto(`${BASE_URL}/posts/hello-world/`, { waitUntil: 'networkidle' });
 
-    // Check .post-hero__i18n-switch presence
-    const i18nSwitch = await page.$('.post-hero__i18n-switch');
-    if (!i18nSwitch) {
-      throw new Error('Expected .post-hero__i18n-switch to exist in PostHero!');
+    // Check article container presence
+    const articleContainer = await page.$('#article-container');
+    if (!articleContainer) {
+      throw new Error('Expected #article-container to exist on article page!');
     }
-    console.log('  ✅ .post-hero__i18n-switch is present in PostHero.');
+    console.log('  ✅ #article-container is present on article page.');
 
     // Switch to dark mode
     await page.evaluate(() => {

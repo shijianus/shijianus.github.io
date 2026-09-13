@@ -1666,3 +1666,25 @@
   1. 本地 Playwright 6 项全景测试全部 100% 通过（包含原生英文文章、手动切回中文、无翻译中文文章就地切英文、英文作者自述、带翻译文章双向跳转、静态 HTML 完整性）；
   2. 部署至生产端（Cloudflare Pages：`https://blog.epocanvas.com`），真实生产环境端到端浏览器与 API 验证 100% PASS。
 
+### Task 77: 国际化翻译双方案落地 (常规输入输出保格式 + 备案Token抽词分片回填)、Gemini Vision 图像 OCR 与暗黑模式纯黑字体治理 (`5498103` / `4debb61`)
+- [x] **国际化翻译双方案落地 (Dual-Scheme Translation Engine - `src/lib/server-article-i18n.ts`)**：
+  1. **常规方案 (Scheme 1 - Format In, Format Out)**：基于完整 Markdown/HTML 提示词工程与上下文分片（4,000-6,000 字符动态切片），模型接收完整排版结构并直接输出保持完全一致结构与标签属性的翻译文本；
+  2. **备案方案 (Scheme 2 - AST/Text Node Extraction & In-Place Re-insertion - `translateArticleByExtraction`)**：基于结构性骨架解析与代码/标签屏蔽机制，将全部 HTML 标签（`<div class="...">`、`<svg>`、`<input>`、`<label>`、`<details>` 等）、数学公式（KaTeX `$..$` / `$$..$$`）、代码块（` ```...``` `）与特殊组件解析转换为只读占位符 `__PROT_i__`，抽离纯文本节点切片（`__TX_NODE_i__`），通过结构化 JSON 分批（25 项/批）精确翻译，随后严格按原序原位插回插槽，100% 保障任何复杂排版、样式名、属性及 DOM 结构 0 丢失、0 篡改；
+  3. **双方案智能编排器 (`translateArticleAuto`)**：优先尝试常规方案 Scheme 1，通过 `validateTranslatedFormat` 校验引擎自动对比源文与译文中的 HTML 标签数、标题层级、代码块、表格结构；一旦检测到格式退化或丢失，自动平滑降级至备案方案 Scheme 2 兜底重建，确保 0 失败率。
+- [x] **Gemini Vision 图像 OCR 识别与多语种图文转译 (`performImageOcr` & `processImagesWithOcr`)**：
+  1. 针对博文中的静态配图（`![]()` 与 `<img>`），通过 Gemini 2.5 Flash Vision 多模态大模型自动扫描并提取图中可见文本、流程图、代码、架构标注与 UI 文字；
+  2. 支持第一方本地资源（`/media/...`）与网络图片，图片内容自动转译为目标语言；
+  3. 在译文图片下方自动注入 `<div class="article-image-ocr" data-image-ocr="true">` 结构化图文转录卡片，并在图片 `alt` 属性中注入多语言说明，彻底解决多语言博文中图片文字看不懂的问题。
+- [x] **暗黑模式纯黑字体治理与排版对比度加固 (`cleanAiArticleOutput` & `src/styles/final-pass.css`)**：
+  1. 清理 AI 偶尔生成的内联 `<font color="black">` 与 `style="color: black/#000"` 样式污染；
+  2. 在 `final-pass.css` 中注入高对比度排版保护规则：深色模式下强制 `#article-container`、`.article-body`、`.post-content` 及各子元素继承高亮度字体颜色（`color: var(--font-color, #f7f7fa) !important`），严禁纯黑字体在深色模式下出现；
+  3. 为 `.article-image-ocr` 注入浅色与深色模式下的精致科技风边框与半透明毛玻璃底色。
+- [x] **多语言与账号中心联动 (`.account-card`)**：
+  1. 遵守设计规范，统一在 `.account-card` 设置面板由访客自由切换 6 种主流语言（`zh-CN`、`zh-Hant`、`en`、`fr`、`es`、`de`）；
+  2. 切换后即时通过 `shijianus:localechange` 自适应平滑跳转至对应博文语言变体，并在首页博文列表中进行去重过滤，杜绝多语言变体在首页生成重复卡片。
+- [x] **自动化端到端测试与真实生产环境验收**：
+  1. `scripts/verify-translation-format-and-ocr.mjs`：全量覆盖 Scheme 2 标签抽词原位插回测试（100% 保留 6 组复杂标签/表格/代码块）、Gemini Vision OCR 识别测试、`validateTranslatedFormat` 校验引擎测试、Playwright 深色模式高对比度字体颜色验证（RGB 247, 247, 250）；
+  2. `scripts/verify-i18n-live.mjs`：Playwright 真实生产环境（`https://blog.epocanvas.com`）全链路覆盖中文、英文、繁体中文、法文、德文、西班牙文切换与直达访问测试，24/24 项断言 100% 验收通过；
+  3. `scripts/verify-live-format-contrast.mjs`：真实生产环境覆盖 27 个代码块、21 个 callout 警告框、2 个表格及深色模式文字颜色（RGB 247, 247, 250），100% 格式无损验证通过。
+
+
