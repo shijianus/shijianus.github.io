@@ -6030,6 +6030,7 @@ body[data-type='home'] .category-chip__count {
   border-radius: 4px !important;
   background: color-mix(in srgb, var(--font-color) 6%, transparent) !important;
   transition: all 0.2s !important;
+  flex-shrink: 0 !important;
 }
 
 body[data-type='home'] .category-chip:hover .category-chip__count {

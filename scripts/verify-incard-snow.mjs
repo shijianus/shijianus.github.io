@@ -186,6 +186,56 @@ try {
   await page.screenshot({ path: 'scripts/audit_screenshots/incard_05_dark_top.png' });
   console.log('Saved incard_05_dark_top.png');
 
+  // Switch back to light
+  await page.evaluate(() => {
+    document.documentElement.dataset.theme = 'light';
+  });
+  await page.waitForTimeout(200);
+
+  // 6. Audit Post Page
+  console.log('Navigating to post page...');
+  await page.goto(`http://localhost:${PORT}/posts/markdown-syntax-mastery/`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(600);
+
+  const postSnowAudit = await page.evaluate(() => {
+    const svgs = document.querySelectorAll('.card-snow-svg');
+    const cards = [];
+    svgs.forEach((svg) => {
+      const p = svg.parentElement;
+      if (p) {
+        cards.push({
+          id: p.id,
+          className: p.className?.slice ? p.className.slice(0, 40) : '',
+          svgWidth: Math.round(svg.getBoundingClientRect().width),
+        });
+      }
+    });
+    return { totalPostSvgs: svgs.length, cards };
+  });
+  console.log('Post Page Snow Audit:', postSnowAudit);
+  await page.screenshot({ path: 'scripts/audit_screenshots/incard_06_post_top.png' });
+  console.log('Saved incard_06_post_top.png');
+
+  // Scroll down on post page to check TOC, relatedPosts, etc.
+  await page.evaluate(() => window.scrollTo({ top: 1200, behavior: 'instant' }));
+  await page.waitForTimeout(300);
+  await page.screenshot({ path: 'scripts/audit_screenshots/incard_07_post_scrolled.png' });
+  console.log('Saved incard_07_post_scrolled.png');
+
+  // Scroll to bottom to check relatedPosts and postNav
+  await page.evaluate(() => window.scrollTo({ top: document.body.scrollHeight - 1400, behavior: 'instant' }));
+  await page.waitForTimeout(400);
+  await page.screenshot({ path: 'scripts/audit_screenshots/incard_08_post_bottom.png' });
+  console.log('Saved incard_08_post_bottom.png');
+
+  // 7. Audit Mobile Viewport
+  console.log('Testing Mobile Viewport (375x812)...');
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto(`http://localhost:${PORT}/`, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: 'scripts/audit_screenshots/incard_09_mobile_home.png' });
+  console.log('Saved incard_09_mobile_home.png');
+
   const fatalErrors = consoleErrors.filter(e => !e.includes('404') && !e.includes('Failed to load resource'));
   console.log('Fatal JS Errors:', fatalErrors);
   if (fatalErrors.length > 0) {
@@ -193,7 +243,7 @@ try {
     process.exit(1);
   }
 
-  console.log('All In-Card Snow Mantle tests passed successfully!');
+  console.log('All In-Card Snow Mantle tests (Home, Post, Mobile, Dark) passed successfully!');
 } finally {
   await browser.close();
   server.close();

@@ -2540,6 +2540,7 @@ export const MULTILINGUAL_DICTIONARY: Record<string, TranslationDict> = {
   '文': { en: 'Post', fr: 'Article', es: 'Post', de: 'Beitrag' },
   '最新动态': { en: 'Latest News', fr: 'Actualités', es: 'Novedades', de: 'Aktuelles' },
   '未读': { en: 'Unread', fr: 'Non lu', es: 'No leído', de: 'Ungelesen' },
+  '已读': { en: 'Read', fr: 'Lu', es: 'Leído', de: 'Gelesen' },
   '第': { en: 'Page', fr: 'Page', es: 'Pág.', de: 'Seite' },
   '快速跳转页码': { en: 'Jump to page', fr: 'Aller à la page', es: 'Ir a la página', de: 'Zur Seite' },
   '输入目标页码': { en: 'Enter target page', fr: 'Entrer le numéro de page', es: 'Ingresar página objetivo', de: 'Zielseite eingeben' },
@@ -2811,7 +2812,7 @@ const MONTHS_DE = ['Jan.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.
 
 export const DYNAMIC_PATTERNS: PatternRule[] = [
   {
-    pattern: /^(\d{4})年(\d{1,2})月(\d{1,2})日$/,
+    pattern: /^(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日$/,
     replace: {
       'zh-CN': (m) => `${m[1]}年${m[2]}月${m[3]}日`,
       'zh-Hant': (m) => `${m[1]}年${m[2]}月${m[3]}日`,
@@ -2822,7 +2823,7 @@ export const DYNAMIC_PATTERNS: PatternRule[] = [
     },
   },
   {
-    pattern: /^(\d{4})年(\d{1,2})月$/,
+    pattern: /^(\d{4})\s*年\s*(\d{1,2})\s*月$/,
     replace: {
       'zh-CN': (m) => `${m[1]}年${m[2]}月`,
       'zh-Hant': (m) => `${m[1]}年${m[2]}月`,
@@ -4010,7 +4011,7 @@ export function initLocaleRuntime() {
     let next: LocaleVariant;
     let isArticleSpecific = false;
     if (event instanceof CustomEvent && event.detail) {
-      const raw = typeof event.detail === 'string' ? event.detail : (event.detail.locale || event.detail.variant);
+      const raw = typeof event.detail === 'string' ? event.detail : (event.detail.locale || event.detail.variant || event.detail.lang);
       next = normaliseLocaleVariant(raw);
       const cleanRaw = String(raw || '').trim().toLowerCase();
       if (cleanRaw && !['zh-cn', 'zh-hans', 'zh', 'zh-hant', 'zh-tw', 'zh-hk', 'zh-mo', 'en', 'fr', 'es', 'de'].includes(cleanRaw)) {

@@ -626,6 +626,10 @@ const categoryIconMap: Record<(typeof categoryItems)[number]['icon'], LucideIcon
     color: #ffffff !important;
     font-size: 10.5px !important;
     font-weight: 700 !important;
+    white-space: nowrap !important;
+    max-width: 80px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 
   body[data-type='home'] .topGroup .recent-post-item:hover .recent-post-top-text {
@@ -649,6 +653,9 @@ const categoryIconMap: Record<(typeof categoryItems)[number]['icon'], LucideIcon
     -webkit-line-clamp: 2 !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
     font-size: 12.5px !important;
     font-weight: 700 !important;
     line-height: 1.35 !important;

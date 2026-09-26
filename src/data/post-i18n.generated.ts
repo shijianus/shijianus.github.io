@@ -18,6 +18,34 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "de": "Zur Überprüfung, ob die passwortbasierte Zugriffskontrolle gemäß den Serverregel...",
     "zh-Hant": "用於驗證密碼存取控制是否依伺服器端規則生效，並確認受限內文在未解鎖時不會直接輸出到頁面。"
   },
+  "系统设计": {
+    "en": "System Design",
+    "fr": "Conception de systèmes",
+    "es": "Diseño de sistemas",
+    "de": "Systemdesign",
+    "zh-Hant": "系統設計"
+  },
+  "访问控制": {
+    "en": "Access Control",
+    "fr": "Contrôle d'accès",
+    "es": "Control de Acceso",
+    "de": "Zugriffskontrolle",
+    "zh-Hant": "存取控制"
+  },
+  "安全": {
+    "en": "Security",
+    "fr": "Sécurité",
+    "es": "Seguridad",
+    "de": "Sicherheit",
+    "zh-Hant": "安全性"
+  },
+  "服务端渲染": {
+    "en": "Server-Side Rendering",
+    "fr": "Rendu côté serveur",
+    "es": "Renderizado del Lado del Servidor",
+    "de": "Serverseitiges Rendering",
+    "zh-Hant": "伺服器端渲染"
+  },
   "安知鱼式 Markdown 能力总检：目录、格式、隐藏内容、媒体与内容块": {
     "en": "Anzhiyu-style Markdown Capability Review: Table of Contents, Formatting, Hidden Content, Media, and Content Blocks",
     "fr": "Bilan complet des capacités Markdown de An Zhi Yu : Table des matières, formatage, contenu caché, médias et blocs de contenu",
@@ -32,6 +60,48 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "de": "Ein langer Beispielartikel, der speziell für Belastungstests von Artikelsuchen,...",
     "zh-Hant": "一篇專門用於壓力測試文章掃描、目錄層級、GFM、隱藏內容、特殊格式、媒體展示與常見內容塊的長範例文章。"
   },
+  "前端工程": {
+    "en": "Front-end Engineering",
+    "fr": "Développement Front-end",
+    "es": "Ingeniería Front-end",
+    "de": "Frontend-Engineering",
+    "zh-Hant": "前端工程"
+  },
+  "Astro": {
+    "en": "Astro",
+    "fr": "Astro",
+    "es": "Astro",
+    "de": "Astro",
+    "zh-Hant": "Astro"
+  },
+  "Markdown": {
+    "en": "Markdown",
+    "fr": "Markdown",
+    "es": "Markdown",
+    "de": "Markdown",
+    "zh-Hant": "Markdown"
+  },
+  "主题重构": {
+    "en": "Theme Refactor",
+    "fr": "Refonte du thème",
+    "es": "Refactorización de Tema",
+    "de": "Theme-Neugestaltung",
+    "zh-Hant": "主題重構"
+  },
+  "UI": {
+    "en": "UI",
+    "fr": "UI",
+    "es": "UI",
+    "de": "UI",
+    "zh-Hant": "UI"
+  },
+  "Study": {
+    "en": "Study",
+    "fr": "Étude",
+    "es": "Estudio",
+    "de": "Lernen",
+    "zh-Hant": "學習"
+  },
   "把主题配置做成可接 API 的契约": {
     "en": "Turning Theme Configuration into an API-Ready Contract",
     "fr": "Transformer la configuration de thème en un contrat API-ready",
@@ -45,6 +115,27 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "es": "La forma verdaderamente conveniente de integrar APIs más adelante no es escribir...",
     "de": "Der wirklich bequeme Weg, später APIs anzubinden, besteht nicht darin, zuerst An...",
     "zh-Hant": "真正方便後續與 API 串接的方式，不是先撰寫請求，而是先把頁面依賴的資料形狀穩定下來。"
+  },
+  "API": {
+    "en": "API",
+    "fr": "API",
+    "es": "API",
+    "de": "API",
+    "zh-Hant": "API"
+  },
+  "Config": {
+    "en": "Config",
+    "fr": "Configuration",
+    "es": "Configuración",
+    "de": "Konfiguration",
+    "zh-Hant": "配置"
+  },
+  "Architecture": {
+    "en": "Architecture",
+    "fr": "Architecture",
+    "es": "Arquitectura",
+    "de": "Architektur",
+    "zh-Hant": "架構"
   },
   "全网盘点！EpoCanvas 博客读者等级、称号与徽章获取完全指南（2026 持续更新）": {
     "en": "Comprehensive Inventory! EpoCanvas Blog Reader Levels, Titles, and Badge Acquisition Complete Guide (2026 Continuously Updated)",
@@ -67,6 +158,41 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "de": "Eine umfassende Übersicht über die von EpoCanvas Blog selbst entwickelten Vertra...",
     "zh-Hant": "全面盤點 EpoCanvas 部落格原創自研的信任階梯（TL.0 ~ TL.100+）、11 級常規讀者稱號、6 大絕版榮譽稱號、管理員與站長權限、15+ 枚成..."
   },
+  "社区指南": {
+    "en": "Community Guide",
+    "fr": "Guide de la communauté",
+    "es": "Guía de la comunidad",
+    "de": "Community-Leitfaden",
+    "zh-Hant": "社群指南"
+  },
+  "读者社区": {
+    "en": "Reader Community",
+    "fr": "Communauté de lecteurs",
+    "es": "Comunidad de lectores",
+    "de": "Leser-Community",
+    "zh-Hant": "讀者社群"
+  },
+  "等级阶梯": {
+    "en": "Level Hierarchy",
+    "fr": "Échelle de niveaux",
+    "es": "Escalera de niveles",
+    "de": "Level-Stufen",
+    "zh-Hant": "等級階梯"
+  },
+  "徽章系统": {
+    "en": "Badge System",
+    "fr": "Système de badges",
+    "es": "Sistema de insignias",
+    "de": "Abzeichen-System",
+    "zh-Hant": "徽章系統"
+  },
+  "EpoCanvas": {
+    "en": "EpoCanvas",
+    "fr": "EpoCanvas",
+    "es": "EpoCanvas",
+    "de": "EpoCanvas",
+    "zh-Hant": "EpoCanvas"
+  },
   "内容优先的首页，为什么比功能堆叠更耐用": {
     "en": "Content-First Homepages: Why They're More Durable Than Feature Stacks",
     "fr": "Une page d'accueil axée sur le contenu : plus durable qu'une accumulation de fonctionnalités",
@@ -80,6 +206,20 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "es": "Si la primera pantalla de la página de inicio prioriza la ruta de lectura en lug...",
     "de": "Wenn der erste Bildschirm einer Startseite den Lesepfad priorisiert, anstatt ein...",
     "zh-Hant": "首頁第一屏如果優先服務閱讀路徑，而不是先展示一堆功能入口，主題通常會更穩固。"
+  },
+  "Homepage": {
+    "en": "Homepage",
+    "fr": "Page d'accueil",
+    "es": "Página de Inicio",
+    "de": "Startseite",
+    "zh-Hant": "首頁"
+  },
+  "Content Strategy": {
+    "en": "Content Strategy",
+    "fr": "Stratégie de contenu",
+    "es": "Estrategia de Contenido",
+    "de": "Inhaltsstrategie",
+    "zh-Hant": "內容策略"
   },
   "静态站点生成器（SSG）与博客主题内容格式全景指南：从主流支持到特异功能、下拉框交互与排版美化": {
     "en": "Comprehensive Guide to Static Site Generators (SSG) and Blog Theme Content Formats: From Mainstream Support to Special Features, Dropdown Interactions, and Typography Enhancement",
@@ -102,6 +242,48 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "de": "Eine umfassende und systematische Übersicht über die wichtigsten statischen Webs...",
     "zh-Hant": "全面系統梳理 Hugo、Jekyll、Eleventy、Astro、Hexo、WordPress 等主流靜態站點與部落格系統的內容格式支援清單。從 Markdo..."
   },
+  "SSG": {
+    "en": "SSG",
+    "fr": "SSG",
+    "es": "SSG",
+    "de": "SSG",
+    "zh-Hant": "SSG"
+  },
+  "MDX": {
+    "en": "MDX",
+    "fr": "MDX",
+    "es": "MDX",
+    "de": "MDX",
+    "zh-Hant": "MDX"
+  },
+  "主题格式": {
+    "en": "Theme Formats",
+    "fr": "Formats de thème",
+    "es": "Formatos de Tema",
+    "de": "Themenformate",
+    "zh-Hant": "主題格式"
+  },
+  "排版规范": {
+    "en": "Typography Standards",
+    "fr": "Normes typographiques",
+    "es": "Estándares Tipográficos",
+    "de": "Typografie-Standards",
+    "zh-Hant": "排版規範"
+  },
+  "Mindmap": {
+    "en": "Mindmap",
+    "fr": "Mindmap",
+    "es": "Mindmap",
+    "de": "Mindmap",
+    "zh-Hant": "Mindmap"
+  },
+  "思维导图": {
+    "en": "Mind Map",
+    "fr": "Carte mentale",
+    "es": "Mapa Mental",
+    "de": "Gedankenkarte",
+    "zh-Hant": "心智圖"
+  },
   "示例：Astro 特殊格式与特异功能综合测试大全": {
     "en": "Example: Comprehensive Test of Astro's Special Formats and Unique Features",
     "fr": "Exemple : Test complet des formats spéciaux et fonctionnalités avancées d'Astro",
@@ -115,6 +297,41 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "es": "Una prueba integral para todos los 13 tipos de Callouts, formatos de publicación...",
     "de": "Testet alle 13 Arten von Callouts, Post-Formaten, Dropdown-Umschaltern, Akkordeo...",
     "zh-Hant": "一站式執行所有 13 種 Callout、文章格式、下拉式選單切換器、手風琴、密碼解密、公式、圖表與排版元件。"
+  },
+  "示例": {
+    "en": "Example",
+    "fr": "Exemple",
+    "es": "Ejemplo",
+    "de": "Beispiel",
+    "zh-Hant": "範例"
+  },
+  "example": {
+    "en": "example",
+    "fr": "exemple",
+    "es": "ejemplo",
+    "de": "Beispiel",
+    "zh-Hant": "範例"
+  },
+  "showcase": {
+    "en": "showcase",
+    "fr": "exposition",
+    "es": "demostración",
+    "de": "Vorführung",
+    "zh-Hant": "展示"
+  },
+  "all-in-one": {
+    "en": "all-in-one",
+    "fr": "tout-en-un",
+    "es": "todo-en-uno",
+    "de": "All-in-One",
+    "zh-Hant": "一站式"
+  },
+  "test": {
+    "en": "test",
+    "fr": "test",
+    "es": "test",
+    "de": "test",
+    "zh-Hant": "test"
   },
   "示例：Callouts 告示框与提示卡完整展示": {
     "en": "Example: Full Display of Callouts and Hint Cards",
@@ -130,6 +347,13 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "de": "Umfassende Darstellung der 13 unterstützten semantischen Callout-Typen, der Stan...",
     "zh-Hant": "全面展示支援的 13 種 Callout 語意類型、預設展開/摺疊版本與 Markdown 原始碼對比。"
   },
+  "callouts": {
+    "en": "callouts",
+    "fr": "callouts",
+    "es": "callouts",
+    "de": "Callouts",
+    "zh-Hant": "callouts"
+  },
   "示例：代码块全量增强功能展示": {
     "en": "Example: Full Code Block Enhancement Showcase",
     "fr": "Exemple : Démonstration complète des améliorations des blocs de code",
@@ -143,6 +367,20 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "es": "Muestra completamente las características de la barra de control de semáforos de...",
     "de": "Umfassende Demonstration der macOS-Semafor-Steuerleiste, Sprach-Badges, Diff-Her...",
     "zh-Hant": "全面展示 macOS 擬物交通燈控制條、語言徽章、增刪 Diff、一鍵複製與超長摺疊特性。"
+  },
+  "code": {
+    "en": "code",
+    "fr": "code",
+    "es": "código",
+    "de": "Code",
+    "zh-Hant": "程式碼"
+  },
+  "shiki": {
+    "en": "shiki",
+    "fr": "shiki",
+    "es": "shiki",
+    "de": "Shiki",
+    "zh-Hant": "Shiki"
   },
   "示例：折叠面板、手风琴与下拉框格式展示": {
     "en": "Example: Collapsible Panels, Accordions, and Dropdown Selectors",
@@ -158,6 +396,20 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "de": "Umfassende Demonstration nativer Details, Akkordeon-Klappgruppen, verschachtelte...",
     "zh-Hant": "全面展示原生 details、手風琴摺疊組、巢狀摺疊與特殊的下拉選單選擇器元件。"
   },
+  "collapse": {
+    "en": "collapse",
+    "fr": "repliement",
+    "es": "plegable",
+    "de": "Klappfeld",
+    "zh-Hant": "collapse"
+  },
+  "dropdown": {
+    "en": "dropdown",
+    "fr": "menu déroulant",
+    "es": "desplegable",
+    "de": "Dropdown",
+    "zh-Hant": "dropdown"
+  },
   "示例：富媒体嵌入、Post Formats 与聊天气泡展示": {
     "en": "Example: Rich Media Embeds, Post Formats, and Chat Bubble Display",
     "fr": "Exemple : Intégration de médias riches, formats de publication et affichage de bulles de chat",
@@ -171,6 +423,20 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "es": "Demostración completa de formatos de publicación estilo WordPress, discos de vin...",
     "de": "Umfassende Demonstration von WordPress-Stil Post-Formaten, Video-/Audio-Schallpl...",
     "zh-Hant": "全面展示 WordPress 風格文章格式、影音黑膠唱片、書籤卡片與聊天氣泡對話流。"
+  },
+  "embeds": {
+    "en": "embeds",
+    "fr": "intégrations",
+    "es": "incrustaciones",
+    "de": "Einbettungen",
+    "zh-Hant": "嵌入"
+  },
+  "post-formats": {
+    "en": "post-formats",
+    "fr": "formats-de-publication",
+    "es": "formatos-de-publicación",
+    "de": "Post-Formate",
+    "zh-Hant": "文章格式"
   },
   "示例：Front Matter 扩展字段与 Zod 验证展示": {
     "en": "Example: Front Matter Extended Fields and Zod Validation Showcase",
@@ -186,6 +452,20 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "de": "Eine umfassende Analyse aller unterstützten Front Matter Felddefinitionen dieses...",
     "zh-Hant": "全面解析本部落格所有支援的 Front Matter 欄位定義及其驅動的主題互動行為。"
   },
+  "frontmatter": {
+    "en": "frontmatter",
+    "fr": "frontmatter",
+    "es": "frontmatter",
+    "de": "Frontmatter",
+    "zh-Hant": "frontmatter"
+  },
+  "config": {
+    "en": "config",
+    "fr": "configuration",
+    "es": "config",
+    "de": "Konfiguration",
+    "zh-Hant": "config"
+  },
   "示例：图片画廊、拍立得相纸与灯箱展示": {
     "en": "Example: Image Gallery, Polaroid Style Photos, and Lightbox Display",
     "fr": "Exemple : Galerie d'images, photos Polaroid et Lightbox",
@@ -199,6 +479,20 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "es": "Demostración completa de la cuadrícula de galería de imágenes adaptable, álbum d...",
     "de": "Umfassende Demonstration von adaptivem Bildergalerie-Raster, Polaroid-Album und...",
     "zh-Hant": "全面展示自適應圖片畫廊網格、人文拍立得相簿與全螢幕無損圖片燈箱功能。"
+  },
+  "gallery": {
+    "en": "gallery",
+    "fr": "galerie",
+    "es": "galería",
+    "de": "Galerie",
+    "zh-Hant": "畫廊"
+  },
+  "lightbox": {
+    "en": "lightbox",
+    "fr": "lightbox",
+    "es": "visor-de-imágenes",
+    "de": "Lightbox",
+    "zh-Hant": "燈箱"
   },
   "示例：KaTeX 数学公式渲染展示": {
     "en": "Example: KaTeX Math Formula Rendering Display",
@@ -214,6 +508,20 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "de": "Umfassende Demonstration des statischen Renderings von Inline-Formeln und Block-...",
     "zh-Hant": "全面呈現基於 remark-math 與 rehype-katex 的行內公式與區塊推導公式靜態渲染。"
   },
+  "math": {
+    "en": "math",
+    "fr": "mathématiques",
+    "es": "matemáticas",
+    "de": "Mathematik",
+    "zh-Hant": "math"
+  },
+  "katex": {
+    "en": "katex",
+    "fr": "katex",
+    "es": "katex",
+    "de": "KaTeX",
+    "zh-Hant": "katex"
+  },
   "示例：Mermaid 11 图表与可视化展示": {
     "en": "Example: Mermaid 11 Diagrams and Visualizations",
     "fr": "Exemple : Graphiques et visualisations Mermaid 11",
@@ -227,6 +535,20 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "es": "Demostración completa de diagramas de arquitectura, secuencias, Gantt, gráficos...",
     "de": "Umfassende Darstellung von Mermaid-Architekturflussdiagrammen, Sequenzdiagrammen...",
     "zh-Hant": "全面展示 Mermaid 架構流程圖、時序圖、甘特圖、統計圓餅圖與 GitGraph 分支圖。"
+  },
+  "mermaid": {
+    "en": "mermaid",
+    "fr": "mermaid",
+    "es": "mermaid",
+    "de": "mermaid",
+    "zh-Hant": "mermaid"
+  },
+  "diagrams": {
+    "en": "diagrams",
+    "fr": "diagrammes",
+    "es": "diagramas",
+    "de": "diagramme",
+    "zh-Hant": "圖表"
   },
   "示例：Markmap 动态交互式思维导图与无限层级扩展": {
     "en": "Example: Markmap Dynamic Interactive Mind Map with Infinite Hierarchy Expansion",
@@ -249,6 +571,20 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "de": "Umfassende Demonstration der dynamischen Markmap-Mindmap-Rendering auf Markdown-...",
     "zh-Hant": "全面展示基於 Markdown 的 Markmap 動態思維導圖渲染，演示 6 層深度堆疊、無限層級擴展語法、預設單塊摺疊保護空間、點擊節點多向擴散分支與全螢幕..."
   },
+  "mindmap": {
+    "en": "mindmap",
+    "fr": "carte mentale",
+    "es": "mapa mental",
+    "de": "mindmap",
+    "zh-Hant": "思維導圖"
+  },
+  "markmap": {
+    "en": "markmap",
+    "fr": "Markmap",
+    "es": "markmap",
+    "de": "markmap",
+    "zh-Hant": "markmap"
+  },
   "示例：多标签页与多代码版本切换展示": {
     "en": "Example: Multi-Tab and Multi-Code Version Switch Showcase",
     "fr": "Exemple : affichage de plusieurs onglets et de plusieurs versions de code",
@@ -262,6 +598,20 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "es": "Demostración completa de la pestaña interactiva Tabs y el componente de conmutad...",
     "de": "Umfassende Demonstration interaktiver Registerkarten und einer Dropdown-basierte...",
     "zh-Hant": "全面展示互動式 Tabs 分頁與基於下拉選單的多語言程式碼切換器組件。"
+  },
+  "tabs": {
+    "en": "tabs",
+    "fr": "onglets",
+    "es": "pestañas",
+    "de": "Registerkarten",
+    "zh-Hant": "分頁"
+  },
+  "code-group": {
+    "en": "code-group",
+    "fr": "groupe-de-code",
+    "es": "grupo de código",
+    "de": "Code-Gruppe",
+    "zh-Hant": "程式碼組"
   },
   "主题重构启动记录": {
     "en": "Theme Refactor Kickoff Log",
@@ -277,6 +627,13 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "de": "Erstes Neugestaltungsprotokoll: Festlegung, dass das neue Theme keine Hülle des...",
     "zh-Hant": "第一篇重構記錄，確定新的主題不是舊主題的殼，而是一套真正可維護的 Astro 實現。"
   },
+  "Tailwind": {
+    "en": "Tailwind",
+    "fr": "Tailwind",
+    "es": "Tailwind",
+    "de": "Tailwind",
+    "zh-Hant": "Tailwind"
+  },
   "通过重构来学习，比单纯临摹更有效": {
     "en": "Learning Through Refactoring: More Effective Than Simple Imitation",
     "fr": "Apprendre par le refactoring : plus efficace que la simple imitation",
@@ -290,6 +647,20 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "es": "Al refactorizar un tema existente, lo más valioso no es replicar su apariencia,...",
     "de": "Beim Refactoring eines bestehenden Themas ist es am wertvollsten, nicht nur das...",
     "zh-Hant": "重構一個現有主題時，最有價值的不是複製外觀，而是理解它為何如此組織資訊。"
+  },
+  "学习笔记": {
+    "en": "Learning Notes",
+    "fr": "Notes d'apprentissage",
+    "es": "Notas de Estudio",
+    "de": "Lernnotizen",
+    "zh-Hant": "學習筆記"
+  },
+  "Refactor": {
+    "en": "Refactor",
+    "fr": "Refactoring",
+    "es": "Refactorización",
+    "de": "Refactoring",
+    "zh-Hant": "重構"
   },
   "Markdown 扫描与展示能力全量示例": {
     "en": "Full Example of Markdown Scanning and Display Capabilities",
@@ -326,6 +697,27 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "de": "Das ultimative Markdown-Referenzhandbuch und umfassende Demonstration für diesen...",
     "zh-Hant": "專為本部落格量身定制的 Markdown 終極參考手冊與全景壓測示範文章。涵蓋基礎排版、KaTeX 數學公式、Mermaid 繪圖、安知魚告示框、程式碼高亮折疊..."
   },
+  "Katex": {
+    "en": "Katex",
+    "fr": "Katex",
+    "es": "Katex",
+    "de": "Katex",
+    "zh-Hant": "Katex"
+  },
+  "Mermaid": {
+    "en": "Mermaid",
+    "fr": "Mermaid",
+    "es": "Mermaid",
+    "de": "Mermaid",
+    "zh-Hant": "Mermaid"
+  },
+  "安知鱼": {
+    "en": "Anzhiyu",
+    "fr": "Anzhiyu",
+    "es": "Anzhiyu",
+    "de": "Anzhiyu",
+    "zh-Hant": "安知魚"
+  },
   "封面、图床与视频适配实验室": {
     "en": "Cover, Image Hosting, and Video Adaptation Lab",
     "fr": "Laboratoire d'adaptation des couvertures, des hébergements d'images et des vidéos",
@@ -339,6 +731,13 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "es": "Verificación centralizada de imágenes de portada de artículos, alojamiento de im...",
     "de": "Zentrale Überprüfung von Artikel-Titelbildern, Remote-Bildhosting, lokalen Resso...",
     "zh-Hant": "集中驗證文章頭圖、遠端圖床、本機資源、影片封面、失效回退以及不同寬度下的媒體展示效果。"
+  },
+  "媒体适配": {
+    "en": "Media Adaptation",
+    "fr": "Adaptation des médias",
+    "es": "Adaptación de Medios",
+    "de": "Medien-Anpassung",
+    "zh-Hant": "媒體適配"
   },
   "极客感界面为什么更需要可读性": {
     "en": "Why Geeky Interfaces Need Readability Even More",
@@ -354,6 +753,34 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "de": "Technische Eleganz entsteht nicht durch leuchtende Rahmen, sondern durch Informa...",
     "zh-Hant": "技術氣質不是靠發光邊框堆出來的，真正讓介面成立的是資訊層級與閱讀節奏。"
   },
+  "产品观察": {
+    "en": "Product Observation",
+    "fr": "Observation de produit",
+    "es": "Observaciones de producto",
+    "de": "Produktbeobachtung",
+    "zh-Hant": "產品觀察"
+  },
+  "UX": {
+    "en": "UX",
+    "fr": "UX",
+    "es": "UX",
+    "de": "UX",
+    "zh-Hant": "UX"
+  },
+  "Blog Theme": {
+    "en": "Blog Theme",
+    "fr": "Thème de blog",
+    "es": "Tema de blog",
+    "de": "Blog-Thema",
+    "zh-Hant": "Blog Theme"
+  },
+  "Visual System": {
+    "en": "Visual System",
+    "fr": "Système visuel",
+    "es": "Sistema visual",
+    "de": "Visuelles System",
+    "zh-Hant": "Visual System"
+  },
   "Dot Notation Casing Test (English)": {
     "en": "Dot Notation Casing Test (English)",
     "fr": "Dot Notation Casing Test (English)",
@@ -367,6 +794,34 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "es": "Testing dot-separated filename with uppercase lang code.",
     "de": "Testing dot-separated filename with uppercase lang code.",
     "zh-Hant": "Testing dot-separated filename with uppercase lang code."
+  },
+  "Audit Test": {
+    "en": "Audit Test",
+    "fr": "Audit Test",
+    "es": "Audit Test",
+    "de": "Audit Test",
+    "zh-Hant": "Audit Test"
+  },
+  "i18n": {
+    "en": "i18n",
+    "fr": "i18n",
+    "es": "i18n",
+    "de": "i18n",
+    "zh-Hant": "i18n"
+  },
+  "audit": {
+    "en": "audit",
+    "fr": "audit",
+    "es": "audit",
+    "de": "audit",
+    "zh-Hant": "audit"
+  },
+  "dot-notation": {
+    "en": "dot-notation",
+    "fr": "dot-notation",
+    "es": "dot-notation",
+    "de": "dot-notation",
+    "zh-Hant": "dot-notation"
   },
   "单语言独立文章隔离审计测试": {
     "en": "单语言独立文章隔离审计测试",
@@ -382,6 +837,20 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "de": "用于核验在没有任何翻译变体时，单个 article-translation-variant 的行为。",
     "zh-Hant": "用于核验在没有任何翻译变体时，单个 article-translation-variant 的行为。"
   },
+  "审计测试": {
+    "en": "Audit Test",
+    "fr": "Audit Test",
+    "es": "Audit Test",
+    "de": "Audit Test",
+    "zh-Hant": "Audit Test"
+  },
+  "monolingual": {
+    "en": "monolingual",
+    "fr": "monolingual",
+    "es": "monolingual",
+    "de": "monolingual",
+    "zh-Hant": "monolingual"
+  },
   "多语言全矩阵极限审计测试 (中文版)": {
     "en": "Polyglot Matrix Audit Verification (English)",
     "fr": "Vérification de la matrice polyglotte (Français)",
@@ -395,6 +864,13 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "es": "Versión en español para la prueba de auditoría.",
     "de": "Deutsche Version für den mehrsprachigen Audittest.",
     "zh-Hant": "繁體中文審計測試版本。"
+  },
+  "polyglot": {
+    "en": "polyglot",
+    "fr": "polyglot",
+    "es": "polyglot",
+    "de": "polyglot",
+    "zh-Hant": "polyglot"
   },
   "测试i18n双向容错解析文章": {
     "en": "Testing i18n Bidirectional Fallback Article",
@@ -410,6 +886,27 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "de": "This English translated post deliberately omits i18nKey to test if the bidirecti...",
     "zh-Hant": "主文章显式指定了自定义 i18nKey，用于测试英文子篇在未显式提供 i18nKey 时能否凭借双向文件名基名推导正常关联并显示。"
   },
+  "测试验证": {
+    "en": "Testing",
+    "fr": "Testing",
+    "es": "Testing",
+    "de": "Testing",
+    "zh-Hant": "测试验证"
+  },
+  "测试": {
+    "en": "Test",
+    "fr": "Test",
+    "es": "Test",
+    "de": "Test",
+    "zh-Hant": "测试"
+  },
+  "容错": {
+    "en": "Fallback",
+    "fr": "Fallback",
+    "es": "Fallback",
+    "de": "Fallback",
+    "zh-Hant": "容错"
+  },
   "测试矩阵：大小写不规范测试主篇": {
     "en": "测试矩阵：大小写不规范测试主篇",
     "fr": "测试矩阵：大小写不规范测试主篇",
@@ -423,6 +920,13 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "es": "主篇为中文，子篇指定大写 EN。",
     "de": "主篇为中文，子篇指定大写 EN。",
     "zh-Hant": "主篇为中文，子篇指定大写 EN。"
+  },
+  "casing": {
+    "en": "casing",
+    "fr": "casing",
+    "es": "casing",
+    "de": "casing",
+    "zh-Hant": "casing"
   },
   "测试矩阵：双后缀文件名下的中文翻译": {
     "en": "Test Matrix: Native English Suffixed Primary Article",
@@ -438,6 +942,13 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "de": "This article has a filename with an -en suffix as the primary file, paired with...",
     "zh-Hant": "对应 test-matrix-native-en 的简体中文版本。"
   },
+  "native-en": {
+    "en": "native-en",
+    "fr": "native-en",
+    "es": "native-en",
+    "de": "native-en",
+    "zh-Hant": "native-en"
+  },
   "测试矩阵：原生英文主篇的中文变体": {
     "en": "Test Matrix: Native English Canonical Post",
     "fr": "Test Matrix: Native English Canonical Post",
@@ -451,5 +962,26 @@ export const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: str
     "es": "A post where English is the primary authoring language (no -en suffix in filenam...",
     "de": "A post where English is the primary authoring language (no -en suffix in filenam...",
     "zh-Hant": "对应原生英文主篇的简体中文翻译版本。"
+  },
+  "canonical-en": {
+    "en": "canonical-en",
+    "fr": "canonical-en",
+    "es": "canonical-en",
+    "de": "canonical-en",
+    "zh-Hant": "canonical-en"
+  },
+  "技术分享": {
+    "en": "Tech Sharing",
+    "fr": "Partage technique",
+    "es": "Compartir tecnología",
+    "de": "Technik-Austausch",
+    "zh-Hant": "技術分享"
+  },
+  "生活随笔": {
+    "en": "Life Essays",
+    "fr": "Essais de vie",
+    "es": "Ensayos de vida",
+    "de": "Lebensnotizen",
+    "zh-Hant": "生活隨筆"
   }
 };

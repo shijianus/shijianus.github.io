@@ -52,10 +52,10 @@ const pubDateFormatted = formatDisplayDate(entry.data.pubDate);
   <!-- 信息内容区域：紧凑排版，提升单屏 2x2 呈现率 -->
   <div class="p-3 sm:p-3.5 flex flex-col flex-1 justify-between gap-1.5">
     <div class="flex flex-col gap-1.5">
-      <!-- 顶部 Tips 栏：置顶、分类、最新、未读状态 -->
-      <div class="flex items-center flex-wrap gap-1.5 text-xs">
+      <!-- 顶部 Tips 栏：置顶、分类、最新、未读状态（防多语种长文本挤压折行） -->
+      <div class="flex items-center flex-wrap gap-1.5 text-xs min-h-[22px]">
         {isSticky && (
-          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full font-bold text-white bg-[#ff7242] shadow-xs text-[10px]">
+          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full font-bold text-white bg-[#ff7242] shadow-xs text-[10px] shrink-0 whitespace-nowrap">
             <i class="anzhiyufont anzhiyu-icon-thumbtack text-[9px]"></i>
             <span>置顶</span>
           </span>
@@ -64,35 +64,36 @@ const pubDateFormatted = formatDisplayDate(entry.data.pubDate);
         {category && (
           <a
             href={getCategoryPath(category)}
-            class="text-[11px] font-medium text-[var(--text-soft)] hover:text-[var(--theme-main)] transition-colors"
+            class="text-[11px] font-medium text-[var(--text-soft)] hover:text-[var(--theme-main)] transition-colors truncate max-w-[110px] sm:max-w-[140px] shrink-0"
             onclick="event.stopPropagation();"
+            title={category}
           >
             {category}
           </a>
         )}
 
         {isNew && !isSticky && (
-          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[var(--theme-op)] text-[var(--theme-main)]">
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[var(--theme-op)] text-[var(--theme-main)] shrink-0 whitespace-nowrap">
             最新
           </span>
         )}
 
-        <span class="unvisited-post text-[10px] text-[var(--text-muted)] opacity-65 ml-auto group-hover:opacity-100 transition-opacity">
+        <span class="unvisited-post text-[10px] text-[var(--text-muted)] opacity-65 ml-auto group-hover:opacity-100 transition-opacity shrink-0 whitespace-nowrap">
           未读
         </span>
       </div>
 
-      <!-- 文章标题：两行截断，字号 15px~16px -->
+      <!-- 文章标题：两行截断，预留统一最小高度避免长短语系导致卡片高低不平 -->
       <a
         href={link}
-        class="article-title post-card-title text-[15px] sm:text-[16px] font-bold line-clamp-2 leading-snug text-[var(--font-color)] group-hover:text-[var(--theme-main)] transition-colors"
+        class="article-title post-card-title text-[15px] sm:text-[16px] font-bold line-clamp-2 min-h-[2.6em] leading-snug text-[var(--font-color)] group-hover:text-[var(--theme-main)] transition-colors break-words hyphens-auto"
       >
         {title}
       </a>
 
-      <!-- 摘要文字：单行或精简两行，让卡片高度大幅收拢 -->
+      <!-- 摘要文字：单行或精简两行，预留统一高度 -->
       {summary && (
-        <p class="post-card-excerpt text-[12px] line-clamp-1 sm:line-clamp-2 leading-relaxed text-[var(--text-soft)] opacity-80 m-0">
+        <p class="post-card-excerpt text-[12px] line-clamp-1 sm:line-clamp-2 min-h-[1.5em] sm:min-h-[2.8em] leading-relaxed text-[var(--text-soft)] opacity-80 m-0 break-words hyphens-auto">
           {summary}
         </p>
       )}
@@ -100,7 +101,7 @@ const pubDateFormatted = formatDisplayDate(entry.data.pubDate);
 
     <!-- 底部 Meta 区域：日期与标签 -->
     <div class="flex items-center justify-between gap-1.5 pt-1.5 border-t border-[var(--card-border)]/50 mt-auto">
-      <div class="flex items-center gap-1 text-[11px] text-[var(--text-muted)]">
+      <div class="flex items-center gap-1 text-[11px] text-[var(--text-muted)] shrink-0 whitespace-nowrap">
         <i class="anzhiyufont anzhiyu-icon-calendar-days text-[12px] opacity-75"></i>
         <time datetime={pubDateIso} class="text-[11px]">
           {pubDateFormatted}
@@ -108,15 +109,16 @@ const pubDateFormatted = formatDisplayDate(entry.data.pubDate);
       </div>
 
       {tags.length > 0 && (
-        <div class="flex items-center flex-wrap gap-1 justify-end">
+        <div class="flex items-center flex-wrap gap-1 justify-end min-w-0">
           {tags.slice(0, 2).map((tag) => (
             <a
               href={getTagPath(tag)}
-              class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] bg-[var(--tag-bg)] text-[var(--tag-text)] hover:bg-[var(--theme-op)] hover:text-[var(--theme-main)] transition-colors"
+              class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] bg-[var(--tag-bg)] text-[var(--tag-text)] hover:bg-[var(--theme-op)] hover:text-[var(--theme-main)] transition-colors max-w-[85px] sm:max-w-[110px] truncate"
               onclick="event.stopPropagation();"
+              title={tag}
             >
-              <span class="opacity-40">#</span>
-              <span>{tag}</span>
+              <span class="opacity-40 shrink-0">#</span>
+              <span class="truncate">{tag}</span>
             </a>
           ))}
         </div>

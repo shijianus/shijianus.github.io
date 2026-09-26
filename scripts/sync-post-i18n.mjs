@@ -204,6 +204,58 @@ async function main() {
         trunc(zhHant?.meta?.description) || trunc(zhDesc)
       );
     }
+
+    // Categories
+    const zhCat = zh.meta?.category || zh.meta?.space;
+    if (zhCat) {
+      addDictEntry(
+        zhCat,
+        en?.meta?.category || en?.meta?.space,
+        fr?.meta?.category || fr?.meta?.space,
+        es?.meta?.category || es?.meta?.space,
+        de?.meta?.category || de?.meta?.space,
+        zhHant?.meta?.category || zhHant?.meta?.space
+      );
+    }
+
+    // Tags
+    const zhTags = Array.isArray(zh.meta?.tags) ? zh.meta.tags : [];
+    const enTags = Array.isArray(en?.meta?.tags) ? en.meta.tags : [];
+    const frTags = Array.isArray(fr?.meta?.tags) ? fr.meta.tags : [];
+    const esTags = Array.isArray(es?.meta?.tags) ? es.meta.tags : [];
+    const deTags = Array.isArray(de?.meta?.tags) ? de.meta.tags : [];
+    const zhHantTags = Array.isArray(zhHant?.meta?.tags) ? zhHant.meta.tags : [];
+
+    zhTags.forEach((tag, idx) => {
+      if (typeof tag === 'string' && tag.trim()) {
+        addDictEntry(
+          tag,
+          enTags[idx],
+          frTags[idx],
+          esTags[idx],
+          deTags[idx],
+          zhHantTags[idx]
+        );
+      }
+    });
+  }
+
+  // Pre-seed known standard categories and tags
+  const KNOWN_CATEGORIES = {
+    '系统设计': { en: 'System Design', fr: 'Conception de systèmes', es: 'Diseño de Sistemas', de: 'Systemdesign', 'zh-Hant': '系統設計' },
+    '前端工程': { en: 'Frontend Engineering', fr: 'Ingénierie Frontend', es: 'Ingeniería Frontend', de: 'Frontend-Entwicklung', 'zh-Hant': '前端工程' },
+    '社区指南': { en: 'Community Guide', fr: 'Guide de la communauté', es: 'Guía de la comunidad', de: 'Community-Leitfaden', 'zh-Hant': '社群指南' },
+    '示例': { en: 'Examples', fr: 'Exemples', es: 'Ejemplos', de: 'Beispiele', 'zh-Hant': '範例' },
+    '学习笔记': { en: 'Learning Notes', fr: "Notes d'étude", es: 'Notas de Estudio', de: 'Lernnotizen', 'zh-Hant': '學習筆記' },
+    '产品观察': { en: 'Product Observation', fr: 'Observation de produit', es: 'Observaciones de producto', de: 'Produktbeobachtung', 'zh-Hant': '產品觀察' },
+    '测试验证': { en: 'Testing & Verification', fr: 'Tests et vérifications', es: 'Pruebas y verificación', de: 'Tests & Verifizierung', 'zh-Hant': '測試驗證' },
+    '审计测试': { en: 'Audit Testing', fr: "Tests d'audit", es: 'Pruebas de auditoría', de: 'Audit-Prüfung', 'zh-Hant': '審計測試' },
+    '测试': { en: 'Testing', fr: 'Test', es: 'Prueba', de: 'Test', 'zh-Hant': '測試' },
+    '技术分享': { en: 'Tech Sharing', fr: 'Partage technique', es: 'Compartir tecnología', de: 'Technik-Austausch', 'zh-Hant': '技術分享' },
+    '生活随笔': { en: 'Life Essays', fr: 'Essais de vie', es: 'Ensayos de vida', de: 'Lebensnotizen', 'zh-Hant': '生活隨筆' },
+  };
+  for (const [k, v] of Object.entries(KNOWN_CATEGORIES)) {
+    if (!postDict[k]) postDict[k] = v;
   }
 
   const postDictTs = `/**\n * Auto-generated post translations dictionary\n * Extracted from sibling markdown files in src/content/posts/\n */\n\nexport const POST_TRANSLATIONS: Record<string, { en: string; fr: string; es: string; de: string; "zh-Hant": string }> = ${JSON.stringify(postDict, null, 2)};\n`;
