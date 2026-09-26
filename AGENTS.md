@@ -4191,5 +4191,31 @@
   - 全量部署至 Cloudflare Pages 生产边缘节点；
   - 针对生产主域名 `https://blog.epocanvas.com/` 进行实机自动化端到端测试，验证歌词流光、60FPS 平滑性与控制台 0 报错。
 
-
-
+### Task 189: 全界面多语种 i18n 深度同步、长语系（德/法/西/英/繁）防崩溃空间防御布局与自动化多端验证 (`28c740e`)
+- [x] **全站文章元信息多语种词典生成与自动收割 (`scripts/sync-post-i18n.mjs` & `src/data/post-i18n.generated.ts`)**:
+  1. 升级 `sync-post-i18n.mjs`，从所有 Markdown 文章 Frontmatter 中自动索引并提取全部 30 个文章组、159 篇文章的多语言（德/法/西/英/繁）标题、完整简介及 80 字符截断摘要；
+  2. 自动收割文章中所属分类（`category` / `space`）与技术标签（`tags`）的多语种映射，注入预置核心技术与生活分类；
+  3. 将生成数据无缝合并入 `client-locale.ts` 的 `MULTILINGUAL_DICTIONARY`，客户端即时匹配转换。
+- [x] **高危紧凑区域长文本防御性布局与防崩溃加固 (Defensive Layout Protocols)**:
+  1. **文章卡片 (`PostCard.astro`) 防折行高低不平重构**：
+     - 置顶 (`isSticky`)、最新 (`isNew`)、未读 (`unvisited-post`) 徽章配置 `shrink-0 whitespace-nowrap`，彻底杜绝德语（"Angeheftet"、"Ungelesen"）等长词折行挤压；
+     - 分类链接配置 `truncate max-w-[110px] sm:max-w-[140px] shrink-0`；
+     - 文章标题与摘要配置 `min-h-[2.6em]` 与 `min-h-[2.8em]`、`break-words hyphens-auto`，抹平不同语言卡片标题行数差异，确保网格卡片严格等高；
+     - 底部发布日期配置 `shrink-0 whitespace-nowrap`，标签配置 `truncate max-w-[85px] sm:max-w-[110px]`。
+  2. **首页 Hero 重点推荐卡片 (`HomeHero.astro`) 溢出防护**：
+     - 顶部小徽标 `.recent-post-top-text` 增加 `white-space: nowrap; max-width: 80px; overflow: hidden; text-overflow: ellipsis;`；
+     - 文章标题 `.article-title` 增加 `word-break: break-word; overflow-wrap: break-word; hyphens: auto;`；
+     - 分类介绍 `.categoryButtonDesc` 保障弹性 hover 与单行省略截断。
+  3. **侧边栏组件 (`Sidebar.astro`) 规范全量国际化**：
+     - 彻底清除 `WEBINFO_METRIC_DEFAULTS` 中陈旧的英文三元判断，统一改用规范化基础键名，交由客户端词典动态精准翻译为 6 国语言；
+     - 热门标签、精选分类、站点资讯头部标题及正常运行状态标签全部打通 i18n；
+     - 为分类芯片计数标 `.category-chip__count` 补充 `flex-shrink: 0 !important;` 防挤压。
+  4. **客户端运行时加固 (`src/lib/client-locale.ts`)**：
+     - 补齐 `'已读'` 状态词典条目；
+     - 日期正则增加对年、月、日之间可能存在的空白符容错支持（`\s*`）；
+     - `syncLocaleVariant` 扩展对 `event.detail.lang` 的标准事件属性监听。
+- [x] **全自动化 Playwright E2E 布局审计与多视口多语言全量验证 (`scripts/verify-i18n-layout.mjs`)**:
+  1. 覆盖 6 国语言全场景切换测试：简体中文 (`zh-CN`)、德语 (`de`)、英语 (`en`)、法语 (`fr`)、西班牙语 (`es`)、繁体中文 (`zh-Hant`)；
+  2. 桌面端 (1440x950)、平板端 (768x1024)、移动端 (375x812) 实机验证，所有卡片 `hasHorizontalOverflow = false`；
+  3. 文章详情页（TOC 目录、延伸阅读、阅读导航）多语言切换测试通过；
+  4. 0 控制台致命报错，测试 100% 通过。
