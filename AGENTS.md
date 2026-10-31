@@ -6593,7 +6593,7 @@
   3. 通过 Wrangler 部署编译产物与 Functions 运行时至 Cloudflare Pages 生产边缘节点（`https://0c4a2ea3.shijianus-blog.pages.dev` / `https://blog.epocanvas.com`）；
   4. 生产域名真实 E2E 审计套件 (`scripts/verify-prod-moments.mjs`) 针对 `https://blog.epocanvas.com/moments/` 审计通过，断言 Console 控制台 0 致命错误、5行折叠展开、九宫格照片墙、标题呼出详情模态框与 URL 锚点全部 PASS。
 
-### Task 111: 朋友圈 (/moments/) QQ 空间沉浸式界面、页面内直接加载说说详情(去弹窗)、精简真实友链与配置化瀑布流
+### Task 111: 朋友圈 (/moments/) QQ 空间沉浸式界面、页面内直接加载说说详情(去弹窗)、精简真实友链与配置化瀑布流 (`ff8c16d`)
 - [x] **详情界面页面内直接加载 (In-Page View, 杜绝模态弹窗)**：
   1. 彻底淘汰浮层弹窗 `#moment-detail-modal` 与背景遮罩，主舞台 `#moments-main-stage` 采用双视图内嵌架构；
   2. 点击说说卡片标题、作者栏、“查看详情”或九宫格图片时，瀑布流 `#moments-stream-view` 平滑隐藏，`#moment-inpage-detail-view` 直接在主页面排版内就地渲染展开；
