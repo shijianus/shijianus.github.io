@@ -1,7 +1,7 @@
 {
   "ok": true,
   "engine": "EpoCanvas Moments Federation Pipeline v3.0",
-  "syncedAt": "2026-10-31T15:38:53.526Z",
+  "syncedAt": "2026-10-31T15:55:45.120Z",
   "total": 8,
   "masterCount": 3,
   "friendCount": 5,
@@ -198,7 +198,7 @@
       "liveSynced": false
     },
     {
-      "id": "sync_Astro_官方生态_tro-740/",
+      "id": "sync_Astro_官方生态_er-2026/",
       "author": "Astro 官方生态",
       "authorUrl": "https://astro.build/",
       "avatar": "https://astro.build/favicon.svg",
@@ -206,26 +206,26 @@
       "isOwner": false,
       "mood": "⚡ 极速",
       "device": "来自好友「Astro 官方生态」的最新发布",
-      "title": "Astro 7.4",
-      "url": "/moments/#moment-sync_Astro_官方生态_tro-740/",
-      "summary": "Astro 7.4 adds a --timings flag that shows where your build spends its time, separate build and runtime image services, a notFound() handler...",
-      "content": "Astro 7.4 adds a --timings flag that shows where your build spends its time, separate build and runtime image services, a notFound() handler...",
+      "title": "What&apos;s new in Astro - October 2026",
+      "url": "/moments/#moment-sync_Astro_官方生态_er-2026/",
+      "summary": "October 2026 - Astro 7.4, conference talks, and more!",
+      "content": "October 2026 - Astro 7.4, conference talks, and more!",
       "images": [
         "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80",
         "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80",
         "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80"
       ],
-      "timeAgo": "16天前",
-      "timestamp": "2026-10-14 16:00",
+      "timeAgo": "15小时前",
+      "timestamp": "2026-10-30 16:00",
       "category": "tech",
       "tags": [
         "友链动态",
         "tech"
       ],
-      "likes": 22,
+      "likes": 29,
       "commentCount": 0,
       "origin": "https://astro.build/",
-      "originUrl": "https://astro.build/blog/astro-740/",
+      "originUrl": "https://astro.build/blog/whats-new-october-2026/",
       "originApi": "https://astro.build/api/comments",
       "liveSynced": true
     },
@@ -253,7 +253,7 @@
         "友链动态",
         "tech"
       ],
-      "likes": 25,
+      "likes": 33,
       "commentCount": 0,
       "origin": "https://blog.cloudflare.com/",
       "originUrl": "https://blog.cloudflare.com/emudhra-patching/",

@@ -268,8 +268,88 @@ async function runVerification() {
       throw new Error('点赞后点赞数未自增');
     }
 
-    // 5. 验证 QQ 空间式就地展开评论楼层与访客留言互动
-    console.log('[E2E 7] 验证 QQ 空间式就地评论楼层与访客留言互动...');
+    // 5. 验证 QQ 空间式 5 行文字上限折叠与展开 (展开全文 ▾ / 收起 ▴)
+    console.log('[E2E 7] 验证 QQ 空间式 5 行文字上限折叠与展开...');
+    const clampedBubble = await page.$('.moment-summary-bubble.is-clamped');
+    if (!clampedBubble) throw new Error('未找到应用 5 行上限样式的 .moment-summary-bubble.is-clamped');
+    const expandBtn = await clampedBubble.$('.btn-toggle-expand');
+    if (expandBtn) {
+      const initialBtnText = await expandBtn.textContent();
+      console.log(`  -> 初始折叠按钮文字: ${initialBtnText.trim()}`);
+      await expandBtn.click();
+      await page.waitForTimeout(200);
+
+      const isUnclamped = await clampedBubble.evaluate((el) => !el.classList.contains('is-clamped'));
+      const expandedBtnText = await expandBtn.textContent();
+      console.log(`  -> 点击后展开状态: unclamped=${isUnclamped}, 按钮文字=${expandedBtnText.trim()}`);
+      if (!isUnclamped || !expandedBtnText.includes('收起')) {
+        throw new Error('点击展开全文后未成功切换为展开状态');
+      }
+
+      await expandBtn.click();
+      await page.waitForTimeout(200);
+      const isReclamped = await clampedBubble.evaluate((el) => el.classList.contains('is-clamped'));
+      console.log(`  -> 再次点击收起状态: reclamped=${isReclamped}`);
+      if (!isReclamped) {
+        throw new Error('点击收起后未成功恢复折叠状态');
+      }
+    }
+
+    // 6. 验证 QQ 空间式 1-9 张多图九宫格渲染
+    console.log('[E2E 8] 验证 1-9 张图片九宫格渲染...');
+    const photoGrids = await page.$$('.moment-photos-grid');
+    console.log(`  -> 页面九宫格照片墙数量: ${photoGrids.length}`);
+    if (photoGrids.length > 0) {
+      const gridClass = await photoGrids[0].getAttribute('class');
+      const photoItems = await photoGrids[0].$$('.moment-photo-item');
+      console.log(`  -> 首个照片墙类名: ${gridClass}, 图片子项数量: ${photoItems.length}`);
+      if (photoItems.length === 0) throw new Error('九宫格中未找到图片子项');
+    }
+
+    // 7. 验证点击说说标题就地打开全景详情模态框 (无跳转反代模式)
+    console.log('[E2E 9] 验证点击说说标题就地呼出全景详情模态框 (无跳转反代)...');
+    const firstTitleBtn = await page.$('.moment-title-btn');
+    if (!firstTitleBtn) throw new Error('未找到说说标题按钮 .moment-title-btn');
+    const targetMomentId = await firstTitleBtn.getAttribute('data-open-detail');
+    console.log(`  -> 点击说说 [${targetMomentId}] 标题...`);
+    await firstTitleBtn.click();
+    await page.waitForTimeout(300);
+
+    const detailModal = await page.$('#moment-detail-modal:not(.hidden)');
+    if (!detailModal) throw new Error('点击说说标题后详情模态框未显示');
+
+    const modalTitle = await page.$eval('#modal-title', (el) => el.textContent);
+    const modalContent = await page.$eval('#modal-content', (el) => el.textContent);
+    console.log(`  -> 模态框标题: ${modalTitle}`);
+    console.log(`  -> 模态框正文字数: ${modalContent.length}`);
+    if (!modalTitle || modalContent.length === 0) throw new Error('模态框内容未正常填充');
+
+    // 验证当前 URL 仍停留在 /moments/ 且带有 #moment- hash (无外部跳转)
+    const currentUrl = page.url();
+    console.log(`  -> 模态框激活时当前 URL: ${currentUrl}`);
+    if (!currentUrl.includes('/moments/#moment-')) {
+      throw new Error(`当前 URL 未符合就地反代锚点规范: ${currentUrl}`);
+    }
+
+    // 验证模态框内点赞与卡片点赞双向同步
+    console.log('[E2E 10] 验证模态框内点赞与卡片点赞双向联动...');
+    const modalLikeBtn = await page.$('#modal-like-btn');
+    const modalLikeCountBefore = parseInt(await page.$eval('#modal-like-count', (el) => el.textContent), 10);
+    await modalLikeBtn.click();
+    await page.waitForTimeout(300);
+    const modalLikeCountAfter = parseInt(await page.$eval('#modal-like-count', (el) => el.textContent), 10);
+    console.log(`  -> 模态框点赞前后计数: ${modalLikeCountBefore} -> ${modalLikeCountAfter}`);
+
+    // 关闭模态框并验证恢复
+    console.log('[E2E 11] 验证关闭详情模态框...');
+    const btnCloseModal = await page.$('#btn-close-modal');
+    await btnCloseModal.click();
+    await page.waitForTimeout(300);
+    const modalHidden = await page.$('#moment-detail-modal.hidden');
+    if (!modalHidden) throw new Error('点击关闭后模态框未隐藏');
+
+    // 8. 验证 QQ 空间式就地展开评论楼层与访客留言互动
+    console.log('[E2E 12] 验证 QQ 空间式就地评论楼层与访客留言互动...');
     const firstCommentToggleBtn = await page.$('.moment-comment-toggle-btn');
     const momentId = await firstCommentToggleBtn.getAttribute('data-moment-id');
     console.log(`  -> 针对说说 ID [${momentId}] 展开评论楼层...`);
