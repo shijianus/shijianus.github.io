@@ -106,34 +106,6 @@ const BASE_FEEDS: SyncedMomentItem[] = [
     liveSynced: false,
   },
 ];
-    timestamp: '2026-10-31 14:10',
-    category: 'tech',
-    tags: ['WebAudio', 'Canvas', '动效'],
-    likes: 29,
-    commentCount: 1,
-    liveSynced: false,
-  },
-  {
-    id: 'sync_leo_1',
-    author: 'Leonus',
-    authorUrl: 'https://blog.leonus.cn/',
-    avatar: 'https://q1.qlogo.cn/g?b=qq&nk=990320751&s=640',
-    badge: '🌐 友邻传送',
-    isOwner: false,
-    mood: '🌅 自由',
-    device: '来自好友「Leonus」的随想',
-    title: '秋日骑行记：在城市边缘追逐落日余晖',
-    url: 'https://blog.leonus.cn/',
-    summary: '放下键盘，骑上单车，沿着滨海公路一路向西。风在耳边呼啸，带走了连续多日重构代码的疲惫。生活除了终端和像素，还有金黄色的落日与旷野。',
-    timeAgo: '昨天',
-    timestamp: '2026-10-30 19:12',
-    category: 'life',
-    tags: ['生活记录', '骑行', '摄影'],
-    likes: 41,
-    commentCount: 4,
-    liveSynced: false,
-  },
-];
 
 export const onRequest: PagesFunction<AppEnv> = async (context) => {
   const { request, env } = context;

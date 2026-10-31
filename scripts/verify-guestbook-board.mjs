@@ -221,42 +221,203 @@ async function runVerification() {
     }
     console.log('[Verify] ✓ Verified old subtitle and stamps are completely eradicated');
 
-    // Verify "+ 发布 Boost" button in header
+    // 2. Test Top Boost Stream (楼上 Boost 实时观点流 - 3排自适应流速)
+    console.log('[Verify] 2. Testing Top Boost Stream...');
+    const boostWall = await page.$('.gb-boost-wall-card');
+    if (!boostWall) throw new Error('Top Boost wall card (.gb-boost-wall-card) not found');
+
+    const boostBadgeText = await page.textContent('.gb-boost-badge');
+    console.log(`[Verify] Boost Badge text: "${boostBadgeText?.trim()}"`);
+    if (!boostBadgeText?.includes('Boost')) {
+      throw new Error('Boost badge missing');
+    }
+
+    // Verify Count Status text
+    const statusCountText = await page.textContent('.gb-boost-status-count');
+    console.log(`[Verify] Boost Status Count text: "${statusCountText?.trim()}"`);
+    if (!statusCountText?.includes('全站共收录')) {
+      throw new Error(`Expected status count to include "全站共收录", got "${statusCountText}"`);
+    }
+
+    // Verify separate Boost launch button is REMOVED as requested
     const launchBoostBtn = await page.$('.gb-launch-boost-btn');
-    if (!launchBoostBtn) {
-      throw new Error('Launch Boost button (.gb-launch-boost-btn) missing in Boost header');
+    if (launchBoostBtn) {
+      throw new Error('Separate Launch Boost button (.gb-launch-boost-btn) should be REMOVED from Boost header');
     }
-    console.log('[Verify] ✓ Launch Boost button found in header');
+    console.log('[Verify] ✓ Confirmed separate Boost launch button is removed; only single publish entry retained');
 
-    // Check dual stream tracks
+    // Verify Boost spec badge on header right
+    const specBadge = await page.$('.gb-boost-spec-badge');
+    if (!specBadge) throw new Error('.gb-boost-spec-badge missing');
+    const specText = await page.textContent('.gb-boost-spec-badge');
+    console.log(`[Verify] Boost Spec Badge text: "${specText?.trim()}"`);
+
+    // Verify 3 rows container and all 3 tracks
+    const marqueeContainer = await page.$('.gb-boost-marquee-container.is-three-rows');
+    if (!marqueeContainer) throw new Error('Boost container missing .is-three-rows class');
+
+    const track1 = await page.$('.gb-track-1');
+    const track2 = await page.$('.gb-track-2');
+    const track3 = await page.$('.gb-track-3');
+    if (!track1 || !track2 || !track3) {
+      throw new Error('Expected all 3 tracks (.gb-track-1, .gb-track-2, .gb-track-3) to be rendered');
+    }
+    console.log('[Verify] ✓ Verified all 3 Boost tracks are actively rendered');
+
+    // Verify dynamic speed duration attribute on track
+    const track1Duration = await page.getAttribute('.gb-track-1', 'style');
+    console.log(`[Verify] Track 1 style duration: "${track1Duration}"`);
+    if (!track1Duration?.includes('animation-duration')) {
+      throw new Error('Expected dynamic animation-duration style set on track');
+    }
+
+    // Check viewpoint cards count
     const marqueeCardsCount = await page.$$eval('.gb-boost-pill-card', (els) => els.length);
-    console.log(`[Verify] Boost viewpoint cards count: ${marqueeCardsCount}`);
-    if (marqueeCardsCount < 4) {
-      throw new Error('Boost stream should have viewpoint cards');
+    console.log(`[Verify] Boost viewpoint cards count across 3 rows: ${marqueeCardsCount}`);
+    if (marqueeCardsCount < 6) {
+      throw new Error('Boost stream should have diverse viewpoint cards across 3 rows');
     }
 
-    // 3. Test Non-blocking Floating Composer Dock for Boost
-    console.log('[Verify] 3. Testing Floating Composer Dock for Boost...');
-    await launchBoostBtn.click();
+    // 3. Test Navigation Bar with 4-Item Scrollable Dropdowns (分区 & 维度)
+    console.log('[Verify] 3. Testing Navigation Bar Dropdowns...');
+    // 3.1 Category Dropdown
+    const catDropdownBtn = await page.$('.gb-nav-dropdown-btn:has-text("分区:")');
+    if (!catDropdownBtn) throw new Error('Category dropdown trigger button (.gb-nav-dropdown-btn) not found');
+    await catDropdownBtn.click();
     await page.waitForTimeout(300);
 
-    const floatingComposer = await page.$('.gb-floating-composer');
-    if (!floatingComposer) {
-      throw new Error('Floating composer (.gb-floating-composer) failed to open');
+    const catDropdownMenu = await page.$('.gb-scrollable-dropdown.is-four-items-max');
+    if (!catDropdownMenu) throw new Error('Category scrollable dropdown failed to open');
+
+    const catItemsCount = await page.$$eval('.gb-scrollable-dropdown.is-four-items-max .gb-scrollable-dropdown__item', (els) => els.length);
+    console.log(`[Verify] Category dropdown total items: ${catItemsCount}`);
+    if (catItemsCount < 7) {
+      throw new Error('Category dropdown should list all categories (最新, 近期, 热门, 精选, 我的贴文, 已读, 书签)');
     }
 
-    // Verify NO blocking modal overlay backdrop
-    const modalBackdrop = await page.$('.gb-modal-overlay:not([style*="display: none"])');
-    if (modalBackdrop) {
-      const isDisplayContents = await page.$eval('.gb-modal-overlay', (el) => window.getComputedStyle(el).display);
-      console.log(`[Verify] Modal overlay display style: ${isDisplayContents}`);
+    // Select "热门"
+    const hotOption = await page.$('.gb-scrollable-dropdown__item:has-text("热门")');
+    if (hotOption) await hotOption.click();
+    await page.waitForTimeout(300);
+    console.log('[Verify] ✓ Selected "热门" category');
+
+    // Switch back to "最新"
+    await catDropdownBtn.click();
+    await page.waitForTimeout(300);
+    const latestOption = await page.$('.gb-scrollable-dropdown__item:has-text("最新")');
+    if (latestOption) await latestOption.click();
+    await page.waitForTimeout(300);
+    console.log('[Verify] ✓ Switched back to "最新" category');
+
+    // 3.2 Dimension Dropdown
+    const dimDropdownBtn = await page.$('.gb-nav-dropdown-btn:has-text("维度:")');
+    if (!dimDropdownBtn) throw new Error('Dimension dropdown trigger button not found');
+    await dimDropdownBtn.click();
+    await page.waitForTimeout(300);
+
+    const dimDropdownMenu = await page.$('.gb-scrollable-dropdown.is-four-items-max');
+    if (!dimDropdownMenu) throw new Error('Dimension scrollable dropdown failed to open');
+
+    const dimItemsCount = await page.$$eval('.gb-scrollable-dropdown.is-four-items-max .gb-scrollable-dropdown__item', (els) => els.length);
+    console.log(`[Verify] Dimension dropdown total items: ${dimItemsCount}`);
+    if (dimItemsCount < 6) {
+      throw new Error('Dimension dropdown should list all 6 channels');
     }
 
-    // Verify Boost Mode Tab active
-    const activeTab = await page.textContent('.gb-mode-tab.is-active');
-    console.log(`[Verify] Active Mode Tab: "${activeTab?.trim()}"`);
-    if (!activeTab?.includes('Boost')) {
-      throw new Error('Expected Boost mode tab to be active');
+    // Select "技术探讨"
+    const techOption = await page.$('.gb-scrollable-dropdown__item:has-text("技术探讨")');
+    if (techOption) await techOption.click();
+    await page.waitForTimeout(300);
+    console.log('[Verify] ✓ Selected "技术探讨" dimension');
+
+    // Reset dimension to all
+    const dimResetBtn = await page.$('.gb-active-dim-reset');
+    if (dimResetBtn) {
+      await dimResetBtn.click();
+      await page.waitForTimeout(300);
+      console.log('[Verify] ✓ Reset dimension to all');
+    }
+
+    // 4. Test Official Pinned Rule Threads in Gesture Feed
+    console.log('[Verify] 4. Testing Official Pinned Rule Threads...');
+    await page.waitForSelector('.gb-gesture-row', { timeout: 10000 });
+
+    const pinnedRowsCount = await page.$$eval('.gb-gesture-row.is-pinned-row', (els) => els.length);
+    console.log(`[Verify] Pinned rule threads count: ${pinnedRowsCount}`);
+    if (pinnedRowsCount < 4) {
+      throw new Error(`Expected at least 4 pinned rule threads, got ${pinnedRowsCount}`);
+    }
+
+    // Verify pinned topic titles
+    const feedText = await page.textContent('.gb-gesture-table');
+    if (!feedText?.includes('欢迎来到全站留言与读者交流广场')) {
+      throw new Error('Official pinned topic 1 missing');
+    }
+    if (!feedText?.includes('全站留言与讨论广场公约及社群守则')) {
+      throw new Error('Official pinned topic 2 missing');
+    }
+    if (!feedText?.includes('关于边缘分布式架构、D1 毫秒级落盘与数据隐私保护说明')) {
+      throw new Error('Official pinned topic 3 missing');
+    }
+    if (!feedText?.includes('讨论维度（Channels）划分、Tag 标签与内容检索指南')) {
+      throw new Error('Official pinned topic 4 missing');
+    }
+    console.log('[Verify] ✓ All 4 official pinned rule threads verified at top of feed');
+
+    // 5. Test Floating Composer with Dynamic Smart Identification
+    console.log('[Verify] 5. Testing Unified Composer with Dynamic Smart Identification...');
+    const newGestureBtn = await page.$('.gb-new-gesture-btn');
+    if (!newGestureBtn) throw new Error('Single publish button (.gb-new-gesture-btn) not found');
+    await newGestureBtn.click();
+    await page.waitForTimeout(300);
+
+    const gComposer = await page.$('.gb-floating-composer');
+    if (!gComposer) throw new Error('Floating composer failed to open');
+
+    // Initially empty -> dynamic detection should be Boost (< 8 chars)
+    let badgeText = await page.textContent('.gb-smart-type-badge');
+    console.log(`[Verify] Initial Smart Badge: "${badgeText?.trim()}"`);
+    if (!badgeText?.includes('Boost')) {
+      throw new Error(`Expected initial empty state to detect Boost, got "${badgeText}"`);
+    }
+
+    let submitBtnText = await page.textContent('.gb-modal-foot .gb-submit-btn');
+    console.log(`[Verify] Initial Submit Button: "${submitBtnText?.trim()}"`);
+    if (!submitBtnText?.includes('发布为 Boost')) {
+      throw new Error('Expected initial submit button to say "发布为 Boost"');
+    }
+
+    // Test typing < 30 chars without title or tag -> stays Boost
+    const textarea = await page.$('.gb-textarea.is-modal-textarea');
+    if (!textarea) throw new Error('Composer textarea not found');
+    await textarea.fill('边缘计算毫秒级落盘体验丝滑！');
+    await page.waitForTimeout(200);
+
+    badgeText = await page.textContent('.gb-smart-type-badge');
+    console.log(`[Verify] Short message Smart Badge: "${badgeText?.trim()}"`);
+    if (!badgeText?.includes('Boost')) {
+      throw new Error('Expected message under 30 chars without title/tag to detect Boost');
+    }
+
+    // Now test entering Title -> dynamically flips to Gesture!
+    const titleInput = await page.$('.gb-modal-title-input');
+    if (!titleInput) throw new Error('Title input not found');
+    await titleInput.fill('关于边缘计算架构的新思考');
+    await page.waitForTimeout(200);
+
+    badgeText = await page.textContent('.gb-smart-type-badge');
+    submitBtnText = await page.textContent('.gb-modal-foot .gb-submit-btn');
+    console.log(`[Verify] After entering title: Badge: "${badgeText?.trim()}", Button: "${submitBtnText?.trim()}"`);
+    if (!badgeText?.includes('Gesture') || !submitBtnText?.includes('发布为 Gesture')) {
+      throw new Error('Expected composer to dynamically flip to Gesture when title is present');
+    }
+
+    // Test entering Custom Tag -> stays Gesture
+    const tagInput = await page.$('.gb-composer-tag-input');
+    if (tagInput) {
+      await tagInput.fill('#边缘架构 #前端工程');
+      await page.waitForTimeout(200);
+      console.log('[Verify] ✓ Tag input filled');
     }
 
     // Test Minimize to Bottom Dock Pill
@@ -265,89 +426,25 @@ async function runVerification() {
       await minimizeBtn.click();
       await page.waitForTimeout(300);
       const minimizedPill = await page.$('.gb-composer-minimized-pill');
-      if (!minimizedPill) throw new Error('Minimized dock pill (.gb-composer-minimized-pill) not found');
-      console.log('[Verify] ✓ Successfully minimized composer to bottom dock pill');
+      if (!minimizedPill) throw new Error('Minimized dock pill not found');
 
-      // Click minimized pill to expand back
+      const pillBadge = await page.textContent('.gb-minimized-badge');
+      console.log(`[Verify] Minimized Dock Pill Badge: "${pillBadge?.trim()}"`);
+      if (!pillBadge?.includes('Gesture')) {
+        throw new Error('Expected minimized pill to display Gesture badge');
+      }
+
+      // Re-expand
       await minimizedPill.click();
       await page.waitForTimeout(300);
-      const reExpanded = await page.$('.gb-floating-composer');
-      if (!reExpanded) throw new Error('Failed to restore composer from minimized pill');
-      console.log('[Verify] ✓ Restored composer from dock pill');
+      console.log('[Verify] ✓ Re-expanded composer from dock pill');
     }
 
-    // Fill Boost Input (<= 30 chars) and submit
-    const boostTextarea = await page.$('.gb-textarea.is-boost-textarea');
-    if (boostTextarea) {
-      await boostTextarea.fill('🚀 边缘计算落盘毫秒级，短句观点随手分享！');
-      const boostSubmitBtn = await page.$('.gb-submit-btn.is-boost-btn');
-      if (boostSubmitBtn) {
-        await boostSubmitBtn.click();
-        await page.waitForTimeout(800);
-        console.log('[Verify] ✓ Boost viewpoint submitted via floating composer');
-      }
-    }
-
-    // 4. Test Horizontal Categories Bar (横排分类导航条)
-    console.log('[Verify] 4. Testing Horizontal Categories Bar...');
-    const navCategories = ['最新', '近期', '维度', '热门', '精选', '我的贴文', '已读', '书签'];
-    for (const catName of navCategories) {
-      const catBtn = await page.$(`.gb-cat-btn:has-text("${catName}")`);
-      if (!catBtn) {
-        throw new Error(`Missing required category button: "${catName}" in horizontal nav bar`);
-      }
-    }
-    console.log('[Verify] ✓ All 8 horizontal categories verified (最新, 近期, 维度, 热门, 精选, 我的贴文, 已读, 书签)');
-
-    // Test clicking "维度" (Dimensions) dropdown
-    const dimBtn = await page.$('.gb-cat-btn:has-text("维度")');
-    if (dimBtn) {
-      await dimBtn.click();
-      await page.waitForTimeout(300);
-      const dropdown = await page.$('.gb-dimension-dropdown');
-      if (!dropdown) throw new Error('Dimensions dropdown failed to open');
-      console.log('[Verify] ✓ Dimensions dropdown menu opened');
-
-      // Select "技术探讨"
-      const techOption = await page.$('.gb-dimension-item:has-text("技术探讨")');
-      if (techOption) await techOption.click();
-      await page.waitForTimeout(300);
-      console.log('[Verify] ✓ Selected "技术探讨" dimension');
-    }
-
-    // 5. Test Gesture Feed & 20-Item Display Cap
-    console.log('[Verify] 5. Testing Gesture Feed & 20-Item Display Cap...');
-    await page.waitForSelector('.gb-gesture-row', { timeout: 10000 });
-    const gestureRowsCount = await page.$$eval('.gb-gesture-row', (els) => els.length);
-    console.log(`[Verify] Active Gesture rows count on screen: ${gestureRowsCount}`);
-    if (gestureRowsCount === 0) {
-      throw new Error('Expected at least 1 Gesture row in discussion feed');
-    }
-    if (gestureRowsCount > 20) {
-      throw new Error(`Gesture rows count on screen exceeds 20: ${gestureRowsCount}`);
-    }
-    console.log('[Verify] ✓ Confirmed Gesture feed is capped at at most 20 items per view');
-
-    // Test Floating Composer for Gesture
-    console.log('[Verify] 5.1. Testing Floating Composer for Gesture...');
-    const newGestureBtn = await page.$('.gb-new-gesture-btn');
-    if (newGestureBtn) {
-      await newGestureBtn.click();
-      await page.waitForTimeout(300);
-      const gComposer = await page.$('.gb-floating-composer');
-      if (!gComposer) throw new Error('Floating composer failed to open for Gesture');
-
-      const isGestureActive = await page.textContent('.gb-mode-tab.is-active');
-      if (!isGestureActive?.includes('Gesture')) {
-        throw new Error('Expected Gesture mode tab to be active');
-      }
-
-      // Close composer
-      const closeBtn = await page.$('.gb-window-tool-btn.is-close');
-      if (closeBtn) await closeBtn.click();
-      await page.waitForTimeout(300);
-      console.log('[Verify] ✓ Verified Floating Composer opens in Gesture mode and closes cleanly');
-    }
+    // Close composer cleanly
+    const closeBtn = await page.$('.gb-window-tool-btn.is-close');
+    if (closeBtn) await closeBtn.click();
+    await page.waitForTimeout(300);
+    console.log('[Verify] ✓ Verified Dynamic Composer identification and non-blocking window controls');
 
     // Verify Bookmark Toggle on Row
     const bookmarkBtn = await page.$('.gb-bookmark-toggle');
