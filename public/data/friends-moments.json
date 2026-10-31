@@ -1,11 +1,11 @@
 {
   "ok": true,
   "engine": "EpoCanvas Moments Federation Pipeline v3.0",
-  "syncedAt": "2026-10-31T15:55:45.120Z",
-  "total": 8,
+  "syncedAt": "2026-10-31T17:32:17.984Z",
+  "total": 7,
   "masterCount": 3,
-  "friendCount": 5,
-  "liveCount": 2,
+  "friendCount": 4,
+  "liveCount": 0,
   "items": [
     {
       "id": "m_20261031_01",
@@ -198,67 +198,34 @@
       "liveSynced": false
     },
     {
-      "id": "sync_Astro_官方生态_er-2026/",
-      "author": "Astro 官方生态",
-      "authorUrl": "https://astro.build/",
-      "avatar": "https://astro.build/favicon.svg",
+      "id": "sync_小康的个人博客_fallback",
+      "author": "小康的个人博客",
+      "authorUrl": "https://www.antmoe.com/",
+      "avatar": "https://cdn.jsdelivr.net/gh/sviptzk/StaticFile_HEXO@v3.2.7/butterfly/img/avatar.jpg",
       "badge": "🌐 友邻传送",
       "isOwner": false,
-      "mood": "⚡ 极速",
-      "device": "来自好友「Astro 官方生态」的最新发布",
-      "title": "What&apos;s new in Astro - October 2026",
-      "url": "/moments/#moment-sync_Astro_官方生态_er-2026/",
-      "summary": "October 2026 - Astro 7.4, conference talks, and more!",
-      "content": "October 2026 - Astro 7.4, conference talks, and more!",
+      "mood": "💡 探索",
+      "device": "来自好友「小康的个人博客」的花园",
+      "title": "Cloudflare D1 边缘数据库在个人博客中的实践踩坑",
+      "url": "/moments/#moment-sync_小康的个人博客_fallback",
+      "summary": "记录一下最近使用 D1 替代传统 MongoDB 的心得。Serverless SQLite 的读性能极为惊艳，在博客应用中能带来零冷启动的毫秒级体验。",
+      "content": "记录一下最近使用 D1 替代传统 MongoDB 的心得。Serverless SQLite 的读性能极为惊艳，在博客应用中能带来零冷启动的毫秒级体验。",
       "images": [
-        "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80",
         "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80"
       ],
-      "timeAgo": "15小时前",
-      "timestamp": "2026-10-30 16:00",
+      "timeAgo": "近期更新",
+      "timestamp": "2026-10-30 15:30",
       "category": "tech",
       "tags": [
         "友链动态",
         "tech"
       ],
-      "likes": 29,
+      "likes": 25,
       "commentCount": 0,
-      "origin": "https://astro.build/",
-      "originUrl": "https://astro.build/blog/whats-new-october-2026/",
-      "originApi": "https://astro.build/api/comments",
-      "liveSynced": true
-    },
-    {
-      "id": "sync_Cloudflare_官方生态_2P37EBD7",
-      "author": "Cloudflare 官方生态",
-      "authorUrl": "https://blog.cloudflare.com/",
-      "avatar": "https://www.cloudflare.com/favicon.ico",
-      "badge": "🌐 友邻传送",
-      "isOwner": false,
-      "mood": "⚡ 边缘",
-      "device": "来自好友「Cloudflare 官方生态」的最新发布",
-      "title": "4 real? Tracking exploitation and patching of eMudhra’s weak keys",
-      "url": "/moments/#moment-sync_Cloudflare_官方生态_2P37EBD7",
-      "summary": "On October 19, 2026, we learned about eMudhra’s eight shockingly weak keys: where eMudhra was trusted to pick a 115-digit number for their v...",
-      "content": "On October 19, 2026, we learned about eMudhra’s eight shockingly weak keys: where eMudhra was trusted to pick a 115-digit number for their v...",
-      "images": [
-        "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&auto=format&fit=crop&q=80"
-      ],
-      "timeAgo": "22小时前",
-      "timestamp": "2026-10-30 09:38",
-      "category": "tech",
-      "tags": [
-        "友链动态",
-        "tech"
-      ],
-      "likes": 33,
-      "commentCount": 0,
-      "origin": "https://blog.cloudflare.com/",
-      "originUrl": "https://blog.cloudflare.com/emudhra-patching/",
-      "originApi": "https://blog.cloudflare.com/api/comments",
-      "liveSynced": true
+      "origin": "https://www.antmoe.com/",
+      "originUrl": "https://www.antmoe.com/",
+      "originApi": "https://www.antmoe.com/api/comments",
+      "liveSynced": false
     }
   ],
   "solution": "全网同规：Markdown 存储 + 构建时清单互联 + 边缘跨站路由评论聚合"

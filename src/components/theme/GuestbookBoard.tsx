@@ -95,8 +95,9 @@ const EMOJI_GROUPS = [
   },
 ];
 
-// Starter Boost viewpoint messages (ensuring top stream is never empty)
+// Starter Boost viewpoint messages (ensuring top stream has diverse thoughts on first view)
 const STARTER_BOOSTS: BlogComment[] = [
+  // Track 1 (Index 0, 3, 6)
   {
     id: 'boost_starter_1',
     postSlug: 'guestbook',
@@ -118,44 +119,6 @@ const STARTER_BOOSTS: BlogComment[] = [
     ipLocation: '上海',
   },
   {
-    id: 'boost_starter_2',
-    postSlug: 'guestbook',
-    parentId: null,
-    postType: 'boost',
-    tag: 'tech',
-    authorId: 'reader_2',
-    authorName: 'KernelHacker',
-    authorRole: 'member',
-    message: '⚡ 边缘计算的毫秒级落盘体验非常丝滑，短句观点随手记录毫无负担！',
-    likesCount: 4,
-    reactions: { summary: { '🔥': 4 }, users: {} },
-    status: 'approved',
-    createdAt: '2026-10-31T01:30:00.000Z',
-    showLocation: true,
-    ipCountryFlag: '🇸🇬',
-    ipCountryName: '新加坡',
-    ipLocation: 'Singapore',
-  },
-  {
-    id: 'boost_starter_3',
-    postSlug: 'guestbook',
-    parentId: null,
-    postType: 'boost',
-    tag: 'life',
-    authorId: 'reader_3',
-    authorName: '晨光微熹',
-    authorRole: 'member',
-    message: '☕ 清晨喝一杯手冲曼特宁，阅读博主的工程规范，收获满满。',
-    likesCount: 3,
-    reactions: { summary: { '👍': 3 }, users: {} },
-    status: 'approved',
-    createdAt: '2026-10-31T02:00:00.000Z',
-    showLocation: true,
-    ipCountryFlag: '🇨🇳',
-    ipCountryName: '中国',
-    ipLocation: '浙江 · 杭州',
-  },
-  {
     id: 'boost_starter_4',
     postSlug: 'guestbook',
     parentId: null,
@@ -173,6 +136,46 @@ const STARTER_BOOSTS: BlogComment[] = [
     ipCountryFlag: '🇯🇵',
     ipCountryName: '日本',
     ipLocation: 'Tokyo',
+  },
+  {
+    id: 'boost_starter_7',
+    postSlug: 'guestbook',
+    parentId: null,
+    postType: 'boost',
+    tag: 'tech',
+    authorId: 'reader_7',
+    authorName: 'Rustacean',
+    authorRole: 'member',
+    message: '🦀 边缘运行时轻量可靠，低延迟交互让全站讨论流畅如飞。',
+    likesCount: 4,
+    reactions: { summary: { '⚡': 4 }, users: {} },
+    status: 'approved',
+    createdAt: '2026-10-31T03:00:00.000Z',
+    showLocation: true,
+    ipCountryFlag: '🇩🇪',
+    ipCountryName: '德国',
+    ipLocation: 'Frankfurt',
+  },
+
+  // Track 2 (Index 1, 4, 7)
+  {
+    id: 'boost_starter_2',
+    postSlug: 'guestbook',
+    parentId: null,
+    postType: 'boost',
+    tag: 'tech',
+    authorId: 'reader_2',
+    authorName: 'KernelHacker',
+    authorRole: 'member',
+    message: '⚡ 边缘计算的毫秒级落盘体验非常丝滑，短句观点随手记录毫无负担！',
+    likesCount: 4,
+    reactions: { summary: { '🔥': 4 }, users: {} },
+    status: 'approved',
+    createdAt: '2026-10-31T01:30:00.000Z',
+    showLocation: true,
+    ipCountryFlag: '🇸🇬',
+    ipCountryName: '新加坡',
+    ipLocation: 'Singapore',
   },
   {
     id: 'boost_starter_5',
@@ -193,21 +196,100 @@ const STARTER_BOOSTS: BlogComment[] = [
     ipCountryName: '美国',
     ipLocation: 'California',
   },
+  {
+    id: 'boost_starter_8',
+    postSlug: 'guestbook',
+    parentId: null,
+    postType: 'boost',
+    tag: 'life',
+    authorId: 'reader_8',
+    authorName: '青空与海',
+    authorRole: 'member',
+    message: '🌊 无论身处何地，敲下几句此刻的想法，都是给世界的信号。',
+    likesCount: 5,
+    reactions: { summary: { '✨': 3, '❤️': 2 }, users: {} },
+    status: 'approved',
+    createdAt: '2026-10-31T03:20:00.000Z',
+    showLocation: true,
+    ipCountryFlag: '🇨🇦',
+    ipCountryName: '加拿大',
+    ipLocation: 'Vancouver',
+  },
+
+  // Track 3 (Index 2, 5, 8)
+  {
+    id: 'boost_starter_3',
+    postSlug: 'guestbook',
+    parentId: null,
+    postType: 'boost',
+    tag: 'life',
+    authorId: 'reader_3',
+    authorName: '晨光微熹',
+    authorRole: 'member',
+    message: '☕ 清晨喝一杯手冲曼特宁，阅读博主的工程规范，收获满满。',
+    likesCount: 3,
+    reactions: { summary: { '👍': 3 }, users: {} },
+    status: 'approved',
+    createdAt: '2026-10-31T02:00:00.000Z',
+    showLocation: true,
+    ipCountryFlag: '🇨🇳',
+    ipCountryName: '中国',
+    ipLocation: '浙江 · 杭州',
+  },
+  {
+    id: 'boost_starter_6',
+    postSlug: 'guestbook',
+    parentId: null,
+    postType: 'boost',
+    tag: 'chat',
+    authorId: 'reader_6',
+    authorName: '极客漫步',
+    authorRole: 'member',
+    message: '💡 悬浮面板边浏览边拟稿，完全不遮挡阅读心流，体验满分！',
+    likesCount: 7,
+    reactions: { summary: { '💯': 4, '👍': 3 }, users: {} },
+    status: 'approved',
+    createdAt: '2026-10-31T02:50:00.000Z',
+    showLocation: true,
+    ipCountryFlag: '🇨🇳',
+    ipCountryName: '中国',
+    ipLocation: '北京',
+  },
+  {
+    id: 'boost_starter_9',
+    postSlug: 'guestbook',
+    parentId: null,
+    postType: 'boost',
+    tag: 'ideas',
+    authorId: 'reader_9',
+    authorName: 'PixelArtist',
+    authorRole: 'member',
+    message: '🎯 3排自适应流速展示很舒展，单句焦点清晰，毫无视觉喧嚣感。',
+    likesCount: 3,
+    reactions: { summary: { '🎨': 3 }, users: {} },
+    status: 'approved',
+    createdAt: '2026-10-31T03:40:00.000Z',
+    showLocation: true,
+    ipCountryFlag: '🇦🇺',
+    ipCountryName: '澳大利亚',
+    ipLocation: 'Sydney',
+  },
 ];
 
-// Official Pinned Welcome Thread (Anchor) with starter multi-floor replies
-const OFFICIAL_PINNED_POST: BlogComment = {
-  id: 'pinned_welcome_official',
-  postSlug: 'guestbook',
-  parentId: null,
-  postType: 'gesture',
-  tag: 'tech',
-  authorId: 'admin',
-  authorName: 'shijianus',
-  authorAvatar: '/media/shijianus/avatar.jpg',
-  authorRole: 'admin',
-  authorWebsite: 'https://blog.epocanvas.com',
-  message: `### 🌟 欢迎来到全站留言与读者交流广场！
+// Official Pinned Rule & Welcome Threads (Anchor)
+export const OFFICIAL_PINNED_POSTS: BlogComment[] = [
+  {
+    id: 'pinned_welcome_official',
+    postSlug: 'guestbook',
+    parentId: null,
+    postType: 'gesture',
+    tag: 'chat',
+    authorId: 'admin',
+    authorName: 'shijianus',
+    authorAvatar: '/media/shijianus/avatar.jpg',
+    authorRole: 'admin',
+    authorWebsite: 'https://blog.epocanvas.com',
+    message: `### 🌟 欢迎来到全站留言与读者交流广场！
 
 这里是为所有读者与探索者打造的开放交流空间。我们采用了**楼上 Boost 观点流 + 楼下 Gesture 话题广场**的分层架构：
 
@@ -221,19 +303,135 @@ const OFFICIAL_PINNED_POST: BlogComment = {
 - 顶部导航条支持切换 **最新、近期、维度、热门、精选、我的贴文、已读、书签**；
 - 底部配备**非阻塞悬浮起草面板**，支持在浏览全站讨论的同时随时拟写观点与话题。
 
-欢迎点击 **「发布 Gesture」** 或 **「发布 Boost」** 留下你的思想足迹！✨`,
-  likesCount: 8,
-  reactions: {
-    summary: { '👍': 5, '🚀': 4, '✨': 3, '❤️': 4 },
-    users: {},
+欢迎点击 **「发布 Gesture」** 留下你的思想足迹！✨`,
+    likesCount: 12,
+    reactions: {
+      summary: { '👍': 7, '🚀': 5, '✨': 4, '❤️': 6 },
+      users: {},
+    },
+    status: 'pinned',
+    createdAt: '2026-10-31T00:00:00.000Z',
+    showLocation: true,
+    ipCountryFlag: '🇨🇳',
+    ipCountryName: '中国',
+    ipLocation: '浙江 · 杭州',
   },
-  status: 'pinned',
-  createdAt: '2026-10-31T00:00:00.000Z',
-  showLocation: true,
-  ipCountryFlag: '🇨🇳',
-  ipCountryName: '中国',
-  ipLocation: '浙江 · 杭州',
-};
+  {
+    id: 'pinned_rules_community',
+    postSlug: 'guestbook',
+    parentId: null,
+    postType: 'gesture',
+    tag: 'feedback',
+    authorId: 'admin',
+    authorName: 'shijianus',
+    authorAvatar: '/media/shijianus/avatar.jpg',
+    authorRole: 'admin',
+    authorWebsite: 'https://blog.epocanvas.com',
+    message: `### 📜 全站留言与讨论广场公约及社群守则
+
+为了维护理性、自由、深度且充满温度的技术与思考交流环境，请所有参与者共同遵守本公约：
+
+#### 1. 关于 Boost 与 Gesture 的定位规范
+- **Boost（短句观点）**：适合表达即时的思考片段、短评、感悟与问候。字数限 **30 字以内**，不设多级嵌套回复，由系统在顶部观点流自适应轮播呈现；
+- **Gesture（深度讨论）**：适合展开严谨的技术探讨、架构分析、生活随笔或设计沉淀。需 **8 字以上**，支持完整 Markdown、语法高亮代码块、多图画廊与多楼层跟帖互动。
+
+#### 2. 发帖与文明互动守则
+- **友善交流，互相尊重**：尊重不同技术选型与认知视角，严禁人身攻击、煽动对立、低俗谩骂或歧视性言论；
+- **拒绝无意义灌水与垃圾信息**：请勿发布无意义纯标点符号或批量重复刷屏，简短心得请优先使用 Boost；
+- **排版规范与结构化沉淀**：长篇讨论请善用 Markdown 分级标题、代码块与引用，方便其他探索者深度阅读与索引；
+- **知识产权与原创保护**：转载或引用他处内容请务必注明出处来源，鼓励原创思考与真诚交流。
+
+共同守护这片属于所有探索者的思想绿洲！🌿`,
+    likesCount: 9,
+    reactions: {
+      summary: { '🛡️': 6, '👍': 5, '❤️': 3 },
+      users: {},
+    },
+    status: 'pinned',
+    createdAt: '2026-10-31T00:05:00.000Z',
+    showLocation: true,
+    ipCountryFlag: '🇨🇳',
+    ipCountryName: '中国',
+    ipLocation: '浙江 · 杭州',
+  },
+  {
+    id: 'pinned_architecture_privacy',
+    postSlug: 'guestbook',
+    parentId: null,
+    postType: 'gesture',
+    tag: 'tech',
+    authorId: 'admin',
+    authorName: 'shijianus',
+    authorAvatar: '/media/shijianus/avatar.jpg',
+    authorRole: 'admin',
+    authorWebsite: 'https://blog.epocanvas.com',
+    message: `### ⚡ 关于边缘分布式架构、D1 毫秒级落盘与数据隐私保护说明
+
+本站留言板与交流广场采用现代 Serverless 边缘分布式架构，为所有读者提供极低延迟与数据隐私保障：
+
+#### 1. 边缘计算与分布式数据架构
+- **零冷启动全球就近处理**：基于 Cloudflare Pages Functions 与 Workers，所有读写请求在离你物理距离最近的边缘节点瞬时响应；
+- **分布式 D1 数据库**：留言数据持久化落盘至全球分布式 SQL 引擎，配合智能缓存策略保障首屏即时加载；
+- **非阻塞交互体验**：全站单页路由与右下角非阻塞悬浮起草底座协同工作，边看帖边构思，绝不割裂阅读心流。
+
+#### 2. 隐私合规与访客权益保护
+- **无明文 IP 暴露**：边缘节点仅提取合规的地理国家/地区国旗与城市名称（如 🇨🇳 浙江 · 杭州），严禁向任何前端或第三方接口暴露明文 IP；
+- **访客临时会话安全所有权**：访客发言后持有时效性临时凭证，可对当前留言就地微调；关闭或刷新浏览器后凭证在内存中安全销毁，杜绝越权；
+- **数据自主与去中心化**：不接入任何第三方广告追踪器或数据采集脚本，尊重每位读者的数字足迹。`,
+    likesCount: 11,
+    reactions: {
+      summary: { '⚡': 7, '💡': 6, '🚀': 4 },
+      users: {},
+    },
+    status: 'pinned',
+    createdAt: '2026-10-31T00:10:00.000Z',
+    showLocation: true,
+    ipCountryFlag: '🇨🇳',
+    ipCountryName: '中国',
+    ipLocation: '浙江 · 杭州',
+  },
+  {
+    id: 'pinned_dimensions_guide',
+    postSlug: 'guestbook',
+    parentId: null,
+    postType: 'gesture',
+    tag: 'ideas',
+    authorId: 'admin',
+    authorName: 'shijianus',
+    authorAvatar: '/media/shijianus/avatar.jpg',
+    authorRole: 'admin',
+    authorWebsite: 'https://blog.epocanvas.com',
+    message: `### 💡 讨论维度（Channels）划分、Tag 标签与内容检索指南
+
+为了让每一种思考与话题都能在广场中找到最契合的声场与归属，我们设立了清晰的分类与索引机制：
+
+#### 1. 六大讨论维度说明
+- 💬 **畅所欲言**：日常闲聊、生活感悟、友邻问候；
+- 🛠️ **技术探讨**：前端架构、边缘计算、AI 工具、工程实践；
+- 💡 **灵感交流**：UI/UX 设计思考、新想法探讨、原型分享；
+- ☕ **生活碎碎念**：阅读心得、咖啡时光、户外探索；
+- 📮 **站点建议**：功能建议、体验反馈与缺陷报告；
+- 🌟 **全部维度**：全景聚合全站所有话题。
+
+#### 2. 自定义 Tag 标签与智能分类
+- 在悬浮面板起草话题时，可自由添加标签（如 \`#前端 #性能优化\`），便于关键词关联；
+- 当内容低于 8 字或低于 30 字且未填写标题与标签时，系统将智能识别为 **Boost** 观点，一键即刻发布上墙；
+- 广场活跃区默认展示最新 20 篇热议 Gesture，所有历史长帖均可通过顶部的**分区下拉框**或**全文搜索框**随时检索。`,
+    likesCount: 8,
+    reactions: {
+      summary: { '✨': 5, '🎯': 4, '👍': 3 },
+      users: {},
+    },
+    status: 'pinned',
+    createdAt: '2026-10-31T00:12:00.000Z',
+    showLocation: true,
+    ipCountryFlag: '🇨🇳',
+    ipCountryName: '中国',
+    ipLocation: '浙江 · 杭州',
+  },
+];
+
+const OFFICIAL_PINNED_POST = OFFICIAL_PINNED_POSTS[0];
 
 // Starter replies for pinned post to demonstrate the floor slider immediately
 const STARTER_PINNED_REPLIES: BlogComment[] = [
@@ -303,7 +501,11 @@ export function GuestbookBoard() {
   const [categoryFilter, setCategoryFilter] = useState<NavCategoryId>('latest');
   const [selectedDimension, setSelectedDimension] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showDimensionDropdown, setShowDimensionDropdown] = useState(false);
+
+  const categoryDropdownRef = useRef<HTMLDivElement>(null);
+  const dimensionDropdownRef = useRef<HTMLDivElement>(null);
 
   // Local storage lists for read & bookmarked posts
   const [readPostIds, setReadPostIds] = useState<string[]>(() => {
@@ -334,26 +536,22 @@ export function GuestbookBoard() {
   // Top Boost Stream State
   const [isBoostMarqueePaused, setIsBoostMarqueePaused] = useState(false);
 
-  // Floating Non-blocking Composer Dock State (Unified for Boost and Gesture)
+  // Floating Non-blocking Composer Dock State
   const [showComposer, setShowComposer] = useState(false);
-  const [composerMode, setComposerMode] = useState<'boost' | 'gesture'>('gesture');
   const [isComposerMinimized, setIsComposerMinimized] = useState(false);
   const [isComposerMaximized, setIsComposerMaximized] = useState(false);
 
-  // Draft inputs for Boost
-  const [boostInput, setBoostInput] = useState('');
-  const [boostSubmitting, setBoostSubmitting] = useState(false);
-
-  // Draft inputs for Gesture
-  const [gestureTitle, setGestureTitle] = useState('');
-  const [gestureMessage, setGestureMessage] = useState('');
-  const [gestureTag, setGestureTag] = useState<string>('tech');
-  const [gestureImages, setGestureImages] = useState<string[]>([]);
-  const [gestureUploading, setGestureUploading] = useState(false);
-  const [gesturePreviewTab, setGesturePreviewTab] = useState<'write' | 'preview'>('write');
-  const [gestureShowEmoji, setGestureShowEmoji] = useState(false);
-  const [gestureSubmitting, setGestureSubmitting] = useState(false);
-  const [gestureError, setGestureError] = useState<string | null>(null);
+  // Unified Draft inputs for Composer (Intelligently detects Boost vs Gesture)
+  const [composerTitle, setComposerTitle] = useState('');
+  const [composerText, setComposerText] = useState('');
+  const [composerDimension, setComposerDimension] = useState<string>('all');
+  const [composerTags, setComposerTags] = useState('');
+  const [composerImages, setComposerImages] = useState<string[]>([]);
+  const [composerUploading, setComposerUploading] = useState(false);
+  const [composerPreviewTab, setComposerPreviewTab] = useState<'write' | 'preview'>('write');
+  const [composerShowEmoji, setComposerShowEmoji] = useState(false);
+  const [composerSubmitting, setComposerSubmitting] = useState(false);
+  const [composerError, setComposerError] = useState<string | null>(null);
 
   // Gesture Detail View State
   const [detailReplyMessage, setDetailReplyMessage] = useState('');
@@ -374,6 +572,28 @@ export function GuestbookBoard() {
   const detailFileInputRef = useRef<HTMLInputElement>(null);
 
   const showToast = (msg: string) => setToastMessage(msg);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (
+        categoryDropdownRef.current &&
+        !categoryDropdownRef.current.contains(target)
+      ) {
+        setShowCategoryDropdown(false);
+      }
+      if (
+        dimensionDropdownRef.current &&
+        !dimensionDropdownRef.current.contains(target)
+      ) {
+        setShowDimensionDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Load identity & fetch comments
   useEffect(() => {
@@ -457,18 +677,61 @@ export function GuestbookBoard() {
     return [...fromDb, ...starters];
   }, [dbComments]);
 
-  // Merge starter pinned post & starter replies with DB comments
+  // 3 Tracks partitioning for Boost stream (Each Boost comment appears strictly ONCE)
+  const { boostRow1, boostRow2, boostRow3 } = useMemo(() => {
+    const row1: BlogComment[] = [];
+    const row2: BlogComment[] = [];
+    const row3: BlogComment[] = [];
+
+    allBoostComments.forEach((b, idx) => {
+      if (idx % 3 === 0) row1.push(b);
+      else if (idx % 3 === 1) row2.push(b);
+      else row3.push(b);
+    });
+
+    return { boostRow1: row1, boostRow2: row2, boostRow3: row3 };
+  }, [allBoostComments]);
+
+  // Animation speed directly proportional to information density:
+  // More items -> faster scroll (shorter duration); Fewer items -> slower scroll (longer duration)
+  const boostAnimDuration = useMemo(() => {
+    const count = allBoostComments.length;
+    const dur = Math.max(18, Math.min(58, Math.round(58 - count * 1.5)));
+    return `${dur}s`;
+  }, [allBoostComments.length]);
+
+  // Merge starter pinned posts (all 4 official topics) & starter replies with DB comments
   const allGestureCommentsWithPinned = useMemo(() => {
-    const hasPinned = dbComments.some((c) => c.id === OFFICIAL_PINNED_POST.id);
-    let list = hasPinned ? [...dbComments] : [OFFICIAL_PINNED_POST, ...dbComments];
+    const existingIds = new Set(dbComments.map((c) => c.id));
+    const missingPinned = OFFICIAL_PINNED_POSTS.filter((p) => !existingIds.has(p.id));
+    let list = [...missingPinned, ...dbComments];
 
     // Ensure starter replies exist if pinned post has no replies
-    const hasStarterReplies = list.some((c) => c.parentId === OFFICIAL_PINNED_POST.id);
+    const hasStarterReplies = list.some((c) => c.parentId === OFFICIAL_PINNED_POSTS[0].id);
     if (!hasStarterReplies) {
       list = [...list, ...STARTER_PINNED_REPLIES];
     }
     return list;
   }, [dbComments]);
+
+  // Intelligent Dynamic Type Detection for Floating Composer:
+  // - < 8 chars: definitely Boost
+  // - <= 30 chars with no title, no custom tag, no image, no specific dimension: Boost
+  // - otherwise: Gesture
+  const trimmedComposerText = composerText.trim();
+  const hasComposerTitle = composerTitle.trim().length > 0;
+  const hasComposerTags = composerTags.trim().length > 0;
+  const hasComposerImages = composerImages.length > 0;
+  const hasComposerSpecificDim = composerDimension !== 'all' && composerDimension !== '';
+
+  const determinedType: 'boost' | 'gesture' = useMemo(() => {
+    const len = trimmedComposerText.length;
+    if (len < 8) return 'boost';
+    if (len <= 30 && !hasComposerTitle && !hasComposerTags && !hasComposerImages && !hasComposerSpecificDim) {
+      return 'boost';
+    }
+    return 'gesture';
+  }, [trimmedComposerText, hasComposerTitle, hasComposerTags, hasComposerImages, hasComposerSpecificDim]);
 
   // Organize Gestures into Top-Level Posts vs Replies
   const { topLevelGestures, repliesByParent } = useMemo(() => {
@@ -676,100 +939,102 @@ export function GuestbookBoard() {
   };
 
   // Open Floating Dock Composer
-  const openFloatingComposer = useCallback((mode: 'boost' | 'gesture' = 'gesture') => {
-    setComposerMode(mode);
+  const openFloatingComposer = useCallback(() => {
     setShowComposer(true);
     setIsComposerMinimized(false);
-    setGestureError(null);
+    setComposerError(null);
   }, []);
 
   // ----------------------------------------------------
   // SUBMISSION HANDLERS
   // ----------------------------------------------------
 
-  // 1. Submit Boost (From Floating Composer or Quick Trigger)
-  const handleBoostSubmit = async (e?: React.FormEvent) => {
+  // 1. Submit from Floating Composer (Intelligently handles Boost or Gesture)
+  const handleComposerSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    const text = boostInput.trim();
+    const text = composerText.trim();
     if (!text) {
-      showToast('⚠️ 请输入 Boost 观点内容');
-      return;
-    }
-    if (text.length > 30) {
-      showToast('🚀 Boost 不能超过 30 个字');
+      setComposerError('⚠️ 请输入讨论或观点内容');
       return;
     }
 
     try {
-      setBoostSubmitting(true);
-      const res = await createComment({
-        postSlug: 'guestbook',
-        message: text,
-        postType: 'boost',
-        tag: 'chat',
-        identity: identity || undefined,
-      });
+      setComposerSubmitting(true);
+      setComposerError(null);
 
-      if (res.ok && res.comment) {
-        setDbComments((prev) => [res.comment!, ...prev]);
-        setBoostInput('');
-        setShowComposer(false);
-        showToast('🚀 Boost 观点已成功发布！');
+      if (determinedType === 'boost') {
+        if (text.length > 30) {
+          setComposerError('🚀 Boost 不能超过 30 个字');
+          setComposerSubmitting(false);
+          return;
+        }
+
+        const res = await createComment({
+          postSlug: 'guestbook',
+          message: text,
+          postType: 'boost',
+          tag: composerDimension !== 'all' ? composerDimension : 'chat',
+          identity: identity || undefined,
+        });
+
+        if (res.ok && res.comment) {
+          setDbComments((prev) => [res.comment!, ...prev]);
+          setComposerText('');
+          setShowComposer(false);
+          showToast('🚀 Boost 观点已成功发布！');
+        } else {
+          setComposerError(res.error || '发布失败，请稍后重试');
+        }
       } else {
-        showToast(res.error || '发布失败，请稍后重试');
+        // Gesture Mode
+        if (text.length < 8) {
+          setComposerError('📝 Gesture 讨论内容至少需要 8 个字');
+          setComposerSubmitting(false);
+          return;
+        }
+
+        let finalMessage = text;
+        if (composerTitle.trim()) {
+          finalMessage = `### ${composerTitle.trim()}\n\n${finalMessage}`;
+        }
+        if (composerTags.trim()) {
+          const formattedTags = composerTags
+            .split(/[\s,，]+/)
+            .filter(Boolean)
+            .map((t) => (t.startsWith('#') ? t : `#${t}`))
+            .join(' ');
+          finalMessage = `${finalMessage}\n\n${formattedTags}`;
+        }
+        if (composerImages.length > 0) {
+          const imgMd = composerImages.map((src) => `\n![image](${src})`).join('');
+          finalMessage += imgMd;
+        }
+
+        const res = await createComment({
+          postSlug: 'guestbook',
+          message: finalMessage,
+          postType: 'gesture',
+          tag: composerDimension !== 'all' ? composerDimension : 'tech',
+          identity: identity || undefined,
+        });
+
+        if (res.ok && res.comment) {
+          setDbComments((prev) => [res.comment!, ...prev]);
+          setShowComposer(false);
+          setComposerTitle('');
+          setComposerText('');
+          setComposerTags('');
+          setComposerImages([]);
+          showToast('✨ Gesture 发布成功！已进入详情讨论');
+          openGestureDetail(res.comment);
+        } else {
+          setComposerError(res.error || '发布失败，请检查网络');
+        }
       }
     } catch (err: any) {
-      showToast(err.message || '网络连接异常');
+      setComposerError(err.message || '网络连接异常');
     } finally {
-      setBoostSubmitting(false);
-    }
-  };
-
-  // 2. Submit New Gesture (From Floating Composer)
-  const handleGestureSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    const body = gestureMessage.trim();
-    if (body.length < 8) {
-      setGestureError('📝 Gesture 讨论内容至少需要 8 个字');
-      return;
-    }
-
-    let finalMessage = body;
-    if (gestureTitle.trim()) {
-      finalMessage = `### ${gestureTitle.trim()}\n\n${body}`;
-    }
-    if (gestureImages.length > 0) {
-      const imgMd = gestureImages.map((src) => `\n![image](${src})`).join('');
-      finalMessage += imgMd;
-    }
-
-    try {
-      setGestureSubmitting(true);
-      setGestureError(null);
-      const res = await createComment({
-        postSlug: 'guestbook',
-        message: finalMessage,
-        postType: 'gesture',
-        tag: gestureTag,
-        identity: identity || undefined,
-      });
-
-      if (res.ok && res.comment) {
-        setDbComments((prev) => [res.comment!, ...prev]);
-        setShowComposer(false);
-        setGestureTitle('');
-        setGestureMessage('');
-        setGestureImages([]);
-        showToast('✨ Gesture 发布成功！已进入详情讨论');
-        // Automatically open the new Gesture
-        openGestureDetail(res.comment);
-      } else {
-        setGestureError(res.error || '发布失败，请检查网络');
-      }
-    } catch (err: any) {
-      setGestureError(err.message || '发布异常');
-    } finally {
-      setGestureSubmitting(false);
+      setComposerSubmitting(false);
     }
   };
 
@@ -903,6 +1168,11 @@ export function GuestbookBoard() {
     }
   };
 
+  const currentCategoryObj = NAV_CATEGORIES.find((c) => c.id === categoryFilter) || NAV_CATEGORIES[0];
+  const CurrentCatIcon = currentCategoryObj.icon;
+  const currentCatBadgeCount = categoryFilter === 'bookmarked' ? bookmarkedPostIds.length : categoryFilter === 'read' ? readPostIds.length : 0;
+  const currentDimensionObj = CHANNELS.find((c) => c.id === selectedDimension) || CHANNELS[0];
+
   return (
     <div className="guestbook-board-container">
       {/* Toast Notification */}
@@ -925,6 +1195,10 @@ export function GuestbookBoard() {
 
       {/* ========================================================
           1. 楼上：BOOST 实时观点流 (TOP BOOST STREAM)
+          - 3 排自适应观点流
+          - 速度与信息总量成正比
+          - 每个 Boost 仅在板上出现 1 次（不重复堆叠）
+          - 宽间距聚焦单句展台（同屏不超过 2 句）
           ======================================================== */}
       <section className="gb-boost-wall-card" aria-label="Boost 实时观点流">
         {/* Boost Header */}
@@ -942,27 +1216,25 @@ export function GuestbookBoard() {
           </div>
 
           <div className="gb-boost-head-right">
-            <button
-              type="button"
-              className="gb-launch-boost-btn"
-              onClick={() => openFloatingComposer('boost')}
-            >
-              <Rocket className="w-3.5 h-3.5 mr-1.5" />
-              <span>发布 Boost</span>
-            </button>
+            <span className="gb-boost-spec-badge">
+              ⚡ 3排观点流 · 速度自适应 · 单句展台
+            </span>
           </div>
         </div>
 
-        {/* Dual Stream Track (Smooth Horizontal Floating Viewpoints) */}
+        {/* 3 Tracks Stream (Smooth Horizontal Floating Viewpoints, Speed Adaptive) */}
         <div
-          className={`gb-boost-marquee-container ${isBoostMarqueePaused ? 'is-paused' : ''}`}
+          className={`gb-boost-marquee-container is-three-rows ${isBoostMarqueePaused ? 'is-paused' : ''}`}
           onMouseEnter={() => setIsBoostMarqueePaused(true)}
           onMouseLeave={() => setIsBoostMarqueePaused(false)}
         >
           {/* Track 1: Normal Direction */}
-          <div className="gb-boost-track gb-track-1">
-            {allBoostComments.concat(allBoostComments).map((b, idx) => (
-              <div key={`track1-${b.id}-${idx}`} className="gb-boost-pill-card">
+          <div
+            className="gb-boost-track gb-track-1"
+            style={{ animationDuration: boostAnimDuration }}
+          >
+            {boostRow1.map((b) => (
+              <div key={`track1-${b.id}`} className="gb-boost-pill-card">
                 <div className="gb-boost-pill__avatar">
                   {b.authorAvatar ? (
                     <img src={b.authorAvatar} alt={b.authorName} />
@@ -987,99 +1259,173 @@ export function GuestbookBoard() {
           </div>
 
           {/* Track 2: Reverse Direction */}
-          <div className="gb-boost-track gb-track-2">
-            {[...allBoostComments]
-              .reverse()
-              .concat([...allBoostComments].reverse())
-              .map((b, idx) => (
-                <div key={`track2-${b.id}-${idx}`} className="gb-boost-pill-card is-reverse">
-                  <div className="gb-boost-pill__avatar is-purple">
-                    {b.authorAvatar ? (
-                      <img src={b.authorAvatar} alt={b.authorName} />
-                    ) : (
-                      <span>{getCommentInitials(b.authorName)}</span>
-                    )}
-                  </div>
-                  <div className="gb-boost-pill__body">
-                    <div className="gb-boost-pill__meta">
-                      <span className="gb-boost-pill__name">{b.authorName || '访客'}</span>
-                      {b.ipCountryFlag && (
-                        <span className="gb-boost-pill__flag" title={b.ipCountryName}>
-                          {b.ipCountryFlag}
-                        </span>
-                      )}
-                      <span className="gb-boost-pill__time">{formatTime(b.createdAt)}</span>
-                    </div>
-                    <div className="gb-boost-pill__text">{b.message}</div>
-                  </div>
+          <div
+            className="gb-boost-track gb-track-2 is-reverse"
+            style={{ animationDuration: boostAnimDuration }}
+          >
+            {boostRow2.map((b) => (
+              <div key={`track2-${b.id}`} className="gb-boost-pill-card is-reverse">
+                <div className="gb-boost-pill__avatar is-purple">
+                  {b.authorAvatar ? (
+                    <img src={b.authorAvatar} alt={b.authorName} />
+                  ) : (
+                    <span>{getCommentInitials(b.authorName)}</span>
+                  )}
                 </div>
-              ))}
+                <div className="gb-boost-pill__body">
+                  <div className="gb-boost-pill__meta">
+                    <span className="gb-boost-pill__name">{b.authorName || '访客'}</span>
+                    {b.ipCountryFlag && (
+                      <span className="gb-boost-pill__flag" title={b.ipCountryName}>
+                        {b.ipCountryFlag}
+                      </span>
+                    )}
+                    <span className="gb-boost-pill__time">{formatTime(b.createdAt)}</span>
+                  </div>
+                  <div className="gb-boost-pill__text">{b.message}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Track 3: Normal Direction (Teal Accent) */}
+          <div
+            className="gb-boost-track gb-track-3 is-track-3"
+            style={{ animationDuration: boostAnimDuration }}
+          >
+            {boostRow3.map((b) => (
+              <div key={`track3-${b.id}`} className="gb-boost-pill-card is-teal">
+                <div className="gb-boost-pill__avatar is-emerald">
+                  {b.authorAvatar ? (
+                    <img src={b.authorAvatar} alt={b.authorName} />
+                  ) : (
+                    <span>{getCommentInitials(b.authorName)}</span>
+                  )}
+                </div>
+                <div className="gb-boost-pill__body">
+                  <div className="gb-boost-pill__meta">
+                    <span className="gb-boost-pill__name">{b.authorName || '访客'}</span>
+                    {b.ipCountryFlag && (
+                      <span className="gb-boost-pill__flag" title={b.ipCountryName}>
+                        {b.ipCountryFlag}
+                      </span>
+                    )}
+                    <span className="gb-boost-pill__time">{formatTime(b.createdAt)}</span>
+                  </div>
+                  <div className="gb-boost-pill__text">{b.message}</div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* ========================================================
-          2. 横排分类导航条 (HORIZONTAL CATEGORIES BAR)
-          包含："最新" "近期" "维度" "热门" "精选" "我的贴文" "已读" "书签"
+          2. 分区与维度下拉导航条 (NAV DROPDOWNS BAR)
+          - 分区下拉：最多 4 个同时展示，支持滚轮平滑滚动
+          - 维度下拉：最多 4 个同时展示，支持滚轮平滑滚动
+          - 右侧保留统一发布入口：发布 Gesture
           ======================================================== */}
-      <nav className="gb-nav-bar" aria-label="Gesture 讨论分类">
-        <div className="gb-nav-bar__categories">
-          {NAV_CATEGORIES.map((cat) => {
-            const Icon = cat.icon;
-            const isActive = categoryFilter === cat.id;
+      <nav className="gb-nav-bar" aria-label="Gesture 讨论分类与维度">
+        <div className="gb-nav-bar__dropdowns">
+          {/* 1. 分区下拉选择器 (Category Dropdown) */}
+          <div className="gb-dropdown-wrapper" ref={categoryDropdownRef}>
+            <button
+              type="button"
+              className={`gb-nav-dropdown-btn ${categoryFilter !== 'latest' ? 'is-filtered' : ''}`}
+              onClick={() => {
+                setShowCategoryDropdown((prev) => !prev);
+                setShowDimensionDropdown(false);
+              }}
+              aria-haspopup="listbox"
+              aria-expanded={showCategoryDropdown}
+            >
+              <span className="gb-dropdown-prefix">分区:</span>
+              <CurrentCatIcon className="w-4 h-4 mr-1.5 text-indigo-500 flex-shrink-0" />
+              <span className="gb-dropdown-value">{currentCategoryObj?.label || '最新'}</span>
+              {currentCatBadgeCount > 0 && (
+                <span className="gb-dropdown-badge">{currentCatBadgeCount}</span>
+              )}
+              <ChevronDown className={`w-3.5 h-3.5 ml-1.5 text-slate-400 transition-transform ${showCategoryDropdown ? 'rotate-180' : ''}`} />
+            </button>
 
-            return (
-              <div key={cat.id} className="gb-cat-btn-wrapper">
-                <button
-                  type="button"
-                  className={`gb-cat-btn ${isActive ? 'is-active' : ''}`}
-                  onClick={() => {
-                    setCategoryFilter(cat.id);
-                    if (cat.id === 'dimensions') {
-                      setShowDimensionDropdown((prev) => !prev);
-                    } else {
-                      setShowDimensionDropdown(false);
-                    }
-                  }}
-                >
-                  <Icon className="w-4 h-4 mr-1.5" />
-                  <span>{cat.label}</span>
-                  {cat.id === 'dimensions' && (
-                    <ChevronDown className="w-3.5 h-3.5 ml-1 text-slate-400" />
-                  )}
-                  {cat.id === 'bookmarked' && bookmarkedPostIds.length > 0 && (
-                    <span className="gb-cat-count">{bookmarkedPostIds.length}</span>
-                  )}
-                  {cat.id === 'read' && readPostIds.length > 0 && (
-                    <span className="gb-cat-count">{readPostIds.length}</span>
-                  )}
-                </button>
+            {showCategoryDropdown && (
+              <div className="gb-scrollable-dropdown is-four-items-max" role="listbox">
+                {NAV_CATEGORIES.map((cat) => {
+                  const Icon = cat.icon;
+                  const isSelected = categoryFilter === cat.id;
+                  const count = cat.id === 'bookmarked' ? bookmarkedPostIds.length : cat.id === 'read' ? readPostIds.length : 0;
 
-                {/* Dimensions Dropdown Menu */}
-                {cat.id === 'dimensions' && showDimensionDropdown && (
-                  <div className="gb-dimension-dropdown">
-                    {CHANNELS.map((ch) => (
-                      <button
-                        key={ch.id}
-                        type="button"
-                        className={`gb-dimension-item ${selectedDimension === ch.id ? 'is-selected' : ''}`}
-                        onClick={() => {
-                          setSelectedDimension(ch.id);
-                          setShowDimensionDropdown(false);
-                        }}
-                      >
-                        <span className="gb-dim-icon">{ch.icon}</span>
-                        <div className="gb-dim-info">
-                          <span className="gb-dim-title">{ch.label}</span>
-                          <span className="gb-dim-desc">{ch.desc}</span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      className={`gb-scrollable-dropdown__item ${isSelected ? 'is-selected' : ''}`}
+                      onClick={() => {
+                        setCategoryFilter(cat.id);
+                        setShowCategoryDropdown(false);
+                      }}
+                      role="option"
+                      aria-selected={isSelected}
+                    >
+                      <Icon className="w-4 h-4 mr-2.5 text-slate-500 dark:text-slate-400 flex-shrink-0" />
+                      <span className="gb-dropdown-item__label">{cat.label}</span>
+                      {count > 0 && <span className="gb-dropdown-item__badge">{count}</span>}
+                      {isSelected && <span className="gb-dropdown-item__check">✓</span>}
+                    </button>
+                  );
+                })}
               </div>
-            );
-          })}
+            )}
+          </div>
+
+          {/* 2. 维度下拉选择器 (Dimension Dropdown) */}
+          <div className="gb-dropdown-wrapper" ref={dimensionDropdownRef}>
+            <button
+              type="button"
+              className={`gb-nav-dropdown-btn ${selectedDimension !== 'all' ? 'is-filtered' : ''}`}
+              onClick={() => {
+                setShowDimensionDropdown((prev) => !prev);
+                setShowCategoryDropdown(false);
+              }}
+              aria-haspopup="listbox"
+              aria-expanded={showDimensionDropdown}
+            >
+              <span className="gb-dropdown-prefix">维度:</span>
+              <span className="mr-1.5 text-base flex-shrink-0">{currentDimensionObj?.icon || '🌟'}</span>
+              <span className="gb-dropdown-value">{currentDimensionObj?.label || '全部维度'}</span>
+              <ChevronDown className={`w-3.5 h-3.5 ml-1.5 text-slate-400 transition-transform ${showDimensionDropdown ? 'rotate-180' : ''}`} />
+            </button>
+
+            {showDimensionDropdown && (
+              <div className="gb-scrollable-dropdown is-four-items-max" role="listbox">
+                {CHANNELS.map((ch) => {
+                  const isSelected = selectedDimension === ch.id;
+
+                  return (
+                    <button
+                      key={ch.id}
+                      type="button"
+                      className={`gb-scrollable-dropdown__item ${isSelected ? 'is-selected' : ''}`}
+                      onClick={() => {
+                        setSelectedDimension(ch.id);
+                        setShowDimensionDropdown(false);
+                      }}
+                      role="option"
+                      aria-selected={isSelected}
+                    >
+                      <span className="mr-2.5 text-base flex-shrink-0">{ch.icon}</span>
+                      <div className="gb-dim-text-wrap">
+                        <span className="gb-dropdown-item__label">{ch.label}</span>
+                        <span className="gb-dropdown-item__desc">{ch.desc}</span>
+                      </div>
+                      {isSelected && <span className="gb-dropdown-item__check">✓</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right Tools: Search & New Gesture Button */}
@@ -1107,7 +1453,7 @@ export function GuestbookBoard() {
           <button
             type="button"
             className="gb-new-gesture-btn"
-            onClick={() => openFloatingComposer('gesture')}
+            onClick={openFloatingComposer}
           >
             <Pencil className="w-4 h-4 mr-1.5" />
             <span>发布 Gesture</span>
@@ -1805,7 +2151,10 @@ export function GuestbookBoard() {
 
       {/* ========================================================
           4. 悬浮非阻塞草拟面板 (FLOATING NON-BLOCKING COMPOSER DOCK)
-          支持在 /guestbook/ 下全景浏览时自由收起、展开、切换 Boost / Gesture
+          智能识别机制：
+          - 低于 8 字：默认智能识别为 Boost
+          - 低于 30 字且无标题、无自定义 Tag、无特定分类：默认智能识别为 Boost
+          - 其余情况（包含标题、选择专属分类、输入 Tag、或达到 30 字以上）：自动转为 Gesture
           ======================================================== */}
       {showComposer && (
         isComposerMinimized ? (
@@ -1817,13 +2166,15 @@ export function GuestbookBoard() {
             title="点击展开草拟面板"
           >
             <span className="gb-pulse-dot"></span>
-            <span className="gb-minimized-badge">
-              {composerMode === 'boost' ? '🚀 Boost' : '📝 Gesture'}
+            <span className={`gb-minimized-badge ${determinedType === 'boost' ? 'is-boost' : 'is-gesture'}`}>
+              {determinedType === 'boost' ? '🚀 Boost' : '📝 Gesture'}
             </span>
             <span className="gb-minimized-preview">
-              {composerMode === 'boost'
-                ? (boostInput.trim() ? boostInput.trim().slice(0, 16) : '正在拟写短句观点...')
-                : (gestureTitle.trim() || gestureMessage.trim() ? (gestureTitle.trim() || gestureMessage.trim()).slice(0, 18) : '正在草拟讨论话题...')}
+              {composerTitle.trim() || composerText.trim()
+                ? (composerTitle.trim() || composerText.trim()).slice(0, 20)
+                : determinedType === 'boost'
+                ? '正在拟写短句观点...'
+                : '正在草拟讨论话题...'}
             </span>
             <div className="gb-minimized-actions">
               <button
@@ -1852,25 +2203,23 @@ export function GuestbookBoard() {
           </div>
         ) : (
           <div className={`gb-floating-composer ${isComposerMaximized ? 'is-maximized' : ''}`}>
-            {/* Composer Top Header with Tabs & Controls */}
+            {/* Composer Header: Title & Dynamic Smart Indicator */}
             <div className="gb-composer-header">
-              <div className="gb-composer-mode-tabs">
-                <button
-                  type="button"
-                  className={`gb-mode-tab ${composerMode === 'boost' ? 'is-active' : ''}`}
-                  onClick={() => setComposerMode('boost')}
-                >
-                  <Rocket className="w-3.5 h-3.5 mr-1" />
-                  <span>Boost</span>
-                </button>
-                <button
-                  type="button"
-                  className={`gb-mode-tab ${composerMode === 'gesture' ? 'is-active' : ''}`}
-                  onClick={() => setComposerMode('gesture')}
-                >
-                  <MessageSquare className="w-3.5 h-3.5 mr-1" />
-                  <span>Gesture</span>
-                </button>
+              <div className="gb-composer-header-title">
+                <span className="gb-composer-title-main">起草讨论 / 观点</span>
+                <span className={`gb-smart-type-badge ${determinedType === 'boost' ? 'is-boost' : 'is-gesture'}`}>
+                  {determinedType === 'boost' ? (
+                    <>
+                      <Rocket className="w-3.5 h-3.5 mr-1 text-amber-500" />
+                      <span>智能识别：Boost (短句观点流)</span>
+                    </>
+                  ) : (
+                    <>
+                      <MessageSquare className="w-3.5 h-3.5 mr-1 text-indigo-500" />
+                      <span>智能识别：Gesture (讨论长帖)</span>
+                    </>
+                  )}
+                </span>
               </div>
 
               <div className="gb-composer-window-tools">
@@ -1902,289 +2251,297 @@ export function GuestbookBoard() {
             </div>
 
             {/* Composer Content Body */}
-            {composerMode === 'boost' ? (
-              /* Boost Mode */
-              <div className="gb-composer-body is-boost-mode">
-                <div className="gb-composer-subtext">
-                  💡 快速表达此时此地的看法，限 30 字以内，不设复杂排版与跟帖，即发即显。
+            <div className="gb-composer-body">
+              {/* Dynamic Type Hint Banner */}
+              <div className="gb-composer-smart-hint">
+                {determinedType === 'boost' ? (
+                  <span>
+                    💡 <strong>Boost 模式已激活</strong>：当前内容
+                    {trimmedComposerText.length < 8 ? ' 少于 8 字' : ' 处于 30 字内且未填写标题/分类/Tag'}
+                    ，将作为即时轻量短句发布至顶部观点流。
+                  </span>
+                ) : (
+                  <span>
+                    📝 <strong>Gesture 模式已激活</strong>：
+                    {trimmedComposerText.length >= 30
+                      ? ' 字数已达到 30 字以上'
+                      : hasComposerTitle
+                      ? ' 已包含标题'
+                      : hasComposerTags
+                      ? ' 已添加自定义 Tag'
+                      : ' 已选择专属讨论维度'}
+                    ，将沉淀为广场深度长帖（支持楼层跟帖互动与时间轴滑块）。
+                  </span>
+                )}
+              </div>
+
+              {/* Title Input */}
+              <div className="gb-modal-row">
+                <input
+                  type="text"
+                  value={composerTitle}
+                  onChange={(e) => setComposerTitle(e.target.value)}
+                  placeholder="话题标题（可选，添加标题将自动识别为 Gesture）..."
+                  maxLength={100}
+                  className="gb-modal-title-input"
+                />
+              </div>
+
+              {/* Dimension & Custom Tag Row */}
+              <div className="gb-composer-meta-row">
+                <div className="gb-composer-dim-selector">
+                  <label className="gb-composer-field-label">讨论维度：</label>
+                  <select
+                    value={composerDimension}
+                    onChange={(e) => setComposerDimension(e.target.value)}
+                    className="gb-composer-select"
+                  >
+                    <option value="all">🌟 默认 / 全部维度</option>
+                    {CHANNELS.filter((ch) => ch.id !== 'all').map((ch) => (
+                      <option key={ch.id} value={ch.id}>
+                        {ch.icon} {ch.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
-                <div className="gb-boost-composer-input-wrap">
-                  <textarea
-                    rows={3}
-                    value={boostInput}
-                    onChange={(e) => setBoostInput(e.target.value)}
-                    placeholder="写下你此时此刻的想法、简短观点或问候（限30字以内）..."
-                    maxLength={30}
-                    className="gb-textarea is-boost-textarea"
+                <div className="gb-composer-tag-input-wrap">
+                  <Tag className="w-3.5 h-3.5 text-slate-400 mr-1.5 flex-shrink-0" />
+                  <input
+                    type="text"
+                    value={composerTags}
+                    onChange={(e) => setComposerTags(e.target.value)}
+                    placeholder="话题标签 Tag（可选，如 #前端 #设计，空格分隔）..."
+                    className="gb-composer-tag-input"
                   />
                 </div>
+              </div>
 
-                <div className="gb-modal-foot">
-                  <span className="gb-word-count">
-                    {boostInput.length} / 30 字
-                  </span>
-                  <div className="gb-modal-actions">
+              {/* Toolbar */}
+              <div className="gb-md-toolbar">
+                <button
+                  type="button"
+                  title="粗体"
+                  onClick={() =>
+                    insertMarkdownHelper(gestureTextareaRef, setComposerText, '**', '**')
+                  }
+                >
+                  <Bold className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  title="斜体"
+                  onClick={() =>
+                    insertMarkdownHelper(gestureTextareaRef, setComposerText, '*', '*')
+                  }
+                >
+                  <Italic className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  title="代码块"
+                  onClick={() =>
+                    insertMarkdownHelper(gestureTextareaRef, setComposerText, '\n```\n', '\n```\n')
+                  }
+                >
+                  <Code className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  title="引用"
+                  onClick={() =>
+                    insertMarkdownHelper(gestureTextareaRef, setComposerText, '\n> ', '\n')
+                  }
+                >
+                  <Quote className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  title="列表"
+                  onClick={() =>
+                    insertMarkdownHelper(gestureTextareaRef, setComposerText, '\n- ', '\n')
+                  }
+                >
+                  <List className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  title="超链接"
+                  onClick={() =>
+                    insertMarkdownHelper(gestureTextareaRef, setComposerText, '[说明](', ')')
+                  }
+                >
+                  <LinkIcon className="w-4 h-4" />
+                </button>
+
+                <div className="gb-toolbar-divider"></div>
+
+                <button
+                  type="button"
+                  title="插入表情"
+                  onClick={() => setComposerShowEmoji((prev) => !prev)}
+                >
+                  <Smile className="w-4 h-4" />
+                </button>
+
+                <button
+                  type="button"
+                  title="上传图片"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <ImageIcon className="w-4 h-4" />
+                </button>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={(e) =>
+                    handleImageFileChange(e, setComposerUploading, setComposerImages)
+                  }
+                />
+
+                <div className="gb-tab-switch ml-auto">
+                  <button
+                    type="button"
+                    className={`gb-tab-btn ${composerPreviewTab === 'write' ? 'is-active' : ''}`}
+                    onClick={() => setComposerPreviewTab('write')}
+                  >
+                    编辑
+                  </button>
+                  <button
+                    type="button"
+                    className={`gb-tab-btn ${composerPreviewTab === 'preview' ? 'is-active' : ''}`}
+                    onClick={() => setComposerPreviewTab('preview')}
+                  >
+                    实时预览
+                  </button>
+                </div>
+              </div>
+
+              {/* Emoji Popover */}
+              {composerShowEmoji && (
+                <div className="gb-emoji-popover">
+                  {EMOJI_GROUPS.map((group, idx) => (
+                    <div key={idx} className="gb-emoji-group">
+                      <span className="gb-emoji-group__title">{group.name}</span>
+                      <div className="gb-emoji-grid">
+                        {group.emojis.map((em) => (
+                          <button
+                            key={em}
+                            type="button"
+                            className="gb-emoji-btn"
+                            onClick={() => {
+                              insertMarkdownHelper(gestureTextareaRef, setComposerText, em);
+                              setComposerShowEmoji(false);
+                            }}
+                          >
+                            {em}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Textarea or Preview */}
+              {composerPreviewTab === 'write' ? (
+                <textarea
+                  ref={gestureTextareaRef}
+                  rows={isComposerMaximized ? 12 : 5}
+                  value={composerText}
+                  onChange={(e) => setComposerText(e.target.value)}
+                  placeholder={
+                    determinedType === 'boost'
+                      ? '写下你此时此刻的想法、简短观点或问候（少于8字或30字以内无标题自动作为 Boost 观点上墙）...'
+                      : '畅所欲言，阐述你的深度思考（支持 Markdown 排版、代码块、列表、多图）...'
+                  }
+                  className="gb-textarea is-modal-textarea"
+                />
+              ) : (
+                <div className="gb-preview-box is-modal-preview">
+                  {composerText.trim() ? (
+                    <div
+                      className="gb-markdown-body"
+                      dangerouslySetInnerHTML={{
+                        __html: renderCommentMarkdown(composerText),
+                      }}
+                    />
+                  ) : (
+                    <span className="text-slate-400 text-xs">暂无预览内容</span>
+                  )}
+                </div>
+              )}
+
+              {/* Attached Images */}
+              {composerImages.length > 0 && (
+                <div className="gb-attached-images">
+                  {composerImages.map((src, idx) => (
+                    <div key={idx} className="gb-thumb-wrap">
+                      <img src={src} alt="Attached" className="gb-thumb" />
+                      <button
+                        type="button"
+                        className="gb-thumb-del"
+                        onClick={() =>
+                          setComposerImages((prev) => prev.filter((_, i) => i !== idx))
+                        }
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Error Alert */}
+              {composerError && (
+                <div className="gb-error-alert">
+                  <AlertCircle className="w-4 h-4 mr-1 text-rose-500" />
+                  <span>{composerError}</span>
+                </div>
+              )}
+
+              {/* Footer */}
+              <div className="gb-modal-foot">
+                <span className="gb-word-count">
+                  当前字数: {trimmedComposerText.length} 字
+                  {determinedType === 'boost' ? ' (Boost 限 30 字内)' : ' (Gesture 需最少 8 字)'}
+                </span>
+                <div className="gb-modal-actions">
+                  <button
+                    type="button"
+                    className="gb-cancel-btn"
+                    onClick={() => setShowComposer(false)}
+                  >
+                    取消
+                  </button>
+
+                  {determinedType === 'boost' ? (
                     <button
                       type="button"
-                      className="gb-cancel-btn"
-                      onClick={() => setShowComposer(false)}
-                    >
-                      取消
-                    </button>
-                    <button
-                      type="button"
-                      disabled={boostSubmitting || !boostInput.trim()}
-                      onClick={handleBoostSubmit}
+                      disabled={composerSubmitting || !trimmedComposerText || trimmedComposerText.length > 30}
+                      onClick={handleComposerSubmit}
                       className="gb-submit-btn is-boost-btn"
                     >
                       <Rocket className="w-3.5 h-3.5 mr-1" />
-                      <span>{boostSubmitting ? '发布中...' : '发布 Boost'}</span>
+                      <span>{composerSubmitting ? '发布中...' : '发布为 Boost'}</span>
                     </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              /* Gesture Mode */
-              <div className="gb-composer-body is-gesture-mode">
-                {/* Channel / Dimension Selector */}
-                <div className="gb-modal-row">
-                  <label className="gb-modal-label">发往维度：</label>
-                  <div className="gb-modal-channels">
-                    {CHANNELS.filter((ch) => ch.id !== 'all').map((ch) => (
-                      <button
-                        key={ch.id}
-                        type="button"
-                        className={`gb-modal-channel-btn ${gestureTag === ch.id ? 'is-active' : ''}`}
-                        onClick={() => setGestureTag(ch.id)}
-                      >
-                        <span>{ch.icon}</span>
-                        <span>{ch.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Title Input */}
-                <div className="gb-modal-row">
-                  <input
-                    type="text"
-                    value={gestureTitle}
-                    onChange={(e) => setGestureTitle(e.target.value)}
-                    placeholder="话题标题（可选，简明概括你的核心议题）..."
-                    maxLength={100}
-                    className="gb-modal-title-input"
-                  />
-                </div>
-
-                {/* Toolbar */}
-                <div className="gb-md-toolbar">
-                  <button
-                    type="button"
-                    title="粗体"
-                    onClick={() =>
-                      insertMarkdownHelper(gestureTextareaRef, setGestureMessage, '**', '**')
-                    }
-                  >
-                    <Bold className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    title="斜体"
-                    onClick={() =>
-                      insertMarkdownHelper(gestureTextareaRef, setGestureMessage, '*', '*')
-                    }
-                  >
-                    <Italic className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    title="代码块"
-                    onClick={() =>
-                      insertMarkdownHelper(gestureTextareaRef, setGestureMessage, '\n```\n', '\n```\n')
-                    }
-                  >
-                    <Code className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    title="引用"
-                    onClick={() =>
-                      insertMarkdownHelper(gestureTextareaRef, setGestureMessage, '\n> ', '\n')
-                    }
-                  >
-                    <Quote className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    title="列表"
-                    onClick={() =>
-                      insertMarkdownHelper(gestureTextareaRef, setGestureMessage, '\n- ', '\n')
-                    }
-                  >
-                    <List className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    title="超链接"
-                    onClick={() =>
-                      insertMarkdownHelper(gestureTextareaRef, setGestureMessage, '[说明](', ')')
-                    }
-                  >
-                    <LinkIcon className="w-4 h-4" />
-                  </button>
-
-                  <div className="gb-toolbar-divider"></div>
-
-                  <button
-                    type="button"
-                    title="插入表情"
-                    onClick={() => setGestureShowEmoji((prev) => !prev)}
-                  >
-                    <Smile className="w-4 h-4" />
-                  </button>
-
-                  <button
-                    type="button"
-                    title="上传图片"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <ImageIcon className="w-4 h-4" />
-                  </button>
-
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    style={{ display: 'none' }}
-                    onChange={(e) =>
-                      handleImageFileChange(e, setGestureUploading, setGestureImages)
-                    }
-                  />
-
-                  <div className="gb-tab-switch ml-auto">
+                  ) : (
                     <button
                       type="button"
-                      className={`gb-tab-btn ${gesturePreviewTab === 'write' ? 'is-active' : ''}`}
-                      onClick={() => setGesturePreviewTab('write')}
-                    >
-                      编辑
-                    </button>
-                    <button
-                      type="button"
-                      className={`gb-tab-btn ${gesturePreviewTab === 'preview' ? 'is-active' : ''}`}
-                      onClick={() => setGesturePreviewTab('preview')}
-                    >
-                      实时预览
-                    </button>
-                  </div>
-                </div>
-
-                {/* Emoji Popover */}
-                {gestureShowEmoji && (
-                  <div className="gb-emoji-popover">
-                    {EMOJI_GROUPS.map((group, idx) => (
-                      <div key={idx} className="gb-emoji-group">
-                        <span className="gb-emoji-group__title">{group.name}</span>
-                        <div className="gb-emoji-grid">
-                          {group.emojis.map((em) => (
-                            <button
-                              key={em}
-                              type="button"
-                              className="gb-emoji-btn"
-                              onClick={() => {
-                                insertMarkdownHelper(gestureTextareaRef, setGestureMessage, em);
-                                setGestureShowEmoji(false);
-                              }}
-                            >
-                              {em}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Textarea or Preview */}
-                {gesturePreviewTab === 'write' ? (
-                  <textarea
-                    ref={gestureTextareaRef}
-                    rows={isComposerMaximized ? 12 : 5}
-                    value={gestureMessage}
-                    onChange={(e) => setGestureMessage(e.target.value)}
-                    placeholder="畅所欲言，阐述你的深度思考（8字以上，支持 Markdown 排版、代码块、列表）..."
-                    className="gb-textarea is-modal-textarea"
-                  />
-                ) : (
-                  <div className="gb-preview-box is-modal-preview">
-                    {gestureMessage.trim() ? (
-                      <div
-                        className="gb-markdown-body"
-                        dangerouslySetInnerHTML={{
-                          __html: renderCommentMarkdown(gestureMessage),
-                        }}
-                      />
-                    ) : (
-                      <span className="text-slate-400 text-xs">暂无预览内容</span>
-                    )}
-                  </div>
-                )}
-
-                {/* Attached Images */}
-                {gestureImages.length > 0 && (
-                  <div className="gb-attached-images">
-                    {gestureImages.map((src, idx) => (
-                      <div key={idx} className="gb-thumb-wrap">
-                        <img src={src} alt="Attached" className="gb-thumb" />
-                        <button
-                          type="button"
-                          className="gb-thumb-del"
-                          onClick={() =>
-                            setGestureImages((prev) => prev.filter((_, i) => i !== idx))
-                          }
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Error Alert */}
-                {gestureError && (
-                  <div className="gb-error-alert">
-                    <AlertCircle className="w-4 h-4 mr-1 text-rose-500" />
-                    <span>{gestureError}</span>
-                  </div>
-                )}
-
-                {/* Footer */}
-                <div className="gb-modal-foot">
-                  <span className="gb-word-count">
-                    当前字数: {gestureMessage.trim().length} 字 (最少 8 字)
-                  </span>
-                  <div className="gb-modal-actions">
-                    <button
-                      type="button"
-                      className="gb-cancel-btn"
-                      onClick={() => setShowComposer(false)}
-                    >
-                      取消
-                    </button>
-                    <button
-                      type="button"
-                      disabled={gestureSubmitting || gestureMessage.trim().length < 8}
-                      onClick={handleGestureSubmit}
+                      disabled={composerSubmitting || trimmedComposerText.length < 8}
+                      onClick={handleComposerSubmit}
                       className="gb-submit-btn"
                     >
                       <Send className="w-3.5 h-3.5 mr-1" />
-                      <span>{gestureSubmitting ? '发布中...' : '发布 Gesture'}</span>
+                      <span>{composerSubmitting ? '发布中...' : '发布为 Gesture'}</span>
                     </button>
-                  </div>
+                  )}
                 </div>
               </div>
-            )}
+            </div>
           </div>
         )
       )}

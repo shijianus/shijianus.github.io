@@ -6593,6 +6593,27 @@
   3. 通过 Wrangler 部署编译产物与 Functions 运行时至 Cloudflare Pages 生产边缘节点（`https://0c4a2ea3.shijianus-blog.pages.dev` / `https://blog.epocanvas.com`）；
   4. 生产域名真实 E2E 审计套件 (`scripts/verify-prod-moments.mjs`) 针对 `https://blog.epocanvas.com/moments/` 审计通过，断言 Console 控制台 0 致命错误、5行折叠展开、九宫格照片墙、标题呼出详情模态框与 URL 锚点全部 PASS。
 
+### Task 111: 朋友圈 (/moments/) QQ 空间沉浸式界面、页面内直接加载说说详情(去弹窗)、精简真实友链与配置化瀑布流
+- [x] **详情界面页面内直接加载 (In-Page View, 杜绝模态弹窗)**：
+  1. 彻底淘汰浮层弹窗 `#moment-detail-modal` 与背景遮罩，主舞台 `#moments-main-stage` 采用双视图内嵌架构；
+  2. 点击说说卡片标题、作者栏、“查看详情”或九宫格图片时，瀑布流 `#moments-stream-view` 平滑隐藏，`#moment-inpage-detail-view` 直接在主页面排版内就地渲染展开；
+  3. 顶部与底部双向配置“← 返回全部动态”快捷导航，并支持 URL Hash (`#moment-{id}`) 双向无刷新同步与直达。
+- [x] **精简友链与数据源净化**：
+  1. 彻底清除 Astro 官方生态、Cloudflare Workers、Tailwind CSS 等框架文档站；
+  2. 仅保留真实独立博友名片与动态（安知鱼、Akilarの糖果屋、Leonus、小康的个人博客等）；
+  3. 友邻朋友圈雷达探测接口同步更新，杜绝非个人博客数据污染。
+- [x] **QQ 空间沉浸式主页美学升级**：
+  1. 顶部 Hero Banner 引入个性化装扮大图 (`friendsConfig.momentsSettings.coverBg`) 与高斯微光扩散；
+  2. 站长头像金色饰环外描边与 👑 空间主人专属认证皇冠；
+  3. 尊贵黄钻 SVIP 身份徽章 (`空间主人 · SVIP`)、实时在线状态雷达脉冲 (`🟢 实时在线 · 专注重构中`) 与个性签名气泡；
+  4. 引入 QQ 空间专属子导航栏：`[💬 说说动态]` · `[📝 博客日志]` · `[📮 交流板]` · `[🤝 友人帐]` 及边缘雷达探测刷新按钮。
+- [x] **去冗余与配置化完整瀑布流**：
+  1. 移除极客传送门串门卡片与分类过滤标签，友邻动态开启后自动按时间戳混排直出；
+  2. 支持 `friendsConfig.momentsSettings` 灵活配置时间范围（`all` / `3d` / `1w` / `1m` / `3m` / `6m` / `1y`）、展示条数上限与置顶优先排序，默认无人工数量截断，加载全量记录。
+- [x] **本地与生产端全流程自动化 Playwright 审计**：
+  1. 本地测试套件 (`scripts/verify-moments-space.mjs`) 全量 12 项检查通过（去弹窗、页面内展开、Hash 直达、发评、返回、搜索等）；
+  2. 部署至 Cloudflare Pages 生产边缘节点并执行线上真实验证。
+
 
 
 

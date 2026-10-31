@@ -160,8 +160,9 @@ export async function getAllMoments(): Promise<MomentItem[]> {
       if (fs.existsSync(dataPath)) {
         const raw = fs.readFileSync(dataPath, 'utf8');
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          syncedFriendMoments = parsed.filter((m: MomentItem) => !m.isOwner);
+        const list = Array.isArray(parsed) ? parsed : (parsed?.items || []);
+        if (Array.isArray(list) && list.length > 0) {
+          syncedFriendMoments = list.filter((m: MomentItem) => !m.isOwner);
         }
       }
     }
@@ -193,7 +194,77 @@ export async function getAllMoments(): Promise<MomentItem[]> {
     }
   }
 
-  return deduplicated;
+  // Apply momentsSettings (timeRange, maxCount, pinnedOnly, autoLoadFriends)
+  return filterMomentsBySettings(deduplicated);
+}
+
+/**
+ * Filter moments stream based on momentsSettings in friendsConfig
+ */
+export function filterMomentsBySettings(items: MomentItem[]): MomentItem[] {
+  const settings = friendsConfig.momentsSettings || {};
+  let result = [...items];
+
+  // 1. If autoLoadFriends is false, keep only owner moments
+  if (settings.autoLoadFriends === false) {
+    result = result.filter((m) => m.isOwner);
+  }
+
+  // 2. If pinnedOnly is true, keep only pinned moments
+  if (settings.pinnedOnly) {
+    result = result.filter((m) => m.pinned);
+  }
+
+  // 3. Time range filter (3d, 1w, 1m, 3m, 6m, 1y, all)
+  if (settings.timeRange && settings.timeRange !== 'all') {
+    const now = Date.now();
+    let msRange = 0;
+    switch (settings.timeRange) {
+      case '3d':
+        msRange = 3 * 86400 * 1000;
+        break;
+      case '1w':
+        msRange = 7 * 86400 * 1000;
+        break;
+      case '1m':
+        msRange = 30 * 86400 * 1000;
+        break;
+      case '3m':
+        msRange = 90 * 86400 * 1000;
+        break;
+      case '6m':
+        msRange = 180 * 86400 * 1000;
+        break;
+      case '1y':
+        msRange = 365 * 86400 * 1000;
+        break;
+    }
+    if (msRange > 0) {
+      const cutoff = now - msRange;
+      result = result.filter((m) => {
+        // Pinned moments always bypass time cutoff
+        if (m.pinned) return true;
+        const ts = new Date(m.timestamp).getTime();
+        return !isNaN(ts) && ts >= cutoff;
+      });
+    }
+  }
+
+  // 4. Sort: pinned first, then newest timestamp first
+  result.sort((a, b) => {
+    if (a.pinned && !b.pinned) return -1;
+    if (!a.pinned && b.pinned) return 1;
+    const timeA = new Date(a.timestamp).getTime() || 0;
+    const timeB = new Date(b.timestamp).getTime() || 0;
+    return timeB - timeA;
+  });
+
+  // 5. Max count limit if configured (default undefined -> unlimited)
+  if (typeof settings.maxCount === 'number' && settings.maxCount > 0) {
+    result = result.slice(0, settings.maxCount);
+  }
+
+  return result;
 }
 
 /**

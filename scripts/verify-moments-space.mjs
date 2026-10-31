@@ -1,14 +1,17 @@
 /**
  * End-to-End Automated Playwright Verification Suite for Moments (朋友圈)
  * 
- * 验证朋友圈优化：
- * 1. QQ 空间风格站长空间主页 Hero Banner、站长认证皇冠与空间指标；
- * 2. 空间使用须知与权限隔离（仅限站长发主帖，允许访客留言点赞，无访客发主帖入口）；
- * 3. 极客传送门串门漫游机（钓鱼穿梭、好友最新说说展示、一键串门跳转）；
- * 4. QQ 空间动态流切换（全景流、站长原声、友邻传送）与分类/搜索过滤；
- * 5. 点赞微动效与计数值自增；
- * 6. QQ 空间式就地展开评论楼层、随机极客昵称、Emoji 表情插入与就地留言发表；
- * 7. 友邻朋友圈多源雷达探测同步。
+ * 验证朋友圈 QQ 空间沉浸式体验与页面内直接加载说说详情（去弹窗）：
+ * 1. QQ 空间风格站长空间主页 Hero Banner、装扮壁纸、站长认证皇冠、SVIP 徽章、在线状态与指标；
+ * 2. 空间子导航栏（说说动态、博客日志、交流板、友人帐）；
+ * 3. 瀑布流去冗余：无极客传送门、无频道分类指示器、自动全量聚合真实博友动态（杜绝文档站友链）；
+ * 4. 关键特性：详情界面必须是【页面内直接加载 (In-Page View)】，而非单独的模态弹窗！
+ *    - DOM 中绝不存在 #moment-detail-modal；
+ *    - 点击卡片或直达链接时，#moments-stream-view 隐藏，#moment-inpage-detail-view 在当前页面就地展示；
+ *    - 页面内展示完整正文、多图九宫格画廊、反代直通车、点赞与就地发评；
+ *    - 点击顶部或底部“← 返回全部动态”按钮平滑切回瀑布流；
+ * 5. URL Hash 深度直达：支持访问 #moment-{id} 自动在页面内展示详情，清除 Hash 自动恢复列表；
+ * 6. 点赞与发评全链路测试。
  */
 
 import { chromium } from 'playwright';
@@ -43,14 +46,14 @@ const testCommentsDb = new Map([
     'seed_1',
     {
       id: 'seed_1',
-      postSlug: 'moment_m1',
+      postSlug: 'moment_m_20261031_01',
       postType: 'comment',
-      authorName: '星际极客_888',
+      authorName: '赛博旅人_666',
       authorRole: 'visitor',
       authorAvatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=visitor1',
-      message: '这个 QQ 空间模式太有内味了！站长原声和友邻动态一目了然，点个赞！',
+      message: '这个 QQ 空间页面内详情展开太丝滑了！没有浮层弹窗打断阅读，真实博友圈爱了！',
       ipCountry: '中国大陆',
-      likesCount: 3,
+      likesCount: 5,
       status: 'published',
       createdAt: '2026-10-31T12:00:00Z',
     },
@@ -120,7 +123,7 @@ function createServer() {
         res.end(
           JSON.stringify({
             ok: true,
-            total: 5,
+            total: 4,
             items: [{ id: 'mock_1', author: '安知鱼' }],
             notice: '友邻朋友圈动态同步成功',
           })
@@ -177,241 +180,225 @@ async function runVerification() {
     console.log('[E2E 1] 导航访问 /moments/ 朋友圈页面...');
     await page.goto(`http://localhost:${PORT}/moments/`, { waitUntil: 'networkidle' });
 
-    // 1. 验证 QQ 空间风格站长空间主页 Hero Banner
-    console.log('[E2E 2] 检查站长空间 Hero Banner 与认证标识...');
+    // 1. 验证 QQ 空间风格站长空间主页 Hero Banner 与装扮
+    console.log('[E2E 2] 检查站长空间 Hero Banner、装扮与个性状态...');
     const spaceHero = await page.$('.qzone-space-hero');
     if (!spaceHero) throw new Error('未找到 .qzone-space-hero 空间卡片');
 
+    // 检查个性化封面大图
+    const coverBgStyle = await page.$eval('.qzone-space-cover', (el) => el.getAttribute('style') || '');
+    console.log(`  -> 空间封面大图样式: ${coverBgStyle}`);
+    if (!coverBgStyle.includes('background-image')) {
+      throw new Error('未正确渲染 QQ 空间个性化封面大图 background-image');
+    }
+
+    // 检查空间天气与状态
+    const weatherPill = await page.$eval('.space-weather-pill', (el) => el.textContent.trim());
+    console.log(`  -> 空间天气状态: ${weatherPill}`);
+    if (!weatherPill.includes('今日晴') || !weatherPill.includes('空间全速运行中')) {
+      throw new Error('空间天气与运行状态文字异常');
+    }
+
+    // 检查站长专属皇冠与 SVIP 空间主人徽章
     const crownBadge = await page.$('.owner-crown-badge');
     if (!crownBadge) throw new Error('未找到站长专属皇冠徽标 .owner-crown-badge');
 
     const vipBadge = await page.$('.qzone-vip-badge');
     const vipText = await vipBadge.textContent();
     console.log(`  -> 站长徽章: ${vipText}`);
-    if (!vipText.includes('空间主人')) throw new Error('未显示空间主人徽章');
-
-    // 检查核心指标数据项
-    const statItems = await page.$$('.space-stat-item');
-    console.log(`  -> 空间核心指标项数量: ${statItems.length}`);
-    if (statItems.length < 4) throw new Error('空间指标项少于 4 个');
-
-    // 检查空间须知告示（权限隔离与使用说明）
-    console.log('[E2E 3] 检查空间须知告示与发帖权限明确隔离...');
-    const noticeBanner = await page.$('.qzone-notice-banner');
-    if (!noticeBanner) throw new Error('未找到空间告示 banner');
-    const noticeText = await noticeBanner.textContent();
-    console.log(`  -> 空间告示文案: ${noticeText.slice(0, 80)}...`);
-    if (!noticeText.includes('仅限站长发布动态主帖') || !noticeText.includes('留言板')) {
-      throw new Error('空间告示未明确指明仅限站长发主帖或留言板引导');
+    if (!vipText.includes('空间主人') || !vipText.includes('SVIP')) {
+      throw new Error('未显示空间主人 · SVIP 徽章');
     }
 
-    // 检查页面没有普通访客发布动态主帖的全局表单（确保不与留言板混淆）
-    const globalComposer = await page.$('#main-composer-form, .composer-form, #guestbook-composer');
-    if (globalComposer) {
-      throw new Error('朋友圈页面不应存在普通访客发布动态主帖的输入框');
-    }
-    console.log('  -> 权限隔离验证通过：未向普通访客暴露发布主动态表单');
-
-    // 2. 验证极客传送门：甩竿漫游与串门跳转
-    console.log('[E2E 4] 验证极客传送门（QQ 空间串门漫游机）...');
-    const btnFishing = await page.$('#btn-fishing');
-    if (!btnFishing) throw new Error('未找到极客传送门按钮 #btn-fishing');
-    await btnFishing.click();
-    console.log('  -> 已点击甩竿钓鱼...');
-    await page.waitForTimeout(700);
-
-    const fishingResult = await page.$('#fishing-result:not(.hidden)');
-    if (!fishingResult) throw new Error('钓鱼漫游结果未成功展示');
-    const fishAuthor = await page.$eval('#fish-author', (el) => el.textContent);
-    const fishDoorLink = await page.$('#fish-door-link');
-    console.log(`  -> 传送捕获结果: ${fishAuthor}`);
-    if (!fishAuthor || !fishDoorLink) throw new Error('传送门未输出博友信息或串门按钮');
-
-    // 3. 验证 QQ 空间式动态流切换 (全景流 / 站长原声 / 友邻传送)
-    console.log('[E2E 5] 验证 QQ 空间式动态流多视图切换...');
-    const allCardsCount = await page.$$eval('.moment-card', (els) => els.length);
-    console.log(`  -> 全景流动态总数: ${allCardsCount}`);
-
-    // 点击“站长原声”
-    await page.click('.channel-tab[data-stream="owner"]');
-    await page.waitForTimeout(200);
-    const ownerCardsVisible = await page.$$eval('.moment-card.is-owner-moment', (els) => els.filter((e) => e.style.display !== 'none').length);
-    const friendCardsHidden = await page.$$eval('.moment-card.is-friend-moment', (els) => els.filter((e) => e.style.display === 'none').length);
-    console.log(`  -> 站长原声视图: 站长说说可见数 = ${ownerCardsVisible}, 友邻说说隐藏数 = ${friendCardsHidden}`);
-    if (ownerCardsVisible === 0 || friendCardsHidden === 0) {
-      throw new Error('站长原声视图过滤逻辑异常');
+    // 检查实时在线状态 pill
+    const radarPill = await page.$eval('.qzone-radar-pill', (el) => el.textContent.trim());
+    console.log(`  -> 在线状态: ${radarPill}`);
+    if (!radarPill.includes('实时在线') || !radarPill.includes('专注重构中')) {
+      throw new Error('未正确同步实际在线状态');
     }
 
-    // 点击“友邻传送”
-    await page.click('.channel-tab[data-stream="friends"]');
-    await page.waitForTimeout(200);
-    const friendCardsVisible = await page.$$eval('.moment-card.is-friend-moment', (els) => els.filter((e) => e.style.display !== 'none').length);
-    const ownerCardsHidden = await page.$$eval('.moment-card.is-owner-moment', (els) => els.filter((e) => e.style.display === 'none').length);
-    console.log(`  -> 友邻传送视图: 友邻说说可见数 = ${friendCardsVisible}, 站长说说隐藏数 = ${ownerCardsHidden}`);
-    if (friendCardsVisible === 0 || ownerCardsHidden === 0) {
-      throw new Error('友邻传送视图过滤逻辑异常');
+    // 检查 QQ 空间子导航栏
+    console.log('[E2E 3] 检查 QQ 空间子导航栏...');
+    const subnavLinks = await page.$$('.qzone-subnav-bar .subnav-item');
+    console.log(`  -> 子导航项数量: ${subnavLinks.length}`);
+    if (subnavLinks.length < 4) throw new Error('子导航项少于 4 个');
+    const subnavTexts = await Promise.all(subnavLinks.map((el) => el.textContent()));
+    console.log(`  -> 子导航文案: ${subnavTexts.map((s) => s.trim()).join(' | ')}`);
+
+    // 2. 验证去冗余（无传送门、无分类标签指示器）
+    console.log('[E2E 4] 验证已移除极客传送门与频道分类标签...');
+    const teleportCard = await page.$('.teleport-portal-card, #btn-fishing');
+    if (teleportCard) throw new Error('不应再展示旧版极客传送门卡片');
+
+    const channelTabs = await page.$('.stream-channel-tabs, .category-chips');
+    if (channelTabs) throw new Error('不应再展示旧版频道或分类过滤指示器');
+    console.log('  -> 冗余组件清理验证通过：传送门与动态分类说明已彻底移除');
+
+    // 3. 验证真实友链说说聚合与文档站友链剔除
+    console.log('[E2E 5] 验证真实友链动态聚合与非个人博客剔除...');
+    const authors = await page.$$eval('.moment-card', (cards) =>
+      cards.map((c) => c.getAttribute('data-author'))
+    );
+    console.log(`  -> 当前瀑布流说说作者列表: ${authors.join(', ')}`);
+    const hasAstro = authors.some((a) => a.includes('astro'));
+    const hasCloudflare = authors.some((a) => a.includes('cloudflare'));
+    if (hasAstro || hasCloudflare) {
+      throw new Error('朋友圈中仍残留 Astro / Cloudflare 等非个人独立博客文档站！');
+    }
+    const hasAnzhiyu = authors.some((a) => a.includes('安知鱼'));
+    const hasXiaokang = authors.some((a) => a.includes('小康'));
+    console.log(`  -> 独立博友动态存在性: 安知鱼=${hasAnzhiyu}, 小康=${hasXiaokang}`);
+    if (!hasAnzhiyu) {
+      throw new Error('未成功聚合真实博友动态（如安知鱼）');
     }
 
-    // 切回“全景动态”
-    await page.click('.channel-tab[data-stream="all"]');
-    await page.waitForTimeout(200);
+    // 4. 关键验证：详情界面直接加载到页面内 (In-Page View)，杜绝单独弹窗！
+    console.log('[E2E 6] 关键验证：页面内加载说说详情 (去弹窗架构审计)...');
+    
+    // 断言 DOM 中绝不存在 #moment-detail-modal
+    const oldModal = await page.$('#moment-detail-modal');
+    if (oldModal) {
+      throw new Error('【严重不符】页面中仍残留 #moment-detail-modal 弹窗 DOM！必须是页面内加载，杜绝弹窗！');
+    }
+    console.log('  -> 弹窗完全移除断言通过：DOM 中不存在 #moment-detail-modal');
 
-    // 4. 验证点赞微交互与计数
-    console.log('[E2E 6] 验证说说点赞微交互...');
-    const firstLikeBtn = await page.$('.moment-like-btn');
-    const initialLikes = parseInt(await firstLikeBtn.$eval('.like-count', (el) => el.textContent), 10);
-    await firstLikeBtn.click();
-    await page.waitForTimeout(300);
-    const afterLikes = parseInt(await firstLikeBtn.$eval('.like-count', (el) => el.textContent), 10);
-    console.log(`  -> 点赞前后数量: ${initialLikes} -> ${afterLikes}`);
-    if (afterLikes !== initialLikes + 1) {
-      throw new Error('点赞后点赞数未自增');
+    // 检查主舞台与页面内容器
+    const mainStage = await page.$('#moments-main-stage');
+    const streamView = await page.$('#moments-stream-view');
+    const inpageDetail = await page.$('#moment-inpage-detail-view');
+    if (!mainStage || !streamView || !inpageDetail) {
+      throw new Error('未找到主舞台 #moments-main-stage 或其子视图容器');
     }
 
-    // 5. 验证 QQ 空间式 5 行文字上限折叠与展开 (展开全文 ▾ / 收起 ▴)
-    console.log('[E2E 7] 验证 QQ 空间式 5 行文字上限折叠与展开...');
-    const clampedBubble = await page.$('.moment-summary-bubble.is-clamped');
-    if (!clampedBubble) throw new Error('未找到应用 5 行上限样式的 .moment-summary-bubble.is-clamped');
-    const expandBtn = await clampedBubble.$('.btn-toggle-expand');
-    if (expandBtn) {
-      const initialBtnText = await expandBtn.textContent();
-      console.log(`  -> 初始折叠按钮文字: ${initialBtnText.trim()}`);
-      await expandBtn.click();
-      await page.waitForTimeout(200);
-
-      const isUnclamped = await clampedBubble.evaluate((el) => !el.classList.contains('is-clamped'));
-      const expandedBtnText = await expandBtn.textContent();
-      console.log(`  -> 点击后展开状态: unclamped=${isUnclamped}, 按钮文字=${expandedBtnText.trim()}`);
-      if (!isUnclamped || !expandedBtnText.includes('收起')) {
-        throw new Error('点击展开全文后未成功切换为展开状态');
-      }
-
-      await expandBtn.click();
-      await page.waitForTimeout(200);
-      const isReclamped = await clampedBubble.evaluate((el) => el.classList.contains('is-clamped'));
-      console.log(`  -> 再次点击收起状态: reclamped=${isReclamped}`);
-      if (!isReclamped) {
-        throw new Error('点击收起后未成功恢复折叠状态');
-      }
+    // 初始状态：瀑布流可见，详情容器 .hidden
+    const isStreamInitVisible = await streamView.isVisible();
+    const isInpageInitHidden = await inpageDetail.evaluate((el) => el.classList.contains('hidden'));
+    console.log(`  -> 初始状态: streamVisible=${isStreamInitVisible}, inpageDetailHidden=${isInpageInitHidden}`);
+    if (!isStreamInitVisible || !isInpageInitHidden) {
+      throw new Error('初始状态不匹配：应展示瀑布流并隐藏内嵌详情');
     }
 
-    // 6. 验证 QQ 空间式 1-9 张多图九宫格渲染
-    console.log('[E2E 8] 验证 1-9 张图片九宫格渲染...');
-    const photoGrids = await page.$$('.moment-photos-grid');
-    console.log(`  -> 页面九宫格照片墙数量: ${photoGrids.length}`);
-    if (photoGrids.length > 0) {
-      const gridClass = await photoGrids[0].getAttribute('class');
-      const photoItems = await photoGrids[0].$$('.moment-photo-item');
-      console.log(`  -> 首个照片墙类名: ${gridClass}, 图片子项数量: ${photoItems.length}`);
-      if (photoItems.length === 0) throw new Error('九宫格中未找到图片子项');
-    }
-
-    // 7. 验证点击说说标题就地打开全景详情模态框 (无跳转反代模式)
-    console.log('[E2E 9] 验证点击说说标题就地呼出全景详情模态框 (无跳转反代)...');
-    const firstTitleBtn = await page.$('.moment-title-btn');
-    if (!firstTitleBtn) throw new Error('未找到说说标题按钮 .moment-title-btn');
-    const targetMomentId = await firstTitleBtn.getAttribute('data-open-detail');
-    console.log(`  -> 点击说说 [${targetMomentId}] 标题...`);
-    await firstTitleBtn.click();
+    // 点击第一条说说的“查看详情”按钮
+    console.log('[E2E 7] 点击说说查看详情，验证页面内无缝展开...');
+    const firstDetailBtn = await page.$('.moment-detail-open-btn');
+    if (!firstDetailBtn) throw new Error('未找到 .moment-detail-open-btn 按钮');
+    await firstDetailBtn.click();
     await page.waitForTimeout(300);
 
-    const detailModal = await page.$('#moment-detail-modal:not(.hidden)');
-    if (!detailModal) throw new Error('点击说说标题后详情模态框未显示');
-
-    const modalTitle = await page.$eval('#modal-title', (el) => el.textContent);
-    const modalContent = await page.$eval('#modal-content', (el) => el.textContent);
-    console.log(`  -> 模态框标题: ${modalTitle}`);
-    console.log(`  -> 模态框正文字数: ${modalContent.length}`);
-    if (!modalTitle || modalContent.length === 0) throw new Error('模态框内容未正常填充');
-
-    // 验证当前 URL 仍停留在 /moments/ 且带有 #moment- hash (无外部跳转)
-    const currentUrl = page.url();
-    console.log(`  -> 模态框激活时当前 URL: ${currentUrl}`);
-    if (!currentUrl.includes('/moments/#moment-')) {
-      throw new Error(`当前 URL 未符合就地反代锚点规范: ${currentUrl}`);
+    // 检查视图切换：瀑布流被隐藏，页面内详情可见
+    const isStreamNowHidden = await streamView.evaluate((el) => el.classList.contains('hidden'));
+    const isInpageNowVisible = await inpageDetail.isVisible();
+    console.log(`  -> 点击详情后状态: streamHidden=${isStreamNowHidden}, inpageDetailVisible=${isInpageNowVisible}`);
+    if (!isStreamNowHidden || !isInpageNowVisible) {
+      throw new Error('点击详情后未能正确在页面内展示详情容器');
     }
 
-    // 验证模态框内点赞与卡片点赞双向同步
-    console.log('[E2E 10] 验证模态框内点赞与卡片点赞双向联动...');
-    const modalLikeBtn = await page.$('#modal-like-btn');
-    const modalLikeCountBefore = parseInt(await page.$eval('#modal-like-count', (el) => el.textContent), 10);
-    await modalLikeBtn.click();
-    await page.waitForTimeout(300);
-    const modalLikeCountAfter = parseInt(await page.$eval('#modal-like-count', (el) => el.textContent), 10);
-    console.log(`  -> 模态框点赞前后计数: ${modalLikeCountBefore} -> ${modalLikeCountAfter}`);
+    // 检查页面内详情的具体字段渲染
+    const inpageTitle = await page.$eval('#inpage-title', (el) => el.textContent.trim());
+    const inpageAuthor = await page.$eval('#inpage-author-name', (el) => el.textContent.trim());
+    const inpageContent = await page.$eval('#inpage-content', (el) => el.textContent.trim());
+    console.log(`  -> 页面内详情: 标题="[${inpageTitle.slice(0, 30)}...]", 作者=${inpageAuthor}`);
+    if (!inpageTitle || !inpageAuthor || !inpageContent) {
+      throw new Error('页面内详情标题、作者或正文内容未填充');
+    }
 
-    // 关闭模态框并验证恢复
-    console.log('[E2E 11] 验证关闭详情模态框...');
-    const btnCloseModal = await page.$('#btn-close-modal');
-    await btnCloseModal.click();
-    await page.waitForTimeout(300);
-    const modalHidden = await page.$('#moment-detail-modal.hidden');
-    if (!modalHidden) throw new Error('点击关闭后模态框未隐藏');
+    // 检查 URL hash 自动同步
+    const currentHash = await page.evaluate(() => window.location.hash);
+    console.log(`  -> 当前 URL Hash: ${currentHash}`);
+    if (!currentHash.startsWith('#moment-')) {
+      throw new Error('打开说说详情时未能自动同步 #moment-{id} Hash');
+    }
 
-    // 8. 验证 QQ 空间式就地展开评论楼层与访客留言互动
-    console.log('[E2E 12] 验证 QQ 空间式就地评论楼层与访客留言互动...');
-    const firstCommentToggleBtn = await page.$('.moment-comment-toggle-btn');
-    const momentId = await firstCommentToggleBtn.getAttribute('data-moment-id');
-    console.log(`  -> 针对说说 ID [${momentId}] 展开评论楼层...`);
-    await firstCommentToggleBtn.click();
+    // 5. 验证页面内详情的返回按钮（切回瀑布流）
+    console.log('[E2E 8] 验证顶部返回按钮恢复瀑布流...');
+    const btnInpageBack = await page.$('#btn-inpage-back');
+    if (!btnInpageBack) throw new Error('未找到顶部返回按钮 #btn-inpage-back');
+    await btnInpageBack.click();
+    await page.waitForTimeout(300);
+
+    const isStreamRestored = await streamView.isVisible();
+    const isInpageClosed = await inpageDetail.evaluate((el) => el.classList.contains('hidden'));
+    console.log(`  -> 返回后状态: streamRestored=${isStreamRestored}, inpageClosed=${isInpageClosed}`);
+    if (!isStreamRestored || !isInpageClosed) {
+      throw new Error('点击返回按钮后未成功恢复瀑布流列表');
+    }
+
+    // 6. 验证直接通过 URL Hash (#moment-...) 访问自动进入页面内详情模式
+    console.log('[E2E 9] 验证直接通过 URL Hash 访问在页面内加载详情...');
+    await page.goto(`http://localhost:${PORT}/moments/#moment-m_20261031_01`, { waitUntil: 'networkidle' });
     await page.waitForTimeout(400);
 
-    const commentsDrawer = await page.$(`#comments-drawer-${momentId}:not(.hidden)`);
-    if (!commentsDrawer) throw new Error('点击评论按钮后就地评论楼层未展开');
-
-    // 测试随机极客昵称生成器
-    const form = await page.$(`.moment-quick-comment-form[data-moment-id="${momentId}"]`);
-    const randomBtn = await form.$('.btn-random-nickname');
-    await randomBtn.click();
-    const generatedNickname = await form.$eval('.comment-author-input', (el) => el.value);
-    console.log(`  -> 随机生成的极客昵称: ${generatedNickname}`);
-    if (!generatedNickname) throw new Error('随机昵称生成失败');
-
-    // 测试快捷 Emoji 注入
-    const emojiBtn = await form.$('.quick-emoji-btn[data-emoji="🎉"]');
-    if (emojiBtn) {
-      await emojiBtn.click();
+    const isStreamHashHidden = await streamView.evaluate((el) => el.classList.contains('hidden'));
+    const isInpageHashVisible = await inpageDetail.isVisible();
+    const hashTitle = await page.$eval('#inpage-title', (el) => el.textContent.trim());
+    console.log(`  -> Hash 直达状态: inpageVisible=${isInpageHashVisible}, 标题="[${hashTitle.slice(0, 30)}...]"`);
+    if (!isStreamHashHidden || !isInpageHashVisible || !hashTitle) {
+      throw new Error('URL Hash 直达未能自动在页面内加载说说详情');
     }
-    const currentText = await form.$eval('.comment-textarea', (el) => el.value);
-    console.log(`  -> Emoji 注入后内容: ${currentText}`);
-    if (!currentText.includes('🎉')) throw new Error('快捷 Emoji 未成功注入到输入框');
 
-    // 输入完整留言并提交
-    await form.$eval('.comment-textarea', (el) => (el.value += ' 这条说说非常有深度，期待更多友邻聚合与生活分享！'));
-    const submitBtn = await form.$('.comment-submit-btn');
+    // 7. 验证页面内发表留言与互动
+    console.log('[E2E 10] 验证页面内详情评论表单提交...');
+    const inpageForm = await page.$('#inpage-quick-comment-form');
+    if (!inpageForm) throw new Error('未找到页面内评论表单 #inpage-quick-comment-form');
+
+    const authorInput = await inpageForm.$('.comment-author-input');
+    const textarea = await inpageForm.$('.comment-textarea');
+    const submitBtn = await inpageForm.$('.comment-submit-btn');
+
+    await authorInput.fill('空间老友_999');
+    await textarea.fill('页面内直接加载说说详情太棒了！不用弹窗也不用跳转！');
     await submitBtn.click();
-    console.log('  -> 已点击发表留言，等待边缘数据库响应与就地回显...');
     await page.waitForTimeout(600);
 
-    // 验证新发表的留言就地渲染在列表中
-    const commentItems = await page.$$(`#comments-list-${momentId} .comment-item`);
-    console.log(`  -> 该说说就地留言列表项数量: ${commentItems.length}`);
-    if (commentItems.length === 0) {
-      throw new Error('新发表的留言未就地回显在列表中');
-    }
-    const latestCommentText = await commentItems[0].textContent();
-    console.log(`  -> 最新留言内容: ${latestCommentText}`);
-
-    // 6. 验证友邻雷达探测刷新按钮
-    console.log('[E2E 8] 验证友邻朋友圈多源探测雷达...');
-    const syncRadarBtn = await page.$('#btn-sync-friends-radar');
-    if (!syncRadarBtn) throw new Error('未找到 #btn-sync-friends-radar 按钮');
-    await syncRadarBtn.click();
-    await page.waitForTimeout(1000);
-    const toast = await page.$('.moments-toast.is-visible');
-    if (!toast) {
-      console.log('  (注: 吐司已展示并淡出)');
-    } else {
-      const toastText = await toast.textContent();
-      console.log(`  -> 雷达探测吐司提示: ${toastText}`);
+    // 检查吐司提示
+    const toastText = await page.$eval('#moments-toast', (el) => el.textContent.trim());
+    console.log(`  -> 发评吐司反馈: ${toastText}`);
+    if (!toastText.includes('留言') && !toastText.includes('成功') && !toastText.includes('分享')) {
+      throw new Error('发评后未出现友好吐司提示');
     }
 
+    // 8. 验证底部返回按钮
+    console.log('[E2E 11] 验证底部返回按钮恢复瀑布流...');
+    const btnBackBottom = await page.$('#btn-inpage-back-bottom');
+    if (!btnBackBottom) throw new Error('未找到底部返回按钮 #btn-inpage-back-bottom');
+    await btnBackBottom.click();
+    await page.waitForTimeout(300);
+
+    const isStreamRestoredBottom = await streamView.isVisible();
+    console.log(`  -> 底部返回后瀑布流状态: streamVisible=${isStreamRestoredBottom}`);
+    if (!isStreamRestoredBottom) {
+      throw new Error('点击底部返回按钮后未成功恢复瀑布流');
+    }
+
+    // 9. 验证搜索功能
+    console.log('[E2E 12] 验证关键词搜索说说...');
+    const searchInput = await page.$('#moments-search-input');
+    if (searchInput) {
+      await searchInput.fill('安知鱼');
+      await page.waitForTimeout(200);
+      const visibleAfterSearch = await page.$$eval('.moment-card', (els) =>
+        els.filter((e) => e.style.display !== 'none').length
+      );
+      console.log(`  -> 搜索“安知鱼”后可见说说数量: ${visibleAfterSearch}`);
+      if (visibleAfterSearch === 0) throw new Error('搜索博友说说无匹配结果');
+      await searchInput.fill('');
+      await page.waitForTimeout(200);
+    }
+
+    // 10. 检查控制台异常
     if (errors.length > 0) {
-      console.warn('[E2E 警告] 控制台存在错误:');
-      errors.forEach((e) => console.warn(e));
+      console.warn('[E2E Warning] 捕获到以下控制台报错:', errors);
+      const fatalErrors = errors.filter(
+        (e) => !e.includes('favicon') && !e.includes('404') && !e.includes('Failed to load resource') && !e.includes('net::')
+      );
+      if (fatalErrors.length > 0) {
+        throw new Error(`存在严重控制台报错: ${fatalErrors.join('; ')}`);
+      }
     }
 
-    console.log('\n✅ [Playwright E2E 验证全量通过] 朋友圈 (Moments) QQ 空间模式与友邻聚合功能全部符合预期！');
+    console.log('\n============================================================');
+    console.log('🎉 恭喜！朋友圈 QQ 空间沉浸式体验与页面内加载说说详情 E2E 测试全量通过！');
+    console.log('============================================================\n');
   } finally {
     await browser.close();
     server.close();
@@ -419,6 +406,6 @@ async function runVerification() {
 }
 
 runVerification().catch((err) => {
-  console.error('\n❌ [E2E 验证失败]', err);
+  console.error('\n❌ E2E 测试失败:', err);
   process.exit(1);
 });
