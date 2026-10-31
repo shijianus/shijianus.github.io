@@ -6,7 +6,7 @@
 import { chromium } from 'playwright';
 
 const PROD_URL = 'https://blog.epocanvas.com/moments/';
-const DEPLOY_URL = 'https://51a65864.shijianus-blog.pages.dev/moments/';
+const DEPLOY_URL = 'https://0c4a2ea3.shijianus-blog.pages.dev/moments/';
 
 async function verifyLiveMoments() {
   console.log(`[Prod E2E] 正在启动无头浏览器访问生产端: ${PROD_URL}...`);
@@ -117,6 +117,48 @@ async function verifyLiveMoments() {
     await randomBtn.click();
     const nickname = await form.$eval('.comment-author-input', (el) => el.value);
     console.log(`  -> 随机昵称生成: ${nickname}`);
+
+    // 6. 验证 5 行上限折叠展开、九宫格照片墙与就地全景详情模态框 (无跳转反代模式)
+    console.log('[Prod E2E 6] 验证 5 行上限折叠展开与九宫格照片墙...');
+    const clampedBubble = await page.$('.moment-summary-bubble.is-clamped');
+    if (clampedBubble) {
+      const toggleBtn = await clampedBubble.$('.btn-toggle-expand');
+      if (toggleBtn) {
+        await toggleBtn.click();
+        await page.waitForTimeout(200);
+        console.log('  -> 5 行折叠展开交互成功！');
+        await toggleBtn.click();
+        await page.waitForTimeout(200);
+      }
+    }
+
+    const photoGrids = await page.$$('.moment-photos-grid');
+    console.log(`  -> 生产端多图照片墙数量: ${photoGrids.length}`);
+
+    console.log('[Prod E2E 7] 验证点击说说标题就地呼出全景详情模态框 (无外部跳转)...');
+    const firstTitleBtn = await page.$('.moment-title-btn');
+    if (firstTitleBtn) {
+      await firstTitleBtn.click();
+      await page.waitForTimeout(400);
+
+      const detailModal = await page.$('#moment-detail-modal:not(.hidden)');
+      if (!detailModal) throw new Error('生产端点击说说标题后模态框未显示');
+
+      const modalTitle = await page.$eval('#modal-title', (el) => el.textContent);
+      console.log(`  -> 生产端模态框详情标题: ${modalTitle}`);
+      console.log(`  -> 生产端模态框当前 URL: ${page.url()}`);
+
+      if (!page.url().includes('/moments/#moment-')) {
+        throw new Error(`生产端当前 URL 未符合就地反代锚点: ${page.url()}`);
+      }
+
+      const btnCloseModal = await page.$('#btn-close-modal');
+      if (btnCloseModal) {
+        await btnCloseModal.click();
+        await page.waitForTimeout(300);
+        console.log('  -> 生产端详情模态框顺利关闭并恢复背景！');
+      }
+    }
 
     if (errors.length > 0) {
       console.warn('[Prod E2E 警告] 控制台消息:');
